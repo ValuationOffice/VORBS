@@ -6,11 +6,12 @@ using System.Web.Mvc;
 
 namespace VORBS.Controllers
 {
-    public class HomeController : Controller
+    public class ManageBookingController : Controller
     {
+        // GET: ManageBooking
         public ActionResult Index()
         {
-            return RedirectToAction("Index", "MyBooking");
+            return View();
         }
     }
 }
