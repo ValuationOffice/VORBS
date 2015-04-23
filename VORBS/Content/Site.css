@@ -1,5 +1,5 @@
 ﻿body {
-    padding-top: 50px;
+    padding-top: 100px;
     padding-bottom: 20px;
 }
 
@@ -21,4 +21,35 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+#logo_text{
+    width: 400px;
+}
+
+#logo_text #logoBanner{
+    background-color: #008770;
+    width: 5px;
+    height: 55px;
+    float: left;
+}
+
+#logo_text h1, #logo_text h1 a, #logo_text h1 a:hover {
+    padding: 0 0 0 0;
+    color: #FFF;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    font-size: 25px;
+}
+
+.navbar-nav{  
+    margin-top: 15px;
+}
+
+.navbar-nav li{
+    text-align: center;
+    width: 170px;
+    border: 1px;
+    border-style: solid;
+    border-color:  #008770;
 }
