@@ -1,7 +1,6 @@
 ﻿newBooking.controller('NewBookingController', ['$scope', '$http', '$resource', NewBookingController]);
 
 function NewBookingController($scope, $http, $resource) {
-    debugger;
     CreateServices($resource);
     
     $scope.locations = Locations.query({});

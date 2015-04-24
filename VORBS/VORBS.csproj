@@ -948,6 +948,8 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\MyBookings\moduleManager.js" />
+    <Content Include="Scripts\MyBookings\myBookingsController.js" />
     <Content Include="Scripts\NewBooking\moduleManager.js" />
     <Content Include="Scripts\NewBooking\newBookingController.js" />
     <Content Include="Scripts\respond.js" />
@@ -975,7 +977,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Scripts\MyBookings\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

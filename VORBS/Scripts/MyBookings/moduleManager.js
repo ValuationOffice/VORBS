@@ -1,0 +1,1 @@
+﻿var myBookings = angular.module('myBookings', ['ngResource']);

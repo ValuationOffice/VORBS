@@ -1,7 +1,21 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "My Bookings";
 }
+<div ng-app="myBookings">
+    <div id="controllerDiv" ng-controller="MyBookingsController">
 
-<h2>My Bookings</h2>
+        <h2>My Bookings</h2>
 
+        {{ name }}
+
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/angular-resource.min.js"></script>
+
+    <script src="~/Scripts/MyBookings/moduleManager.js"></script>
+    <script src="~/Scripts/MyBookings/myBookingsController.js"></script>
+
+}
