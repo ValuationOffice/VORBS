@@ -10,7 +10,7 @@ namespace VORBS.Controllers
     {
         public ActionResult Index()
         {
-            return RedirectToAction("Index", "MyBooking");
+            return RedirectToAction("Index", "MyBookings");
         }
     }
 }

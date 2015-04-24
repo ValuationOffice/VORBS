@@ -130,8 +130,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ManageBookingController.cs" />
-    <Compile Include="Controllers\MyBookingController.cs" />
+    <Compile Include="Controllers\ManageBookingsController.cs" />
+    <Compile Include="Controllers\MyBookingsController.cs" />
     <Compile Include="Controllers\NewBookingController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -969,12 +969,13 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\NewBooking\Index.cshtml" />
-    <Content Include="Views\MyBooking\Index.cshtml" />
-    <Content Include="Views\ManageBooking\Index.cshtml" />
+    <Content Include="Views\MyBookings\Index.cshtml" />
+    <Content Include="Views\ManageBookings\Index.cshtml" />
     <Content Include="Scripts\version.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Scripts\MyBookings\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

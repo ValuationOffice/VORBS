@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace VORBS.Controllers
 {
-    public class ManageBookingController : Controller
+    public class ManageBookingsController : Controller
     {
         // GET: ManageBooking
         public ActionResult Index()
