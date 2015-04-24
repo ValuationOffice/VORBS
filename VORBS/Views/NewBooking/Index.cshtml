@@ -2,51 +2,45 @@
 @{
     ViewBag.Title = "New Booking";
 }
-<link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
+<div ng-app="newBooking">
+    <div ng-controller="NewBookingController">
+        <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
 
-<h2>New Booking</h2>
+        <h2>New Booking</h2>
 
-<select class=".form-control">
-    <option>CEO</option>
-    <option>Worthing</option>
-    <option>Leeds</option>
-    <option>Leicester</option>
-    <option>Thurrock</option>
-</select>
+        <select ng-options="location.name for location in locations" ng-model="currentLocation"></select>
+        <select ng-options="room for room in currentLocation.rooms" ng-model="currentRoom"></select>
 
-<select>
-    <option>MR1</option>
-    <option>MR2</option>
-    <option>MR3</option>
-    <option>MR4</option>
-    <option>MR5</option>
-</select>
+        <div id="calendar"></div>
 
+        @section scripts{
+            <script src="~/Scripts/moment.js"></script>
 
+            <script src="~/Scripts/angular.min.js"></script>
+            <script src="~/Scripts/angular-resource.min.js"></script>
+            <script src="~/Scripts/NewBooking/moduleManager.js"></script>
+            <script src="~/Scripts/NewBooking/newBookingController.js"></script>
 
-
-<div id="calendar"></div>
-
-@section scripts{
-<script src="~/Scripts/moment.js"></script>
-<script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
-<script>
-    $(function () {
-        $('#calendar').fullCalendar({
-            weekends: false,
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek,agendaDay'
-            },
-            events: [
-			    {
-			        title: 'Reece Bedding',
-			        start: '2015-04-13T07:00:00',
-			        end: '2015-04-13T10:30:00'
-			    }
-            ]
-        });
-    })
-</script>
-}
+            <script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
+            <script>
+                $(function () {
+                    $('#calendar').fullCalendar({
+                        weekends: false,
+                        header: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'month,agendaWeek,agendaDay'
+                        },
+                        events: [
+                            {
+                                title: 'Reece Bedding',
+                                start: '2015-04-13T07:00:00',
+                                end: '2015-04-13T10:30:00'
+                            }
+                        ]
+                    });
+                })
+            </script>
+        }
+    </div>
+</div>
