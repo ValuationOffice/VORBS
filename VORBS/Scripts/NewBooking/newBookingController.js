@@ -33,7 +33,7 @@ function InitiateCalendar() {
             events: function (start, end, timezone, callback) {
                 var $scope = angular.element($("#controllerDiv")).scope();
                 $.ajax({
-                    url: '/api/bookings?' + 'start=' + moment.utc(start, "DD-MM-YYYY").format("MM-DD-YYYY") + '&end=' + moment.utc(end, "DD-MM-YYYY").format("MM-DD-YYYY") + '&room=' + $scope.currentRoom,
+                    url: '/api/bookings/' + moment.utc(start, "DD-MM-YYYY").format("MM-DD-YYYY") + '/' + moment.utc(end, "DD-MM-YYYY").format("MM-DD-YYYY") + '/' + $scope.currentRoom,
                     dataType: 'json',
                     type: 'POST',
                     contentType: 'application/json; charset=utf-8',
