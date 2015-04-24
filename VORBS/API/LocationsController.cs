@@ -8,8 +8,8 @@ using VORBS.Models;
 
 namespace VORBS.API
 {
-    [RoutePrefix("api/location")]
-    public class LocationController : ApiController
+    [RoutePrefix("api/locations")]
+    public class LocationsController : ApiController
     {
         [HttpGet]
         [Route("")]

@@ -3,7 +3,7 @@
     ViewBag.Title = "New Booking";
 }
 <div ng-app="newBooking">
-    <div ng-controller="NewBookingController">
+    <div id="controllerDiv" ng-controller="NewBookingController">
         <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
 
         <h2>New Booking</h2>
@@ -22,25 +22,6 @@
             <script src="~/Scripts/NewBooking/newBookingController.js"></script>
 
             <script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
-            <script>
-                $(function () {
-                    $('#calendar').fullCalendar({
-                        weekends: false,
-                        header: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'month,agendaWeek,agendaDay'
-                        },
-                        events: [
-                            {
-                                title: 'Reece Bedding',
-                                start: '2015-04-13T07:00:00',
-                                end: '2015-04-13T10:30:00'
-                            }
-                        ]
-                    });
-                })
-            </script>
         }
     </div>
 </div>
