@@ -144,6 +144,11 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\BootStrapDatePicker\datepicker.css" />
+    <Content Include="Content\BootStrapDatePicker\datepicker3.css" />
+    <Content Include="Content\BootStrapTimePicker\bootstrap-responsive.css" />
+    <Content Include="Content\BootStrapTimePicker\bootstrap-timepicker.css" />
+    <Content Include="Content\BootStrapTimePicker\bootstrap-timepicker.min.css" />
     <Content Include="Content\fullcalendar\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar\fullcalendar.print.css" />
     <Content Include="Content\images\voaLogo.jpg" />
@@ -186,6 +191,9 @@
     <Content Include="Scripts\angular-sanitize.min.js.map" />
     <Content Include="Scripts\angular-touch.min.js.map" />
     <Content Include="Scripts\angular.min.js.map" />
+    <Content Include="Scripts\BootStrapDatePicker\bootstrap-datepicker.js" />
+    <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.js" />
+    <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.min.js" />
     <Content Include="Scripts\errors.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\FullCalandar\fullcalendar.min.js" />
@@ -952,6 +960,7 @@
     <Content Include="Scripts\MyBookings\myBookingsController.js" />
     <Content Include="Scripts\NewBooking\moduleManager.js" />
     <Content Include="Scripts\NewBooking\newBookingController.js" />
+    <Content Include="Scripts\NewBooking\newBookingController_calendar.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
@@ -970,10 +979,11 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-    <Content Include="Views\NewBooking\Index.cshtml" />
+    <Content Include="Views\NewBooking\Index_calendar.cshtml" />
     <Content Include="Views\MyBookings\Index.cshtml" />
     <Content Include="Views\ManageBookings\Index.cshtml" />
     <Content Include="Scripts\version.json" />
+    <Content Include="Views\NewBooking\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
