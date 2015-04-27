@@ -57,3 +57,7 @@ textarea {
 #calendarContainer{
     margin-top: 20px;
 }
+
+#calendar{
+    width: 800px;
+}
