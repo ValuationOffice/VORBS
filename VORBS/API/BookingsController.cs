@@ -32,7 +32,7 @@ namespace VORBS.API
             return new List<Booking>() { new Booking() { Location = location, EndDate = date.AddDays(2), Owner = "Reece Bedding", StartDate = date, Room = "MR2" } };
         }
 
-        [Route("{start:DateTime}/{end:DateTime}/{room}")]
+        [Route("{start:DateTime}/{end:DateTime}/{room:int}")]
         [HttpPost]
         public List<Booking> GetRoomBookingsForRoom(Location location, DateTime start, DateTime end, string room)
         {
@@ -75,8 +75,8 @@ namespace VORBS.API
         }
 
         [Route("{start:DateTime}/{end:DateTime}/{person}")]
-        [HttpPost]
-        public List<Booking> GetRoomBookingsForPerson(DateTime start, DateTime end, string room, string person)
+        [HttpGet]
+        public List<Booking> GetRoomBookingsForPerson(DateTime start, DateTime end, string person)
         {
             List<Booking> bookings = new List<Booking>()
             {
