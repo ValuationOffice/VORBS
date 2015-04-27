@@ -53,3 +53,7 @@ textarea {
     border-style: solid;
     border-color:  #008770;
 }
+
+#calendarContainer{
+    margin-top: 20px;
+}

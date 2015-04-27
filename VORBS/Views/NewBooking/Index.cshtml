@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "New Booking";
 }
 <div ng-app="newBooking">
@@ -7,12 +6,23 @@
         <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
 
         <h2>New Booking</h2>
-
-        <select ng-options="location.name for location in locations" ng-model="currentLocation"></select>
-        <select ng-options="room for room in currentLocation.rooms" ng-model="currentRoom"></select>
-
-        <div id="calendar"></div>
-
+        <div class="form-inline">
+            <div class="form-group">
+                <span class="glyphicon glyphicon-filter btn-lg"></span>
+                <div class="input-group">
+                    <label class="col-sm-2 control-label">Location</label>
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="currentLocation"></select>
+                </div>
+                <div class="input-group">
+                    <label class="col-sm-2 control-label">Room</label>
+                    <select class="form-control" ng-options="room for room in currentLocation.rooms" ng-model="currentRoom"></select>
+                </div>
+            </div>
+            <hr/>
+            <div class="form-group" id="calendarContainer">
+                <div id="calendar"></div>
+            </div>
+        </div>
         @section scripts{
             <script src="~/Scripts/moment.js"></script>
 
