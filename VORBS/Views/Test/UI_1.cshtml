@@ -1,7 +1,62 @@
-﻿
-@{
-    ViewBag.Title = "UI_1";
-}
-
+﻿<div>
+    @{
+        ViewBag.Title = "UI_1";
+    }
+</div>
+<link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
 <h2>UI_1</h2>
 
+<form>
+        <div class="form-group">
+            <div class="input-group">
+                <label class="control-label">Location:</label>
+                <select class="form-control">
+                    <option value="Default">Select a Location</option>
+                    <option value="Worthing">Worthing</option>
+                    <option value="CEO">CEO</option>
+                    <option value="Kent">Kent</option>
+                    <option value="Leicester">Leicester</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <label class="control-label">Date</label>
+                    <input class="form-control datepicker" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group-sm">
+                    <label class="control-label">Number of People</label>
+                    <input class="form-control" type="number" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <label class="control-label">Smart Room:</label>
+                    <label class="radio-inline"><input type="radio" name="inlineRadioOptions" value="option1" />No</label>
+                    <label class="radio-inline"><input type="radio" name="inlineRadioOptions" value="option2" />Yes</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <label class="control-label">Special Requirements</label>
+                    <textarea class="form-control" rows="3" ></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-primary">Next</button>
+            </div>
+        </div>
+</form>
+
+@section scripts{
+<script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+    <script>
+        $('.datepicker').datepicker({
+            format: 'dd-mm-yyyy',
+            autoClose: true,
+            todayBtn: true,
+            todayHighlight:true
+        });
+    </script>
+    }
