@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace VORBS.Models
+namespace VORBS.Models.DTOs
 {
-    public class Booking
+    public class BookingDTO
     {
         public int ID { get; set; }
-        public int RoomID { get; set; }
 
         public string Owner { get; set; }
-
-        public Room Room { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

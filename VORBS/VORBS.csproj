@@ -45,6 +45,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -129,15 +136,23 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\EntityReferenceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageBookingsController.cs" />
     <Compile Include="Controllers\MyBookingsController.cs" />
     <Compile Include="Controllers\NewBookingController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="DAL\VORBSContext.cs" />
+    <Compile Include="DAL\VORBSInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Booking.cs" />
+    <Compile Include="Models\DTOs\BookingDTO.cs" />
+    <Compile Include="Models\DTOs\LocationDTO.cs" />
+    <Compile Include="Models\DTOs\RoomDTO.cs" />
     <Compile Include="Models\Location.cs" />
+    <Compile Include="Models\Room.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\CustomHelpers.cs" />
   </ItemGroup>
@@ -968,8 +983,8 @@
     <Content Include="Scripts\MyBookings\moduleManager.js" />
     <Content Include="Scripts\MyBookings\myBookingsController.js" />
     <Content Include="Scripts\NewBooking\moduleManager.js" />
-    <Content Include="Scripts\NewBooking\newBookingController_2.js" />
     <Content Include="Scripts\NewBooking\newBookingController.js" />
+    <Content Include="Scripts\NewBooking\newBookingController_2.js" />
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
@@ -989,11 +1004,14 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-    <Content Include="Views\NewBooking\Index.cshtml" />
+    <Content Include="Views\NewBooking\Index_old.cshtml" />
     <Content Include="Views\MyBookings\Index.cshtml" />
     <Content Include="Views\ManageBookings\Index.cshtml" />
     <Content Include="Scripts\version.json" />
-    <Content Include="Views\NewBooking\Index_2.cshtml" />
+    <Content Include="Views\NewBooking\Index.cshtml" />
+    <Content Include="Views\Test\UI_1.cshtml" />
+    <Content Include="Views\Test\UI_2.cshtml" />
+    <Content Include="Views\Test\UI_3.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
