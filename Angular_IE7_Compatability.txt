@@ -1,5 +1,11 @@
 This works in the current state of the project as of 30-04-2015, it is a workaround and i highly suggest we do not implement it as it is for ie7 and requires using old versions of frameworks.
 
+Disable sceProvider for module
+eg: var myBookings = angular.module('myBookings', ['ngResource']).config(function ($sceProvider) {
+    // Completely disable SCE to support IE7.
+    $sceProvider.enabled(false);
+});
+
 Use ~/Scripts/IE7Compatibility/angular1.2.9.min.js instead of most recent version
 
 Include ~/Scripts/IE7Compatibility/json3.min.js for JSON support in 1.2.9 only if it is IE8 or older
