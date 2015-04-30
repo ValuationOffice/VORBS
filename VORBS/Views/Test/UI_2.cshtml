@@ -1,7 +1,95 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "UI_2";
 }
 
-<h2>UI_2</h2>
+<link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
+<link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
 
+<div class="form-inline">
+
+
+    <div class="form-group">
+        <div class="input-group">
+            <label class="col-sm-2 control-label">Location</label>
+            <select class="form-control">
+                <option>CEO</option>
+                <option>Worthing</option>
+                <option>Kent</option>
+                <option>Leicester</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label class="col-sm-2 control-label">Date</label>
+            <input class="form-control datepicker" />
+        </div>
+        <div class="input-group">
+            <label class="control-label">Time Start</label>
+            <input class="form-control timepicker" />
+        </div>
+    </div>
+
+    <hr />
+
+    <h2>Rooms available</h2>
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Room</td>
+                    <td>From</td>
+                    <td>End</td>
+                    <td>Book</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>MR2</td>
+                    <td>11:00</td>
+                    <td><input class="timepicker" /></td>
+                    <td><span class="glyphicon glyphicon-ok btn"></span></td>
+                </tr>
+                <tr>
+                    <td>MR2</td>
+                    <td>11:00</td>
+                    <td><input class="timepicker" /></td>
+                    <td><span class="glyphicon glyphicon-ok btn"></span></td>
+                </tr>
+                <tr>
+                    <td>MR2</td>
+                    <td>11:00</td>
+                    <td><input class="timepicker" /></td>
+                    <td><span class="glyphicon glyphicon-ok btn"></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/moment.js"></script>
+
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/angular-resource.min.js"></script>
+    <script src="~/Scripts/NewBooking/moduleManager.js"></script>
+    <script src="~/Scripts/NewBooking/newBookingController.js"></script>
+    <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
+    <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+
+    <script>
+        debugger;
+        $('.datepicker').datepicker({
+            format: 'dd-mm-yyyy',
+            autoClose: true,
+            todayBtn: true,
+            todayHighlight: true
+        });
+
+        $('#weekCommencing + span').on('click', function () {
+            $('.datepicker').datepicker('show');
+        });
+
+        $('.timepicker').timepicker({
+            showInputs: false
+        });
+    </script>
+}
