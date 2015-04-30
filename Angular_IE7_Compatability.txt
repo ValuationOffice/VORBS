@@ -1,0 +1,14 @@
+This works in the current state of the project as of 30-04-2015, it is a workaround and i highly suggest we do not implement it as it is for ie7 and requires using old versions of frameworks.
+
+Use ~/Scripts/IE7Compatibility/angular1.2.9.min.js instead of most recent version
+
+Include ~/Scripts/IE7Compatibility/json3.min.js for JSON support in 1.2.9 only if it is IE8 or older
+    <!--[if lte IE 8]>
+        <script src="~/Scripts/IE7Compatibility/json3.min.js"></script>
+    <![endif]-->
+
+ng-app element also requires id="ng-app" attribute.
+eg: <div id="ng-app" ng-app="myBookings">
+
+Class ng-view is required on outer container
+eg: <div class="ng-view" id="controllerDiv" ng-controller="MyBookingsController">
