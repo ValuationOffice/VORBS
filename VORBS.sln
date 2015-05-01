@@ -15,15 +15,19 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Dev-Test|Any CPU = Dev-Test|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Test|Any CPU.ActiveCfg = Dev-Test|Any CPU
+		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Test|Any CPU.Build.0 = Dev-Test|Any CPU
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7EA38425-6161-4014-A5EE-2769B40D4257}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7EA38425-6161-4014-A5EE-2769B40D4257}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EA38425-6161-4014-A5EE-2769B40D4257}.Dev-Test|Any CPU.ActiveCfg = Dev-Test|Any CPU
 		{7EA38425-6161-4014-A5EE-2769B40D4257}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EA38425-6161-4014-A5EE-2769B40D4257}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
