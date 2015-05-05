@@ -5,7 +5,7 @@ using System.Web;
 
 namespace VORBS.Models.DTOs
 {
-    public class LocationDTO
+    public class LocationDTO : Location
     {
         public int ID { get; set; }
 

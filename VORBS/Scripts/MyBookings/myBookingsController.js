@@ -15,7 +15,7 @@ function CreateServices($resource) {
     });
 
     Booking.prototype = {
-        startDateFormatted: function () { debugger; return moment(this.startDate).format("DD/MM/YYYY - hh:mm"); },
+        startDateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY - hh:mm"); },
         endDateFormatted: function () { return moment(this.endDate).format("DD/MM/YYYY - hh:mm"); }
     };
 }

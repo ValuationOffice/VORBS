@@ -5,24 +5,24 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using VORBS.Models;
+using VORBS.Models.DTOs;
+
+using VORBS.DAL;
 
 namespace VORBS.API
 {
     [RoutePrefix("api/locations")]
     public class LocationsController : ApiController
     {
+        VORBSContext db = new VORBSContext();
+
         [HttpGet]
         [Route("")]
-        public List<Location> GetLocations()
+        public List<LocationDTO> GetLocations()
         {
-            List<Location> locations = new List<Location>()
-            {
-                new Location(){ Name = "CEO", Rooms = new string[3]{"MR1", "MR2", "MR3"} },
-                new Location(){ Name = "Worthing", Rooms = new string[3]{"MR4", "MR5", "MR6"}  },
-                new Location(){ Name = "Kent", Rooms = new string[3]{"MR7", "MR8", "MR9"}  },
-                new Location(){ Name = "Leicester", Rooms = new string[3]{"MR10", "MR11", "MR12"}  },
-                new Location(){ Name = "Thurrock", Rooms = new string[3]{"MR13", "MR14", "MR15"}  }
-            };
+            List<LocationDTO> locations = db.Locations.ToList()
+                .Select(l => new LocationDTO() { ID = l.ID, Name = l.Name })
+                .ToList();
             return locations;
         }
     }

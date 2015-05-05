@@ -11,6 +11,9 @@ namespace VORBS.Models.DTOs
 
         public string Owner { get; set; }
 
+        public RoomDTO Room { get; set; }
+        public LocationDTO Location { get; set; }
+
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
     }
