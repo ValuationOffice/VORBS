@@ -12,6 +12,7 @@ namespace VORBS.Models.DTOs
         public string RoomName { get; set; }
         public int ComputerCount { get; set; }
         public int PhoneCount { get; set; }
+        public int SeatCount { get; set; }
         public bool SmartRoom { get; set; }
 
     }

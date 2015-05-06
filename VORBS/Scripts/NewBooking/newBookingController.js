@@ -42,7 +42,8 @@ function InitiateCalendar() {
                         for (var i = 0; i < data.length; i++) {
                             events.push({
                                 title: data[i].owner,
-                                start: data[i].startDate
+                                start: data[i].startDate,
+                                end: data[i].endDate
                             });
                         }
                         callback(events);
