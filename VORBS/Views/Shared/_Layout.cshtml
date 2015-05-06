@@ -8,6 +8,15 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
+
+    <div class="alert alert-dismissible alert-info " style="width: 250px; position: fixed; right: 0; top :0;z-index:10000;">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 style="text-align: center;">Debug</h4>
+        <strong>User:</strong> @User.Identity.Name
+    </div>
+
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             

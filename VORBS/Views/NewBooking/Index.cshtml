@@ -8,14 +8,14 @@
         <h2>New Booking</h2>
         <div class="form-inline">
             <div class="form-group">
-                <span class="glyphicon glyphicon-filter btn-lg"></span>
+                <span class="glyphicon glyphicon-filter btn btn-lg"></span>
                 <div class="input-group">
                     <label class="col-sm-2 control-label">Location</label>
                     <select class="form-control" ng-options="location.name for location in locations" ng-model="currentLocation"></select>
                 </div>
                 <div class="input-group">
                     <label class="col-sm-2 control-label">Room</label>
-                    <select class="form-control" ng-options="room for room in currentLocation.rooms" ng-model="currentRoom"></select>
+                    <select class="form-control" ng-options="room.roomName for room in currentLocation.rooms" ng-model="currentRoom"></select>
                 </div>
             </div>
             <hr/>

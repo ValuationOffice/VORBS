@@ -20,10 +20,28 @@ namespace VORBS.API
         [Route("")]
         public List<LocationDTO> GetLocations()
         {
-            List<LocationDTO> locations = db.Locations.ToList()
-                .Select(l => new LocationDTO() { ID = l.ID, Name = l.Name })
+            List<LocationDTO> locationsDTO = new List<LocationDTO>();
+            List<Location> locations = db.Locations.ToList()
                 .ToList();
-            return locations;
+
+            locations.ForEach(x => locationsDTO.Add(new LocationDTO()
+            {
+                ID = x.ID,
+                Name = x.Name,
+                Rooms = x.Rooms.Select(r =>
+                {
+                    RoomDTO rDto = new RoomDTO()
+                        {
+                            ID = r.ID,
+                            RoomName = r.RoomName,
+                            ComputerCount = r.ComputerCount,
+                            PhoneCount = r.PhoneCount,
+                            SmartRoom = r.SmartRoom
+                        }; return rDto;
+                }).ToList()
+            }));
+
+            return locationsDTO;
         }
     }
 }

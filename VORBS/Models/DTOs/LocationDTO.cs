@@ -5,10 +5,11 @@ using System.Web;
 
 namespace VORBS.Models.DTOs
 {
-    public class LocationDTO : Location
+    public class LocationDTO
     {
         public int ID { get; set; }
-
         public string Name { get; set; }
+
+        public IEnumerable<RoomDTO> Rooms { get; set; }
     }
 }
