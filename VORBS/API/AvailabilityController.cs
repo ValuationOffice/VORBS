@@ -19,6 +19,7 @@ namespace VORBS.API
         [Route("{location}/{start:DateTime}/{end:DateTime}")]
         public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end)
         {
+
             List<RoomDTO> rooms = new List<RoomDTO>();
 
             if (location == null)
