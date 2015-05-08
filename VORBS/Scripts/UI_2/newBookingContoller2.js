@@ -89,7 +89,7 @@ function NewBookingController2($scope, $http, $resource) {
 
 
     $scope.bookingFilter = {
-        startDate: FormatDate(new Date().toDateString()),
+        startDate: '11-05-2015',
         startTime: $('.timepicker').val(),
         endTime: $('.timepicker').val(),
         location: $scope.currentLocation,
@@ -111,6 +111,7 @@ function InitiateDateTimeCalanders() {
         autoClose: true,
         todayBtn: true,
         todayHighlight: true,
+        weekStart: 1
     })
 
     $('.timepicker').timepicker({
