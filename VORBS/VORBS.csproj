@@ -157,12 +157,14 @@
     <Compile Include="Utils\CustomHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\bootstrap-combined.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\BootStrapDatePicker\datepicker.css" />
     <Content Include="Content\BootStrapDatePicker\datepicker3.css" />
+    <Content Include="Content\BootStrapDateTimePicker\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\BootStrapTimePicker\bootstrap-responsive.css" />
     <Content Include="Content\BootStrapTimePicker\bootstrap-timepicker.css" />
     <Content Include="Content\BootStrapTimePicker\bootstrap-timepicker.min.css" />
@@ -210,6 +212,7 @@
     <Content Include="Scripts\angular-touch.min.js.map" />
     <Content Include="Scripts\angular.min.js.map" />
     <Content Include="Scripts\BootStrapDatePicker\bootstrap-datepicker.js" />
+    <Content Include="Scripts\BootstrapDateTimePicker\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.js" />
     <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.min.js" />
     <Content Include="Scripts\errors.json" />
@@ -1020,9 +1023,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Scripts\FullCalendarResourceView\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <PropertyGroup>

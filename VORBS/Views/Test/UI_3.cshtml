@@ -3,156 +3,119 @@
 }
 
 <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
-<div class="form">
-    <div class="form-group">
-        <div class="input-group">
-            <label class="col-sm-2 control-label">Location</label>
-            <select class="form-control">
-                <option>CEO</option>
-                <option>Worthing</option>
-                <option>Kent</option>
-                <option>Leicester</option>
-            </select>
-        </div>
-    </div>
-    <div class="form-group" id="calendarContainer">
-        <div id="calendar"></div>
-    </div>
+<link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
 
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">New Meeting</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form">
-                        <div class="form-group">
-                            <div class="input-group ">
-                                <label class="control-label">Date</label>
-                                <input id="newDate" class="form-control" readonly />
+<style>
+    .dailyCalendarContainer{
+        width: 150px;
+        float: left;
+    }
+</style>
+
+<div class="form" ng-app="UI_3">
+    <div id="controllerDiv" ng-controller="UI_3">
+        <div class="form-group">
+            <div class="input-group">
+                <label class="col-sm-2 control-label">Location</label>
+                <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location"></select>
+            </div>
+        </div>
+        <div class="form-group" id="calendarContainer">
+            <div id="calendar"></div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">New Meeting</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form">
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <label class="control-label">Date</label>
+                                    <input id="newDate" class="form-control datepicker" ng-model="bookingFilter.startDate" />
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group ">
-                                <label class="control-label">Number of attendees</label>
-                                <input type="number" class="form-control" />
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <label class="control-label">Number of attendees</label>
+                                    <input type="number" class="form-control" value="1" ng-model="bookingFilter.numberOfAttendees" />
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group ">
-                                <label class="control-label">Smart room</label>
-                                <input type="checkbox" class="form-control" />
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <label class="control-label">Smart room</label>
+                                    <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <label class="control-label">Additional Equipment</label><br />
+                                    <input type="checkbox" value="PC" /> PC<br />
+                                    <input type="checkbox" value="FlipChart" /> Flipchart<br />
+                                    <input type="checkbox" value="Projector" /> Projector
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" data-toggle="modal" data-target="#resultModal" class="btn btn-primary">Search</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="GetSearchResults()">Search</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Select Room</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form">
-                        <div class="form-group">
-                            <div class="input-group ">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Time</th>
-                                            <th>MR1 <span class="glyphicon glyphicon-info-sign" title="1 Computer, 1 Phone"></span></th>
-                                            <th>MR2 <span class="glyphicon glyphicon-info-sign" title="4 Computer, 2 Phone"></span></th>
-                                            <th>MR3 <span class="glyphicon glyphicon-info-sign" title="0 Computer, 0 Phone"></span></th>
-                                            <th>MR4 <span class="glyphicon glyphicon-info-sign" title="1 Computer, 1 Phone"></span></th>
-                                            <th>MR5 <span class="glyphicon glyphicon-info-sign" title="2 Computer, 1 Phone"></span></th>
-                                            <th>MR6 <span class="glyphicon glyphicon-info-sign" title="3 Computer, 1 Phone"></span></th>
-                                            <th>MR7 <span class="glyphicon glyphicon-info-sign" title="10 Computer, 3 Phone"></span></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>08-09</td>
-                                            <td></td>
-                                            <td>Reece</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Charlie</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>09-10</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Mthoko</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Ben</td>
-                                        </tr>
-                                        <tr>
-                                            <td>11-12</td>
-                                            <td>Reece</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Yomi</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Ben</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>12-13</td>
-                                            <td>Reece</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Ben</td>
-                                            <td></td>
-                                            <td>Charlie</td>
-                                            <td>Reece</td>
-                                        </tr>
-                                        <tr>
-                                            <td>13-14</td>
-                                            <td>Yomi</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Mthoko</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>15-16</td>
-                                            <td></td>
-                                            <td>Charlie</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>Ben</td>
-                                            <td>Yomi</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+        <!-- Modal -->
+        <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Select Room for {{ bookingFilter.startDate | date : 'MM/dd/yyyy' }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form">
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <div class="alert alert-info">Please use the meeting rooms responsibly. Only book rooms that are suitable for your meeting size.</div>
+                                    <div id="roomResults">
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="">Confirm Booking For {{ bookingFilter.startDate | date : 'MM/dd/yyyy' }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form">
+                            <div class="form-group">                                
+                                <div class="input-group ">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -162,6 +125,179 @@
 @section scripts{
     <script src="~/Scripts/moment.js"></script>
     <script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
+    <script src="~/Scripts/angular.js"></script>
+    <script src="~/Scripts/angular-resource.js"></script>
+
+    <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+
+
+    <script>
+        $(function () {
+            $('.datepicker').datepicker();
+        });
+    </script>
+
+    <script>
+        var UI_3 = angular.module('UI_3', ['ngResource']);
+    </script>
+
+    <script>
+        UI_3.controller('UI_3', ['$scope', '$http', '$resource', UI_3Controller]);
+
+        function UI_3Controller($scope, $http, $resource) {
+            CreateServices($resource);
+
+            $scope.locations = Locations.query({});
+            $scope.currentLocation = '';
+
+            $scope.ShowData = function () {
+                alert(JSON.stringify($scope.bookingFilter));
+            }
+
+
+            $scope.GetSearchResults = function () {
+                $scope.roomBookings = Available.query({
+                    location: $scope.bookingFilter.location.name,
+                    startDate: new moment.utc(($scope.bookingFilter.startDate)).format('MM-DD-YYYY'),
+                    attendees: $scope.bookingFilter.numberOfAttendees,
+                    smartRoom: $scope.bookingFilter.smartRoom
+                }, function (success) {
+                    debugger;
+                    $('#roomResults').html('');
+                    $("#resultModal").css('display', 'block');
+
+                    for (var i = 0; i < success.length; i++) {
+                        debugger;
+                        var eventData = [];
+                        for (var b = 0; b < success[i].bookings.length; b++) {
+                            eventData.push({
+                                title: success[i].bookings[b].owner,
+                                start: success[i].bookings[b].startDate,
+                                end: success[i].bookings[b].endDate
+                            });
+                        }
+
+                        var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
+                        debugger;
+                        roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
+                        roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
+
+                        $('#roomResults').append('<div class="dailyCalendarContainer"><div style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
+                        var roomName = '[' + success[i].roomName + ']';
+                        $("#" + success[i].roomName + "_calendar").fullCalendar({
+                            weekends: false,
+                            header: {
+                                left: '',
+                                center: '',
+                                right: ''
+                            },
+                            defaultDate: $scope.bookingFilter.startDate,
+                            defaultView: 'agendaDay',
+                            selectable: true,
+                            selectHelper: true,
+                            height: 500,
+                            titleFormat: '' + roomName + '',
+                            select: function (start, end, allDay) {
+
+                                var newEvent = { start: start, end: end };
+                                if (isOverlapping(newEvent, this.calendar)) {
+                                    alert('New meeting clashes with existing booking. Please choose a new time!"');
+                                    return;
+                                }
+                                
+                                var $scope = angular.element($("#controllerDiv")).scope();
+                                debugger;
+                                var room = $scope.GetRoomByName(this.title);
+
+                                //if (room.seatCount > $scope.bookingFilter.numberOfAttendees) {
+                                //    if (!confirm("You have chosen a room for more people than you specified, are you sure you want this room?")) {
+                                //        return false;
+                                //    }
+                                //}
+
+
+                                if (true) {
+                                    $("#confirmModal").modal('show')
+                                    
+                                }
+                                    
+                                //calendar.fullCalendar('renderEvent',
+                                //    {
+                                //        title: title,
+                                //        start: start,
+                                //        end: end,
+                                //        allDay: allDay
+                                //    },
+                                //    true // make the event "stick"
+                                //);
+                                //calendar.fullCalendar('unselect');
+                            },
+                            events: eventData
+                        });//.fullCalendar('changeView', 'agendaDay');
+                    }
+                    $("#resultModal").css('display', 'none');
+                    $('#resultModal').modal('show');
+                }, function (error) {
+                    alert('Something went wrong ....');
+                    //perhaps let them know ?
+                });
+
+            }
+
+            $scope.bookingFilter = {
+                startDate: new Date(),
+                endDate: new Date(),
+                room: { RoomName: '' },
+                location: '',
+                smartRoom: false,
+                numberOfAttendees: 1
+            };
+
+            $scope.booking = {
+                StartDate: new Date(),
+                EndDate: new Date(),
+                Room: { RoomName: '' },
+                Location: { LocationName: '' }
+            };
+
+            $scope.GetRoomByName = function(roomName){
+                for (var i = 0; i < $scope.bookingFilter.location.rooms.length; i++) {
+                    if ($scope.bookingFilter.location.rooms[i].roomName == roomName) {
+                        return $scope.bookingFilter.location.rooms[i];
+                    }
+                }
+            }
+        }
+
+        function CreateServices($resource) {
+            Locations = $resource('/api/locations', {
+            }, {
+                query: { method: 'GET', isArray: true }
+            })
+
+            Bookings = $resource('/api/bookings/:location/:startDate/:endDate/:room', { location: '@@location', room: '@@room', startDate: '@@startDate', endDate: '@@endDate' },
+            {
+                query: { method: 'GET', isArray: true }
+            });
+
+            Available = $resource('/api/availability/:location/:startDate/:endDate/:attendees/:smartRoom', { location: '@@location', startDate: '@@startDate', endDate: '@@endDate', attendees: '@@attendees', smartRoom: '@@smartRoom' },
+            {
+                query: { method: 'GET', isArray: true }
+            });
+        }
+
+        function isOverlapping(event, calendar) {
+            var array = calendar.clientEvents();
+            for (i in array) {
+                if (event.end > array[i].start && event.start < array[i].end) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+    </script>
 
     <script>
         $('#calendar').fullCalendar({
@@ -173,7 +309,7 @@
             },
             dayRender: function (event, element) {
                 element.bind('dblclick', function () {
-                    $('#newDate').val(event.format('DD-MM-YYYY'));
+                    $('#newDate').val(event.format('DD/MM/YYYY'));
                     $('#myModal').modal('toggle');
                 });
             }

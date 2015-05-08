@@ -16,15 +16,15 @@ namespace VORBS.API
     {
         private VORBSContext db = new VORBSContext();
 
-        [Route("{start:DateTime}/{end:DateTime}/")]
-        [HttpPost]
-        public List<BookingDTO> GetRoomBookingsForLocation(Location location, DateTime start, DateTime end)
+        [Route("{location}/{start:DateTime}/{end:DateTime}/")]
+        [HttpGet]
+        public List<BookingDTO> GetRoomBookingsForLocation(string location, DateTime start, DateTime end)
         {
             if (location == null)
                 return new List<BookingDTO>();
 
             List<Booking> bookings = db.Bookings
-                .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.ID == location.ID)
+                .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location)
                 .ToList();
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
@@ -42,15 +42,15 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        [Route("{start:DateTime}/{end:DateTime}/{room}")]
-        [HttpPost]
-        public List<BookingDTO> GetRoomBookingsForRoom(Location location, DateTime start, DateTime end, string room)
+        [Route("{location}/{room}/{start:DateTime}/{end:DateTime}")]
+        [HttpGet]
+        public List<BookingDTO> GetRoomBookingsForRoom(string location, DateTime start, DateTime end, string room)
         {
             if (location == null || room == null)
                 return new List<BookingDTO>();
 
             List<Booking> bookings = db.Bookings
-                .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.ID == location.ID && x.Room.RoomName == room)
+                .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location && x.Room.RoomName == room)
                 .ToList();
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
@@ -68,15 +68,15 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        [Route("{start:DateTime}/{end:DateTime}/{room}/{person}")]
-        [HttpPost]
-        public List<BookingDTO> GetRoomBookingsForRoomAndPerson(Location location, DateTime start, DateTime end, string room, string person)
+        [Route("{location}/{room}/{start:DateTime}/{end:DateTime}/{person}")]
+        [HttpGet]
+        public List<BookingDTO> GetRoomBookingsForRoomAndPerson(string location, DateTime start, DateTime end, string room, string person)
         {
             if (location == null || room == null || person == null)
                 return new List<BookingDTO>();
 
             List<Booking> bookings = db.Bookings
-                .Where(x => x.Owner == person && x.StartDate >= start && x.EndDate <= end && x.Room.Location.ID == location.ID && x.Room.RoomName == room)
+                .Where(x => x.Owner == person && x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location && x.Room.RoomName == room)
                 .ToList();
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
