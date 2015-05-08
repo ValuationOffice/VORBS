@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "UI2";
+}
+
+
+<div ng-app="newBooking2">
+    <div id="contollerDiv" ng-controller="NewBookingController2">
+
+        <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
+        <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
+
+        <div class=" form-inline">
+
+            <div class="form-group">
+
+                <div class="input-group">
+                    <label class="col-sm-2 control-label">Location</label>
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="SearchBookings()"></select>
+                </div>
+
+                <div class="input-group">
+                    <label class="col-sm-2 control-label">Date</label>
+                    <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" ng-change="SearchBookings()" />
+                </div>
+
+                <div class="input-group">
+                    <label class="control-label">Time Start</label>
+                    <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" ng-change="SearchBookings()" />
+                </div>
+
+                <div class="input-group">
+                    <label class="control-label">Time End</label>
+                    <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" ng-change="SearchBookings()" />
+                </div>
+
+                <div class="input-group ">
+                    <label class="control-label">Smart room</label>
+                    <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" ng-change="SearchBookings()" />
+                </div>
+
+                <div class="input-group">
+                    <label class="control-label">Number of Attendees</label>
+                    <input id="attendessControl" type="number" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-change="SearchBookings()" />
+                </div>
+
+                @*<input id="searchButton" type="button" class="form-control" ng-click="SearchBookings()" value="Search" />*@
+
+                <div class="fc-button-group">
+                    
+                </div>
+
+            </div>
+
+            <hr />
+
+            <h2 id="bookingTitle">Available Rooms</h2>
+
+            <span id="errorMessage"></span>
+
+            <div id="bookingTable">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Room</td>
+                            <td>From</td>
+                            <td>End</td>
+                            <td>Book</td>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTableBody">
+                        
+                    </tbody>
+                </table>
+
+            </div>
+
+            @*<div id="errorMessage">
+            </div>*@
+        </div>
+
+        @section scripts{
+            <script src="~/Scripts/moment.js"></script>
+
+            <script src="~/Scripts/angular.js"></script>
+            <script src="~/Scripts/angular-resource.js"></script>
+            <script src="~/Scripts/UI_2/moduleManager.js"></script>
+            <script src="~/Scripts/UI_2/newBookingContoller2.js"></script>
+
+            <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
+            <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+        }
+
+    </div>
+</div>

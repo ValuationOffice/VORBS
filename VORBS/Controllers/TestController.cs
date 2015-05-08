@@ -23,5 +23,10 @@ namespace VORBS.Controllers
         {
             return View();
         }
+
+        public ActionResult UI2()
+        {
+            return View();
+        }
     }
 }

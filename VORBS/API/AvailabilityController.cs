@@ -28,8 +28,8 @@ namespace VORBS.API
             var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= 5).ToList();
             var availableRooms = db.Rooms.Where(x =>
                 x.Location.Name == location
-                && x.SeatCount >= 5
-                && (x.Bookings.Where(b => b.StartDate < end && start < b.EndDate)).Count() == 0
+                //&& x.SeatCount >= 5
+                //&& (x.Bookings.Where(b => b.StartDate < end && start < b.EndDate)).Count() == 0
             ).ToList();
 
             roomData.AddRange(availableRooms);
@@ -41,7 +41,8 @@ namespace VORBS.API
                 PhoneCount = x.PhoneCount,
                 ComputerCount = x.ComputerCount,
                 SmartRoom = x.SmartRoom,
-                Bookings = x.Bookings.Select(b =>
+                SeatCount = x.SeatCount,
+                Bookings = x.Bookings.Where( b => b.StartDate.Date == start.Date && b.EndDate.Date == end.Date).Select(b =>
                 {
                     BookingDTO bDto = new BookingDTO()
                     {

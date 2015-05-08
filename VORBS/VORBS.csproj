@@ -130,6 +130,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\AvailabilityController.cs" />
     <Compile Include="API\BookingsController.cs" />
     <Compile Include="API\LocationsController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -988,6 +989,8 @@
     <Content Include="Scripts\npm.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
+    <Content Include="Scripts\UI_2\moduleManager.js" />
+    <Content Include="Scripts\UI_2\newBookingContoller2.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -1013,6 +1016,7 @@
     <Content Include="Views\Test\UI_1.cshtml" />
     <Content Include="Views\Test\UI_2.cshtml" />
     <Content Include="Views\Test\UI_3.cshtml" />
+    <Content Include="Views\Test\UI2.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
