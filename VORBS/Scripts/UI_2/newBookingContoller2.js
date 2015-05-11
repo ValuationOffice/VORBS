@@ -188,7 +188,10 @@ function FormatTime(time, date) {
 
 function ValidateAttendess(attendees) {
 
-    if (isNaN(attendees) || attendees === null) {
+    if (attendees === null) {
+        throw new Error();
+    }
+    else if (isNaN(attendees)) {
         alert('Invalid Number');
         throw new Error();
     }
@@ -200,7 +203,8 @@ function ValidateAttendess(attendees) {
 }
 
 function ValidateDates(start, end) {
-    if (start >= end) {
+    //ToDo: Add Equals then
+    if (start > end) {
         alert('Start Date Can Not Be Ahead Of End Date');
         throw new Error();
     }
