@@ -72,8 +72,10 @@ function NewBookingController2($scope, $http, $resource) {
                 $('#errorMessage').append('<h4 style="color:red">No Rooms Available. Here are Some Suggested Rooms.</h4>')
 
                 //Hardcoded suggested rooms
-                $('#bookingTableBody').append('<tr><td>MR8</td><td>Wed May 13 2015 ‎10‎:30‎:‎00</td><td>Wed May 13 2015 ‎11‎:‎30:‎00</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
-                $('#bookingTableBody').append('<tr><td>MR21</td><td>Wed May 13 2015 ‎10:‎30‎:‎00</td><td>Wed May 13 2015 ‎11‎:30‎:‎00</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
+                $('#bookingTableBody').append('<tr><td>MR8</td><td>Wed May 13 2015  ‎<b>‎10‎:00‎:‎00</b></td><td>Wed May 13 2015 <b>‎11‎:‎00:‎00</b></td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
+                $('#bookingTableBody').append('<tr><td>MR21</td><td>Wed May 13 2015 ‎<b>10:‎00‎:‎00</b></td><td>Wed May 13 2015 ‎<b>11‎:00‎:‎00</b></td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
+                $('#bookingTableBody').append('<tr><td>MR16</td><td><b>Thur May 14 2015</b> ‎10:‎30‎:‎00</td><td><b>Thur May 14 2015</b> ‎11‎:30‎:‎00</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
+                $('#bookingTableBody').append('<tr><td>MR18</td><td><b>Thur May 14 2015</b> ‎10:‎30‎:‎00</td><td><b>Thur May 14 2015</b> ‎11‎:30‎:‎00</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
             }
 
             $('.glyphicon.glyphicon-ok.btn').click(function () {
