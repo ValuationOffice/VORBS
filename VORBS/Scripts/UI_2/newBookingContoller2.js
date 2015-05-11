@@ -21,7 +21,7 @@ function NewBookingController2($scope, $http, $resource) {
 
             var parms = [ValidateAttendess($scope.bookingFilter.numberOfAttendees), FormatTime($scope.bookingFilter.startTime, $scope.bookingFilter.startDate), FormatTime($scope.bookingFilter.endTime, $scope.bookingFilter.startDate)]
 
-            //ValidateDates(parms[1], parms[2]);
+            ValidateDates(parms[1], parms[2]);
 
             for (var i = 0; i < success.length; i++) {
                 overLapping = false;
