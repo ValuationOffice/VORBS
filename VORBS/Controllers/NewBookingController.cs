@@ -11,7 +11,7 @@ namespace VORBS.Controllers
         // GET: NewBooking
         public ActionResult Index()
         {
-            return View();
+            return View("~/Views/Test/ui2.cshtml");
         }
     }
 }
