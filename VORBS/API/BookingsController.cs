@@ -8,6 +8,7 @@ using System.Web.Http;
 using VORBS.Models;
 using VORBS.DAL;
 using VORBS.Models.DTOs;
+using VORBS.AD;
 
 namespace VORBS.API
 {
@@ -94,15 +95,17 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        [Route("{start:DateTime}/{end:DateTime}/{person}")]
+        [Route("{start:DateTime}/{end:DateTime}")]
         [HttpGet]
-        public List<BookingDTO> GetRoomBookingsForPerson(DateTime start, DateTime end, string person)
+        public List<BookingDTO> GetRoomBookingsForPerson(DateTime start, DateTime end)
         {
-            if (person == null)
+            if (User.Identity.Name == null)
                 return new List<BookingDTO>();
 
+            var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+
             List<Booking> bookings = db.Bookings
-                .Where(x => x.Owner == person && x.StartDate >= start && x.EndDate <= end).ToList()
+                .Where(x => x.Owner == user.Name && x.StartDate >= start && x.EndDate <= end).ToList()
                 .ToList();
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
@@ -119,5 +122,18 @@ namespace VORBS.API
 
             return bookingsDTO;
         }
+
+        [Route("{testTime:DateTime}")]
+        [HttpGet]
+        public List<BookingDTO> PassingTimeAsUrl(DateTime testTime)
+        {
+            if (testTime == null)
+            {
+                return null;
+            }
+
+            return null;
+        }
+
     }
 }

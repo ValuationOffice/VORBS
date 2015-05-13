@@ -41,7 +41,6 @@ function NewBookingController2($scope, $http, $resource) {
                         }
 
                         if (overLapping) {
-                            console.log(success[i].roomName);
                             break;
                         }
                         else if (success[i].bookings.length !== (k + 1)) {
