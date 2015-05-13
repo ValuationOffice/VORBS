@@ -17,10 +17,11 @@
             </thead>
             <tr ng-repeat="booking in bookings">                
                 <td>{{ booking.location.name}}</td>
-                <td>{{ booking.room }}</td>
+                <td>{{ booking.room.roomName }}</td>
                 <td>{{ booking.startDateFormatted() }}</td>
                 <td>{{ booking.endDateFormatted() }}</td>
                 <td><span class="btn glyphicon glyphicon-edit"></span></td>
+                <td><span class="btn glyphicon glyphicon-remove"></span></td>
             </tr>
         </table>
 
