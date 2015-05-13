@@ -95,9 +95,9 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        [Route("{start:DateTime}/{end:DateTime}")]
+        [Route("{start:DateTime}")]
         [HttpGet]
-        public List<BookingDTO> GetRoomBookingsForPerson(DateTime start, DateTime end)
+        public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start)
         {
             if (User.Identity.Name == null)
                 return new List<BookingDTO>();
@@ -105,7 +105,8 @@ namespace VORBS.API
             var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
             List<Booking> bookings = db.Bookings
-                .Where(x => x.Owner == user.Name && x.StartDate >= start && x.EndDate <= end).ToList()
+                .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
+                .OrderBy(x => x.StartDate)
                 .ToList();
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
@@ -122,18 +123,5 @@ namespace VORBS.API
 
             return bookingsDTO;
         }
-
-        [Route("{testTime:DateTime}")]
-        [HttpGet]
-        public List<BookingDTO> PassingTimeAsUrl(DateTime testTime)
-        {
-            if (testTime == null)
-            {
-                return null;
-            }
-
-            return null;
-        }
-
     }
 }
