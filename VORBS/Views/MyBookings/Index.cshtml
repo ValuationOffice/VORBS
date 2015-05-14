@@ -1,6 +1,7 @@
 ﻿@{
     ViewBag.Title = "My Bookings";
 }
+
 <div ng-app="myBookings">
     <div id="controllerDiv" ng-controller="MyBookingsController">
 
@@ -15,26 +16,42 @@
                     <th></th>
                 </tr>
             </thead>
-            <tr ng-repeat="booking in bookings">                
+            <tr ng-repeat="booking in bookings">
                 <td>{{ booking.location.name}}</td>
                 <td>{{ booking.room.roomName }}</td>
                 <td>{{ booking.startDateFormatted() }}</td>
                 <td>{{ booking.endDateFormatted() }}</td>
                 <td><span class="btn glyphicon glyphicon-edit"></span></td>
-                <td><span class="btn glyphicon glyphicon-remove"></span></td>
+                <td><span data-toggle="modal" data-target="#deleteModal" class="btn glyphicon glyphicon-remove"></span></td>
             </tr>
         </table>
 
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Confirm Deletion</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete this meeting?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
+
 @section scripts{
     <script src="~/Scripts/moment.js"></script>
-
     <script src="~/Scripts/angular.min.js"></script>
     <script src="~/Scripts/angular-resource.min.js"></script>
 
     <script src="~/Scripts/MyBookings/moduleManager.js"></script>
     <script src="~/Scripts/MyBookings/myBookingsController.js"></script>
-
 }
