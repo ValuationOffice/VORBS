@@ -5,13 +5,13 @@ using System.Linq;
 using System.Security.Permissions;
 using System.Web;
 
-namespace VORBS.AD
+namespace VORBS.Utils
 {
     public static class AdQueries
     {
         public static UserPrincipal GetUserByCurrentUser(string currentIdentity)
         {
-            if (currentIdentity == null)
+            if (currentIdentity == null)           
                 return null;
 
             //Remove the domain string

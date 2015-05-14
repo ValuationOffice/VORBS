@@ -8,7 +8,8 @@ using System.Web.Http;
 using VORBS.Models;
 using VORBS.DAL;
 using VORBS.Models.DTOs;
-using VORBS.AD;
+
+using VORBS.Utils;
 
 namespace VORBS.API
 {

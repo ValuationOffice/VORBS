@@ -131,7 +131,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AD\AdQueries.cs" />
+    <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
     <Compile Include="API\BookingsController.cs" />
     <Compile Include="API\LocationsController.cs" />
@@ -1024,6 +1024,7 @@
     <Content Include="Views\Test\UI2.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="AD\" />
     <Folder Include="App_Data\" />
     <Folder Include="Scripts\FullCalendarResourceView\" />
   </ItemGroup>
