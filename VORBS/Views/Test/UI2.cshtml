@@ -15,39 +15,35 @@
 
                 <div class="input-group">
                     <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="SearchBookings()"></select>
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location"></select>
                 </div>
 
                 <div class="input-group">
                     <label class="col-sm-2 control-label">Date</label>
-                    <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" ng-change="SearchBookings()" />
+                    <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" />
                 </div>
 
                 <div class="input-group">
                     <label class="control-label">Time Start</label>
-                    <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" ng-change="SearchBookings()" />
+                    <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" />
                 </div>
 
                 <div class="input-group">
                     <label class="control-label">Time End</label>
-                    <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" ng-change="SearchBookings()" />
+                    <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" />
                 </div>
 
                 <div class="input-group ">
                     <label class="control-label">Smart room</label>
-                    <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" ng-change="SearchBookings()" />
+                    <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" />
                 </div>
 
                 <div class="input-group">
                     <label class="control-label">Number of Attendees</label>
-                    <input id="attendessControl" type="number" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-change="SearchBookings()" />
+                    <input id="attendessControl" type="number" class="form-control" ng-model="bookingFilter.numberOfAttendees" />
                 </div>
 
-                @*<input id="searchButton" type="button" class="form-control" ng-click="SearchBookings()" value="Search" />*@
-
-                <div class="fc-button-group">
-                    
-                </div>
+                <input id="searchButton" type="button" class="form-control" ng-click="SearchBookings()" value="Search" />
 
             </div>
 
@@ -67,15 +63,78 @@
                             <td>Book</td>
                         </tr>
                     </thead>
-                    <tbody id="bookingTableBody">
-                        
-                    </tbody>
+                    <tbody id="bookingTableBody"></tbody>
                 </table>
 
             </div>
+        </div>
 
-            @*<div id="errorMessage">
-            </div>*@
+        <!--Confirmation Screen-->
+        <div class="modal fade" id="newModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">New Booking for {{ bookingFilter.startDate }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form">
+                            @*<h6 class="modal-title">Please Enter in the Below Details:</h6>*@
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label">Room Name</label>
+                                    <input class="form-control" readonly="readonly" value="MR6">
+                                </div>
+                                <div class="form-group" style="padding-left:40px;">
+                                    <label class="control-label">Date</label>
+                                    <input class="form-control" readonly="readonly" ng-model="bookingFilter.startDate">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label">Start Time</label>
+                                    <span style="padding-left:12px;">
+                                        <input class="form-control" readonly="readonly" ng-model="bookingFilter.startTime">
+                                    </span>
+                                </div>
+                                <div class="form-group" style="padding-left:10px;">
+                                    <label class="control-label">End Time</label>
+                                    <input class="form-control" readonly="readonly" ng-model="bookingFilter.endTime">
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                <h3 class="modal-title">Attendees</h3>
+                                <div class="form-group">
+                                    <label style="font-weight: normal !important;">Internal (VOA)</label>
+                                    <input class="form-control" ng-enter="alert('Open AD Dialog')">
+                                </div>
+                                <div class="form-group">
+                                    <label style="font-weight: normal !important;">External</label>
+                                    <div class="form-inline">
+                                        <input class="form-control" ng-model="newBooking.externalAttendes">
+                                        <input type="button" value="Add" />
+                                    </div>
+                            </div>
+                            <hr />
+                            <div class="form-group">
+                                <div class="input-group ">
+                                    <label class="control-label">Additional Equipment</label><br />
+                                    <input type="checkbox" value="PC" ng-model="newBooking.pc" /> PC<br />
+                                    <input type="checkbox" value="FlipChart" ng-model="newBooking.flipChart" /> Flipchart<br />
+                                    <input type="checkbox" value="Projector" ng-model="newBooking.projector" /> Projector
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" ng-click="NewBooking()">Confirm Booking</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         @section scripts{

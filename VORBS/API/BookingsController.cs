@@ -96,9 +96,9 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        [Route("{start:DateTime}")]
+        [Route("{start:DateTime}/{person}")]
         [HttpGet]
-        public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start)
+        public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start, string person)
         {
             if (User.Identity.Name == null)
                 return new List<BookingDTO>();
@@ -123,6 +123,37 @@ namespace VORBS.API
 
 
             return bookingsDTO;
+        }
+
+        [Route("{bookingId:Int}")]
+        [HttpDelete]
+        public HttpResponseMessage DeleteBookingById(int bookingId)
+        {
+            try
+            {
+                Booking booking = db.Bookings.First(b => b.ID == bookingId);
+                
+                db.Bookings.Remove(booking);
+                db.SaveChanges();
+
+                //Once Booking has been removed; Send Cancealtion Emails
+                //if (booking.Attendes.Count > 0)
+                //{
+                //    //Outlook.SendCancellationRequest("7220451", "7220393");
+                //}
+
+                //if (booking.Equipment.Count > 0)
+                //{
+                //    //Outlook.SendCancelEquipmentMail("7220451", "7220393");
+                //}
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+               //Log Exception
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

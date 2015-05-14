@@ -22,7 +22,7 @@
                 <td>{{ booking.startDateFormatted() }}</td>
                 <td>{{ booking.endDateFormatted() }}</td>
                 <td><span class="btn glyphicon glyphicon-edit"></span></td>
-                <td><span data-toggle="modal" data-target="#deleteModal" class="btn glyphicon glyphicon-remove"></span></td>
+                <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-remove"></span></td>
             </tr>
         </table>
 
@@ -38,7 +38,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Delete</button>
+                        <button type="button" class="btn btn-primary" ng-click="DeleteBooking()">Delete</button>
                     </div>
                 </div>
             </div>

@@ -63,7 +63,8 @@ function NewBookingController2($scope, $http, $resource) {
 
             for (var i = 0; i < eventData.length; i++) {
                 $('#bookingTableBody').append('<tr><td>' + eventData[i].room + '</td><td>' + parms[1].toDateString() + " " + parms[1].toLocaleTimeString() +
-                    '</td><td>' + parms[2].toDateString() + " " + parms[2].toLocaleTimeString() + '</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
+                    '</td><td>' + parms[2].toDateString() + " " + parms[2].toLocaleTimeString() +
+                    '</td><td><span data-toggle="modal" data-target="#newModal" class="glyphicon glyphicon-ok btn"></span></td></tr>');
             }
 
             if (eventData.length == 0) {
@@ -76,11 +77,6 @@ function NewBookingController2($scope, $http, $resource) {
                 $('#bookingTableBody').append('<tr><td>MR16</td><td><b>Thur May 14 2015</b> ‎10:‎30‎:‎00</td><td><b>Thur May 14 2015</b> ‎11‎:30‎:‎00</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
                 $('#bookingTableBody').append('<tr><td>MR18</td><td><b>Thur May 14 2015</b> ‎10:‎30‎:‎00</td><td><b>Thur May 14 2015</b> ‎11‎:30‎:‎00</td><td><span class="glyphicon glyphicon-ok btn"></span></td></tr>');
             }
-
-            $('.glyphicon.glyphicon-ok.btn').click(function () {
-                //Room booking Function
-                alert("Room Booked");
-            });
         },
             function (error) {
                 alert('Error');
@@ -90,7 +86,7 @@ function NewBookingController2($scope, $http, $resource) {
 
 
     $scope.bookingFilter = {
-        startDate: '11-05-2015',
+        startDate: '14-05-2015',
         startTime: $('.timepicker').val(),
         endTime: $('.timepicker').val(),
         location: $scope.currentLocation,
@@ -103,6 +99,15 @@ function NewBookingController2($scope, $http, $resource) {
         EndDate: new Date(),
         Room: { RoomName: '' },
         Location: { LocationName: '' }
+    };
+
+    $scope.newBooking = {
+        roommName: { RoomName: '' },
+        internalAttendes: null,
+        externalAttendes: null,
+        pc: false,
+        flipChart: false,
+        projector: false,
     };
 }
 
