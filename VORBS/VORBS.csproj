@@ -1022,7 +1022,6 @@
     <Content Include="Views\Test\UI2.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="AD\" />
     <Folder Include="App_Data\" />
     <Folder Include="Content\BootStrapDateTimePicker\" />
     <Folder Include="Scripts\BootstrapDateTimePicker\" />

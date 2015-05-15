@@ -107,7 +107,7 @@ function NewBookingController2($scope, $http, $resource) {
         externalAttendes: null,
         pc: false,
         flipChart: false,
-        projector: false,
+        projector: false
     };
 }
 
