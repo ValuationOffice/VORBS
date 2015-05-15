@@ -29,7 +29,7 @@ namespace VORBS.Utils
             //mailClient = new SmtpClient();
 
             from = AdQueries.GetUserByPid(from).EmailAddress;
-            to = sAdQueries.GetUserByPid(to).EmailAddress;
+            to = AdQueries.GetUserByPid(to).EmailAddress;
 
 
             message.To.Add(to);
