@@ -61,3 +61,26 @@ textarea {
 #calendar{
     width: 800px;
 }
+
+
+/*ADDED 15/05/2015 CL*/
+.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff !important;
+  font-weight:bold !important;
+}
+
+/*ADDED 15/05/2015 CL*/
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  text-decoration: underline !important;
+  background-color: transparent !important;
+}
+
+/*ADDED 15/05/2015 CL*/
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: #1d8feb !important;
+  font-weight: bold !important;
+  background-color: #080808 !important;
+}
