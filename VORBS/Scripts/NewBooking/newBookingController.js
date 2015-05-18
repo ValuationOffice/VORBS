@@ -39,7 +39,7 @@ function NewBookingController($scope, $http, $resource) {
                     });
                 }
                 var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
-                debugger;
+                //debugger;
                 roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
                 roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
 
@@ -83,7 +83,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.bookingFilter = {
-        startDate: '14-05-2015',
+        startDate: new moment().utc().format('DD-MM-YYYY'),
         startTime: '',
         endTime: '',
         location: $scope.currentLocation,

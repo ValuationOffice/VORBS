@@ -4,6 +4,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Security.Permissions;
 using System.Web;
+using VORBS.Models.DTOs;
 
 namespace VORBS.Utils
 {
@@ -27,6 +28,21 @@ namespace VORBS.Utils
             PrincipalContext context = new PrincipalContext(ContextType.Domain);
 
             return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, pid);
+        }
+
+        public static List<UserDTO> UserDetails(string emailAddress) 
+        {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain);
+            UserPrincipal userPrincipal = new UserPrincipal(context);
+            userPrincipal.EmailAddress = emailAddress + "*";
+            PrincipalSearcher search = new PrincipalSearcher(userPrincipal);            
+            List<UserDTO> user = new List<UserDTO>();
+            foreach (UserPrincipal result in search.FindAll())
+            {
+                user.Add( new UserDTO() { EmailAddress = result.EmailAddress.ToString(), Name = result.DisplayName.ToString()});
+            }
+
+            return user;
         }
     }
 }

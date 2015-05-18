@@ -105,36 +105,36 @@ namespace VORBS.API
 
             try
             {
-                if (User.Identity.Name == null)
-                    return new List<BookingDTO>();
+            if (User.Identity.Name == null)
+                return new List<BookingDTO>();
 
-                var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+            var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
-                List<Booking> bookings = db.Bookings
-                    .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
-                    .OrderBy(x => x.StartDate)
-                    .ToList();
+            List<Booking> bookings = db.Bookings
+                .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
+                .OrderBy(x => x.StartDate)
+                .ToList();
 
-                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
-                {
-                    ID = x.ID,
-                    EndDate = x.EndDate,
-                    StartDate = x.StartDate,
-                    Owner = x.Owner,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-                }));
+            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+            bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+            {
+                ID = x.ID,
+                EndDate = x.EndDate,
+                StartDate = x.StartDate,
+                Owner = x.Owner,
+                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+            }));
 
 
-                return bookingsDTO;
-            }
+            return bookingsDTO;
+        }
             catch (Exception ex)
             {
                 //TODO: Log Error
                 return null;
             }    
-            
+
         }
 
         [Route("{bookingId:Int}")]
@@ -166,6 +166,18 @@ namespace VORBS.API
                //TODO: Log Exception
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError);
             }
+        }
+
+        [Route("{email}")]
+        [HttpGet]
+        public List<UserDTO> GetAvailableUsers(string email)
+        {
+            List<UserDTO> userDTO = new List<UserDTO>();
+            if (email == null || email == string.Empty)
+                return new List<UserDTO>();
+
+            userDTO = AdQueries.UserDetails(email);
+            return userDTO;
         }
     }
 }

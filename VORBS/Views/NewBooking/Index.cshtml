@@ -96,14 +96,17 @@
                             <div class="form-group">
                                 <h3 class="modal-title">Attendees</h3>
                                 <div class="form-group">
-                                    <label style="font-weight: normal !important;">Internal (VOA)</label>
+                                    <label style="font-weight: normal !important;">Internal Email</label>
+                                    <button type="button" class="btn btn-primary" style="float:left; margin-top:25px; margin-right:5px;" data-toggle="modal" data-target="#addressModal">To</button>
                                     <input class="form-control" ng-enter="alert('Open AD Dialog')">
                                 </div>
                                 <div class="form-group">
-                                    <label style="font-weight: normal !important;">External</label>
+                                    <label style="font-weight: normal !important;">External Names</label>
                                     <div class="form-inline">
-                                        <input class="form-control" ng-model="newBooking.externalAttendes">
-                                        <input type="button" value="Add" />
+                                        <input class="form-control"/>
+                                        <label style="font-weight: normal !important;">Full Name</label>
+                                        <input class="form-control"/> 
+                                        <button type="button" class="btn btn-primary">Add</button>
                                     </div>
                                 </div>
                                 <hr />
@@ -126,6 +129,41 @@
                 </div>
             </div>
         </div>
+
+        <!--Address Book Modal (Internal Attendees)-->
+        <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add Emails</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label>Email:</label>
+                        <input class="form-control" />
+                        <!--TODO-->
+                        <table class="table table-bordered table-hover table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>
 

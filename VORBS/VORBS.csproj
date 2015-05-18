@@ -131,6 +131,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\DTOs\UserDTO.cs" />
     <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
     <Compile Include="API\BookingsController.cs" />
