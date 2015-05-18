@@ -5,9 +5,9 @@ function MyBookingsController($scope, $http, $resource) {
     CreateServices($resource);
 
     $scope.bookings = GetBookings.query({
-        startDate: new moment().utc().format("MM-DD-YYYY-HHmm")
-        //person: Get PID
-    });
+            startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
+            //person: '7220451' //TODO: Change To get UserName
+        });
 
     $scope.deleteBookingId = 0;
 

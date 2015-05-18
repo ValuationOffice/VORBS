@@ -10,6 +10,8 @@ using VORBS.DAL;
 using VORBS.Models.DTOs;
 
 using VORBS.Utils;
+using System.Diagnostics;
+using System.IO;
 
 namespace VORBS.API
 {
@@ -100,29 +102,39 @@ namespace VORBS.API
         [HttpGet]
         public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start, string person)
         {
-            if (User.Identity.Name == null)
-                return new List<BookingDTO>();
 
-            var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
-
-            List<Booking> bookings = db.Bookings
-                .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
-                .OrderBy(x => x.StartDate)
-                .ToList();
-
-            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-            bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+            try
             {
-                ID = x.ID,
-                EndDate = x.EndDate,
-                StartDate = x.StartDate,
-                Owner = x.Owner,
-                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-            }));
+                if (User.Identity.Name == null)
+                    return new List<BookingDTO>();
+
+                var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+
+                List<Booking> bookings = db.Bookings
+                    .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
+                    .OrderBy(x => x.StartDate)
+                    .ToList();
+
+                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Owner = x.Owner,
+                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
 
 
-            return bookingsDTO;
+                return bookingsDTO;
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log Error
+                return null;
+            }    
+            
         }
 
         [Route("{bookingId:Int}")]
@@ -151,7 +163,7 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-               //Log Exception
+               //TODO: Log Exception
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError);
             }
         }

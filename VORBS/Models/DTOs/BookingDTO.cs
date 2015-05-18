@@ -15,8 +15,8 @@ namespace VORBS.Models.DTOs
         public RoomDTO Room { get; set; }
         public LocationDTO Location { get; set; }
 
-        public List<string> Emails { get; set; }
-        public List<string> ExternalNames { get; set; }
+        public string Emails { get; set; }
+        public string ExternalNames { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
