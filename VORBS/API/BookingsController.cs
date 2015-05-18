@@ -105,36 +105,75 @@ namespace VORBS.API
 
             try
             {
-            if (User.Identity.Name == null)
-                return new List<BookingDTO>();
+                if (User.Identity.Name == null)
+                    return new List<BookingDTO>();
 
-            var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
-            List<Booking> bookings = db.Bookings
-                .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
-                .OrderBy(x => x.StartDate)
-                .ToList();
+                List<Booking> bookings = db.Bookings
+                    .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
+                    .OrderBy(x => x.StartDate)
+                    .ToList();
 
-            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-            bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
-            {
-                ID = x.ID,
-                EndDate = x.EndDate,
-                StartDate = x.StartDate,
-                Owner = x.Owner,
-                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-            }));
+                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Owner = x.Owner,
+                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
 
 
-            return bookingsDTO;
-        }
+                return bookingsDTO;
+            }
             catch (Exception ex)
             {
                 //TODO: Log Error
                 return null;
-            }    
+            }
 
+        }
+
+        [Route("{room}/{startDate:DateTime}/{endDate:DateTime}/{subject}/{attendeEmails}/{externalNames}/{pc:bool}/{flipchart:bool}/{projector:bool}")]
+        [HttpPost]
+        public HttpResponseMessage SaveNewBooking(string room, DateTime startDate, DateTime endDate, string subject, string attendeEmails, string externalNames, bool pc, bool flipchart, bool projector)
+        {
+            try
+            {
+                Booking booking = new Booking()
+                {
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    Subject = subject,
+                    Emails = attendeEmails,
+                    ExternalNames = externalNames,
+                    RoomID = db.Rooms.Single(r => r.RoomName == room).ID,
+                    Owner = AdQueries.GetUserByCurrentUser(User.Identity.Name).SamAccountName
+                };
+
+                if (pc || flipchart || projector)
+                {
+                    //Send Email to DSO
+                }
+
+                if (externalNames != null)
+                {
+                    //Send Email to secuirty
+                }
+
+                //Send Meeting Request to all Attnedees
+
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log Exception
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            }
         }
 
         [Route("{bookingId:Int}")]
@@ -144,7 +183,7 @@ namespace VORBS.API
             try
             {
                 Booking booking = db.Bookings.First(b => b.ID == bookingId);
-                
+
                 db.Bookings.Remove(booking);
                 db.SaveChanges();
 
@@ -163,7 +202,7 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-               //TODO: Log Exception
+                //TODO: Log Exception
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError);
             }
         }

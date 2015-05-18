@@ -20,5 +20,9 @@ namespace VORBS.Models
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+
+        public bool PC { get; set; }
+        public bool Flipchart { get; set; }
+        public bool Projector { get; set; }
     }
 }

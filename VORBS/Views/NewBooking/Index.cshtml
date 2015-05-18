@@ -72,11 +72,11 @@
                             <div class="form-inline">
                                 <div class="form-group">
                                     <label class="control-label">Room Name</label>
-                                    <input class="form-control" readonly="readonly" ng-model="newBooking.roomName">
+                                    <input class="form-control" readonly="readonly" ng-model="newBooking.RoomName">
                                 </div>
-                                <div class="form-group" style="padding-left:40px;">
-                                    <label class="control-label">Date</label>
-                                    <input class="form-control" readonly="readonly" ng-model="bookingFilter.startDate">
+                                <div class="form-group" style="padding-left:15px;">
+                                    <label class="control-label">Location</label>
+                                    <input class="form-control" readonly="readonly" ng-model="bookingFilter.location.name">
                                 </div>
                             </div>
                             <br />
@@ -84,38 +84,57 @@
                                 <div class="form-group">
                                     <label class="control-label">Start Time</label>
                                     <span style="padding-left:12px;">
-                                        <input class="form-control" readonly="readonly" ng-model="bookingFilter.startTime">
+                                        <input class="form-control" readonly="readonly" ng-model="newBooking.StartDate">
                                     </span>
                                 </div>
                                 <div class="form-group" style="padding-left:10px;">
                                     <label class="control-label">End Time</label>
-                                    <input class="form-control" readonly="readonly" ng-model="bookingFilter.endTime">
+                                    <input class="form-control" readonly="readonly" ng-model="newBooking.EndDate">
                                 </div>
+                            </div>
+                            <br />
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label class="control-label">Subject</label>
+                                    <span style="padding-left:30px;">
+                                        <input class="form-control" ng-model="newBooking.Subject">
+                                    </span>
+                                </div>
+                                <span style="padding-left:120px;">
+                                    <button type="button" class="btn btn-primary">Recurring Meeting</button>
+                                </span>
                             </div>
                             <hr />
                             <div class="form-group">
                                 <h3 class="modal-title">Attendees</h3>
                                 <div class="form-group">
-                                    <label style="font-weight: normal !important;">Internal Email</label>
+                                    <label style="font-weight: normal !important;">Attendee Emails</label>
                                     <button type="button" class="btn btn-primary" style="float:left; margin-top:25px; margin-right:5px;" data-toggle="modal" data-target="#addressModal">To</button>
-                                    <input class="form-control" ng-enter="alert('Open AD Dialog')">
+                                    <input class="form-control" ng-model="newBooking.AttendeeEmails" />
                                 </div>
+                                <label class="control-label">External Attendees</label>
                                 <div class="form-group">
-                                    <label style="font-weight: normal !important;">External Names</label>
                                     <div class="form-inline">
-                                        <input class="form-control"/>
-                                        <label style="font-weight: normal !important;">Full Name</label>
-                                        <input class="form-control"/> 
-                                        <button type="button" class="btn btn-primary">Add</button>
+                                        <label style="font-weight: normal !important;">First Name</label>
+                                        <input class="form-control" id="externalFirstNameTextBox" />
+                                        <label style="font-weight: normal !important;">Last Name</label>
+                                        <input class="form-control" id="externalLastNameTextBox" />
+                                        <button type="button" class="btn btn-primary" ng-click="AddExternalName()">Add</button>
                                     </div>
+                                    <table>
+                                        <tr ng-repeat="externalName in newBooking.ExternalNames">
+                                            <td>{{ externalName.fName + ' ' + externalName.lName}}</td>
+                                            <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalName(externalName.fName, externalName.lName)"></span></td>
+                                        </tr>
+                                    </table>
                                 </div>
                                 <hr />
                                 <div class="form-group">
                                     <div class="input-group ">
                                         <label class="control-label">Additional Equipment</label><br />
-                                        <input type="checkbox" value="PC" ng-model="newBooking.pc" /> PC<br />
-                                        <input type="checkbox" value="FlipChart" ng-model="newBooking.flipChart" /> Flipchart<br />
-                                        <input type="checkbox" value="Projector" ng-model="newBooking.projector" /> Projector
+                                        <input type="checkbox" value="PC" ng-model="newBooking.Pc" /> PC<br />
+                                        <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
+                                        <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
                                     </div>
                                 </div>
                             </div>

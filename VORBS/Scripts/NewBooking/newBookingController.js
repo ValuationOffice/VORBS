@@ -22,8 +22,8 @@ function NewBookingController($scope, $http, $resource) {
     $scope.SearchBookings = function () {
         $scope.roomBookings = Available.query({
             location: $scope.bookingFilter.location.name,
-            startDate: FormatDate($scope.bookingFilter.startDate),
-            endDate: FormatDate($scope.bookingFilter.startDate),
+            startDate: FormatDateForURL($scope.bookingFilter.startDate),
+            endDate: FormatDateForURL($scope.bookingFilter.startDate),
             smartRoom: $scope.bookingFilter.smartRoom,
             numberOfAttendees: $scope.bookingFilter.numberOfAttendees
         }, function (success) {
@@ -69,7 +69,7 @@ function NewBookingController($scope, $http, $resource) {
                         var $scope = angular.element($("#controllerDiv")).scope();
                         var room = $scope.GetRoomByName(this.title);
 
-                        $scope.newBooking.roomName = room.roomName;
+                        $scope.newBooking.RoomName = room.roomName;
 
                         $scope.$digest();
                         $("#confirmModal").modal('show');
@@ -82,13 +82,68 @@ function NewBookingController($scope, $http, $resource) {
         });
     }
 
+    $scope.AddExternalName = function () {
+
+        var fName = $('#externalFirstNameTextBox').val();
+        var lName = $('#externalLastNameTextBox').val();
+
+        if (fName === null || lName === null) {
+            //TODO: Validation - Duplicate - Null
+        }
+
+        $scope.newBooking.ExternalNames.push({
+            fName: fName,
+            lName: lName
+        });
+
+        $('#externalFirstNameTextBox').val('');
+        $('#externalLastNameTextBox').val('');
+    }
+
+    $scope.RemoveExternalName = function (fName, lName) {
+        for (var i = 0; i < $scope.newBooking.ExternalNames.length; i++) {
+            if ($scope.newBooking.ExternalNames[i].fName === fName && $scope.newBooking.ExternalNames[i].lName === lName) {
+                $scope.newBooking.ExternalNames.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    $scope.NewBooking = function () {
+
+        //Validate Number Of Emails Matches Attendees
+        //Validate Number of External Names is not graether than attendees
+
+        var Emails = ValidateEmails($scope.newBooking.AttendeeEmails.split(' '));
+        var Subject = ValidateSubject($scope.newBooking.Subject);  
+
+        Booking.save({
+            room: $scope.newBooking.RoomName,
+            startDate: $scope.newBooking.StartDate,
+            endDate: $scope.newBooking.EndDate,
+            subject: Subject,
+            attendeeEmails: Emails,
+            externalNames: JSON.stringify($scope.newBooking.ExternalNames),
+            pc: $scope.newBooking.Pc,
+            flipchart: $scope.newBooking.FlipChart,
+            projector: $scope.newBooking.Projector
+        },
+        function (success) {
+            alert('Booking Saved');
+        },
+        function (error) {
+            alert('Error');
+        })
+
+    }
+
     $scope.bookingFilter = {
         startDate: new moment().utc().format('DD-MM-YYYY'),
         startTime: '',
         endTime: '',
         location: $scope.currentLocation,
         smartRoom: false,
-        numberOfAttendees: 1
+        numberOfAttendees: 8
     };
 
     $scope.booking = {
@@ -99,12 +154,15 @@ function NewBookingController($scope, $http, $resource) {
     };
 
     $scope.newBooking = {
-        roomName: '',
-        internalAttendes: null,
-        externalAttendes: null,
-        pc: false,
-        flipChart: false,
-        projector: false
+        RoomName: '',
+        Subject: '',
+        AttendeeEmails: '',
+        ExternalNames: [],
+        StartDate: new moment().format("DD-MM-YYYY HH:mm A"), //Change To Chart Input
+        EndDate: new moment().format("DD-MM-YYYY HH:mm A"), //Change To Chart Input
+        Pc: false,
+        FlipChart: false,
+        Projector: false
     };
 }
 
@@ -118,6 +176,23 @@ function CreateServices($resource) {
     {
         query: { method: 'GET', isArray: true }
     });
+
+    Booking = $resource('/api/bookings/:room/:startDate/:endDate/:subject/:attendeeEmails/:externalNames/:pc/:flipchart/:projector', { room: 'room', startDate: 'startDate', endDate: 'endDate', subject: 'subject', attendeeEmails: 'attendeeEmails', externalNames: 'externalNames', pc: 'pc', flipchart: 'flipchart', projector: 'projector' },
+    {
+        save: { method: 'POST' }
+    });
+}
+
+//Caladner UI Functions
+
+function isMeetingOverlapping(event, calendar) {
+    var array = calendar.clientEvents();
+    for (i in array) {
+        if (event.end > array[i].start && event.start < array[i].end) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function InitiateCalendar() {
@@ -154,20 +229,23 @@ function InitiateCalendar() {
         });
     });
 }
+///////////////////////////////////////////////////////////////////
 
-function ExtractTimeFromDate(date) {
-    var dateParts = date.split('T');
+//Format Functions
 
-    var dateSplit = dateParts[0].split('-');
-    var timeSplit = dateParts[1].split(':');
-
-    var timeDate = new Date(dateSplit[0], dateSplit[1] - 1, dateSplit[2]);
-    timeDate.setHours(timeSplit[0], timeSplit[1], timeSplit[2]);
-
-    return timeDate;
+function convertTo24Hour(time) {
+    var hours = parseInt(time.substr(0, 2));
+    time = time.toString().trim();
+    if (time.indexOf('AM') != -1 && hours == 12) {
+        time = time.replace('12', '0');
+    }
+    if (time.indexOf('PM') != -1 && hours < 12) {
+        time = time.replace(hours, (hours + 12));
+    }
+    return time.replace(/(AM|PM)/, '').slice(0, -1);
 }
 
-function FormatDate(date) {
+function FormatDateForURL(date) {
 
     if (date === "") {
         alert('Please Enter a Valid Date');
@@ -204,6 +282,38 @@ function FormatTime(time, date) {
 
     return timeDate;
 }
+///////////////////////////////////////////////////////////////////
+
+//New Booking Functions
+
+function ValidateEmails(emails) {
+
+    if (emails.length < 1) {
+        alert('New Emails Detected');
+        throw new Error();
+    }
+
+    for (var i = 0; i < emails.length; i++) {
+        //Validate Each Email
+        if (emails[i].trim() === "") {
+            alert('Invalid Email Detected: ' + emails[i]);
+            throw new Error();
+        }
+    }
+    return emails.join(';');
+}
+
+function ValidateSubject(subject) {
+    if(subject.trim() === "")
+    {
+        alert('Invalid Subject Detected')
+        throw new Error();
+    }
+    return subject;
+}
+///////////////////////////////////////////////////////////////////
+
+//Filtering Functions
 
 function ValidateAttendess(attendees) {
 
@@ -229,18 +339,6 @@ function ValidateDates(start, end) {
     }
 }
 
-function convertTo24Hour(time) {
-    var hours = parseInt(time.substr(0, 2));
-    time = time.toString().trim();
-    if (time.indexOf('AM') != -1 && hours == 12) {
-        time = time.replace('12', '0');
-    }
-    if (time.indexOf('PM') != -1 && hours < 12) {
-        time = time.replace(hours, (hours + 12));
-    }
-    return time.replace(/(AM|PM)/, '').slice(0, -1);
-}
-
 function IncrementTime(time, minutes) {
     var timeSplit = time.split(':');
     var amPm = timeSplit[1].split(" ");
@@ -254,13 +352,4 @@ function IncrementTime(time, minutes) {
 
     return "'" + timeSplit[0] + ":" + minutes + " " + amPm[1] + "'";
 }
-
-function isMeetingOverlapping(event, calendar) {
-    var array = calendar.clientEvents();
-    for (i in array) {
-        if (event.end > array[i].start && event.start < array[i].end) {
-            return true;
-        }
-    }
-    return false;
-}
+///////////////////////////////////////////////////////////////////

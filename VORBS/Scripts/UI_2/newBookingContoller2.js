@@ -142,18 +142,6 @@ function CreateServices($resource) {
     });
 }
 
-function ExtractTimeFromDate(date) {
-    var dateParts = date.split('T');
-
-    var dateSplit = dateParts[0].split('-');
-    var timeSplit = dateParts[1].split(':');
-
-    var timeDate = new Date(dateSplit[0], dateSplit[1] - 1, dateSplit[2]);
-    timeDate.setHours(timeSplit[0], timeSplit[1], timeSplit[2]);
-
-    return timeDate;
-}
-
 function FormatDate(date) {
 
     if (date === "") {
