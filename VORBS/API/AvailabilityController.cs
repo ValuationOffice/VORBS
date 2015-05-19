@@ -126,6 +126,7 @@ namespace VORBS.API
                 RoomName = x.RoomName,
                 PhoneCount = x.PhoneCount,
                 ComputerCount = x.ComputerCount,
+                SeatCount = x.SeatCount,
                 SmartRoom = x.SmartRoom,
                 Bookings = x.Bookings.Select(b =>
                 {

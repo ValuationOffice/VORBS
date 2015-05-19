@@ -42,6 +42,7 @@ function NewBookingController($scope, $http, $resource) {
                 //debugger;
                 roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
                 roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
+                roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-user" title="' + success[i].seatCount + ' Attendees"> ' + success[i].seatCount + '</span></span>';
 
                 $('#bookingTable').append('<div class="dailyCalendarContainer"><div style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
                 var roomName = '[' + success[i].roomName + ']';
