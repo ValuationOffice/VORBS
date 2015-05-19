@@ -111,7 +111,7 @@ namespace VORBS.API
                 var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
                 List<Booking> bookings = db.Bookings
-                    .Where(x => x.Owner == user.Name && x.StartDate >= start).ToList()
+                    .Where(x => x.Owner == user.SamAccountName && x.StartDate >= start).ToList()
                     .OrderBy(x => x.StartDate)
                     .ToList();
 
@@ -137,43 +137,46 @@ namespace VORBS.API
 
         }
 
-        [Route("{room}/{startDate:DateTime}/{endDate:DateTime}/{subject}/{attendeEmails}/{externalNames}/{pc:bool}/{flipchart:bool}/{projector:bool}")]
-        [HttpPost]
-        public HttpResponseMessage SaveNewBooking(string room, DateTime startDate, DateTime endDate, string subject, string attendeEmails, string externalNames, bool pc, bool flipchart, bool projector)
+        //[Route("{room}/{startDate:DateTime}/{endDate:DateTime}/{subject}/{attendeEmails}/{externalNames}/{pc:bool}/{flipchart:bool}/{projector:bool}")]
+        //[HttpPost]
+        //public HttpResponseMessage SaveNewBooking(string room, DateTime startDate, DateTime endDate, string subject, string attendeEmails, string externalNames, bool pc, bool flipchart, bool projector)
+        //{
+        //   
+        //}
+
+        public HttpResponseMessage SaveNewBooking([FromBody] Booking newBooking)
         {
-            try
-            {
-                Booking booking = new Booking()
-                {
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    Subject = subject,
-                    Emails = attendeEmails,
-                    ExternalNames = externalNames,
-                    RoomID = db.Rooms.Single(r => r.RoomName == room).ID,
-                    Owner = AdQueries.GetUserByCurrentUser(User.Identity.Name).SamAccountName
-                };
+             try
+             {
+                 newBooking.RoomID = db.Rooms.Single(r => r.RoomName == newBooking.Room.RoomName).ID;
+                 newBooking.Owner = AdQueries.GetUserByCurrentUser(User.Identity.Name).SamAccountName;
 
-                if (pc || flipchart || projector)
-                {
-                    //Send Email to DSO
-                }
+                 //Reset Room as we dont want to create another room
+                 newBooking.Room = null;
 
-                if (externalNames != null)
-                {
-                    //Send Email to secuirty
-                }
+                 db.Bookings.Add(newBooking);
+                 db.SaveChanges();
 
-                //Send Meeting Request to all Attnedees
+                 if (newBooking.PC || newBooking.Flipchart || newBooking.Projector)
+                 {
+                     //Send Email to DSO
+                 }
+
+                 if (newBooking.ExternalNames != null)
+                 {
+                     //Send Email to secuirty
+                 }
+
+                 //Send Meeting Request to all Attnedees
 
 
-                return new HttpResponseMessage(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                //TODO: Log Exception
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
-            }
+                 return new HttpResponseMessage(HttpStatusCode.OK);
+             }
+             catch (Exception ex)
+             {
+                 //TODO: Log Exception
+                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+             }
         }
 
         [Route("{bookingId:Int}")]
@@ -203,7 +206,7 @@ namespace VORBS.API
             catch (Exception ex)
             {
                 //TODO: Log Exception
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 

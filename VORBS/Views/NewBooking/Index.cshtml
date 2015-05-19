@@ -65,15 +65,16 @@
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="myModalLabel">New Booking for {{ bookingFilter.startDate }}</h4>
-                        <div class="alert alert-danger" id="newBookingErrorMessage" style="display: none;"></div>
+                        @*<span class="alert alert-danger" id="newBookingErrorMessage" style="display: none;"></span>*@
                     </div>
                     <div class="modal-body">
                         <div class="form">
                             @*<h6 class="modal-title">Please Enter in the Below Details:</h6>*@
+                            <div class="alert alert-danger" id="newBookingErrorMessage" style="display: none;"></div>
                             <div class="form-inline">
                                 <div class="form-group">
                                     <label class="control-label">Room Name</label>
-                                    <input class="form-control" readonly="readonly" ng-model="newBooking.RoomName">
+                                    <input class="form-control" readonly="readonly" ng-model="newBooking.Room.RoomName">
                                 </div>
                                 <div class="form-group" style="padding-left:15px;">
                                     <label class="control-label">Location</label>
@@ -85,12 +86,12 @@
                                 <div class="form-group">
                                     <label class="control-label">Start Time</label>
                                     <span style="padding-left:12px;">
-                                        <input class="form-control" readonly="readonly" ng-model="newBooking.StartDate">
+                                        <input class="form-control" readonly="readonly" ng-model="booking.StartDate">
                                     </span>
                                 </div>
                                 <div class="form-group" style="padding-left:10px;">
                                     <label class="control-label">End Time</label>
-                                    <input class="form-control" readonly="readonly" ng-model="newBooking.EndDate">
+                                    <input class="form-control" readonly="readonly" ng-model="booking.EndDate">
                                 </div>
                             </div>
                             <br />
@@ -111,7 +112,7 @@
                                 <div class="form-group">
                                     <label style="font-weight: normal !important;">Attendee Emails</label>
                                     <button type="button" class="btn btn-primary" style="float:left; margin-top:25px; margin-right:5px;" data-toggle="modal" data-target="#addressModal">To</button>
-                                    <input class="form-control" ng-model="newBooking.AttendeeEmails" />
+                                    <input class="form-control" ng-model="newBooking.Emails" />
                                 </div>
                                 <label class="control-label">External Attendees</label>
                                 <div class="form-group">
@@ -123,9 +124,9 @@
                                         <button type="button" class="btn btn-primary" ng-click="AddExternalName()">Add</button>
                                     </div>
                                     <table>
-                                        <tr ng-repeat="externalName in newBooking.ExternalNames">
-                                            <td>{{ externalName.fName + ' ' + externalName.lName}}</td>
-                                            <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalName(externalName.fName, externalName.lName)"></span></td>
+                                        <tr ng-repeat="externalName in booking.ExternalNames">
+                                            <td>{{ externalName }}</td>
+                                            <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalName(externalName)"></span></td>
                                         </tr>
                                     </table>
                                 </div>
