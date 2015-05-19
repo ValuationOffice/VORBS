@@ -34,8 +34,8 @@ function NewBookingController($scope, $http, $resource) {
                 for (var b = 0; b < success[i].bookings.length; b++) {
                     eventData.push({
                         title: success[i].bookings[b].owner,
-                        start: new moment(success[i].bookings[b].startTime),
-                        end: new moment(success[i].bookings[b].endTime)
+                        start: new moment(success[i].bookings[b].startDate),
+                        end: new moment(success[i].bookings[b].endDate)
                     });
                 }
                 var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
@@ -54,6 +54,9 @@ function NewBookingController($scope, $http, $resource) {
                     },
                     //defaultDate: $scope.bookingFilter.startDate,                    
                     defaultView: 'agendaDay',
+                    minTime: "09:00:00",
+                    maxTime: "17:00:00",
+                    allDaySlot: false,
                     selectable: true,
                     selectHelper: true,
                     height: 500,
@@ -70,6 +73,8 @@ function NewBookingController($scope, $http, $resource) {
                         var room = $scope.GetRoomByName(this.title);
 
                         $scope.newBooking.RoomName = room.roomName;
+                        $scope.newBooking.StartDate = start.utc().format('DD-MM-YYYY HH:mm A');
+                        $scope.newBooking.EndDate = end.utc().format('DD-MM-YYYY HH:mm A');
 
                         $scope.$digest();
                         $("#confirmModal").modal('show');
@@ -163,8 +168,8 @@ function NewBookingController($scope, $http, $resource) {
         Subject: '',
         AttendeeEmails: '',
         ExternalNames: [],
-        StartDate: new moment().format("DD-MM-YYYY HH:mm A"), //Change To Chart Input
-        EndDate: new moment().format("DD-MM-YYYY HH:mm A"), //Change To Chart Input
+        StartDate: new Date(),
+        EndDate: new Date(), 
         Pc: false,
         FlipChart: false,
         Projector: false
