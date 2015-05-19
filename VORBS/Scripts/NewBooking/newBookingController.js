@@ -34,8 +34,8 @@ function NewBookingController($scope, $http, $resource) {
                 for (var b = 0; b < success[i].bookings.length; b++) {
                     eventData.push({
                         title: success[i].bookings[b].owner,
-                        start: new moment(success[i].bookings[b].startDate),
-                        end: new moment(success[i].bookings[b].endDate)
+                        start: new moment(success[i].bookings[b].startTime),
+                        end: new moment(success[i].bookings[b].endTime)
                     });
                 }
                 var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
@@ -111,11 +111,16 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.NewBooking = function () {
 
-        //Validate Number Of Emails Matches Attendees
-        //Validate Number of External Names is not graether than attendees
+        //Validate Emails
+        var emails = $scope.newBooking.AttendeeEmails.split(' ');
+        var AttendeeEmails = ValidateEmails(emails);
 
-        var Emails = ValidateEmails($scope.newBooking.AttendeeEmails.split(' '));
-        var Subject = ValidateSubject($scope.newBooking.Subject);  
+        //Validate Number Of Emails Matches Attendees 
+        //Validate Number of External Names is not graether than attendees
+        ValidateNoAttendees(emails.length, $scope.bookingFilter.numberOfAttendees, $scope.newBooking.ExternalNames.length);
+
+        //Validate Subject
+        var Subject = ValidateSubject($scope.newBooking.Subject);
 
         Booking.save({
             room: $scope.newBooking.RoomName,
@@ -143,7 +148,7 @@ function NewBookingController($scope, $http, $resource) {
         endTime: '',
         location: $scope.currentLocation,
         smartRoom: false,
-        numberOfAttendees: 8
+        numberOfAttendees: 1
     };
 
     $scope.booking = {
@@ -288,29 +293,61 @@ function FormatTime(time, date) {
 
 function ValidateEmails(emails) {
 
+    var attendeeEmails = null;
+
     if (emails.length < 1) {
-        alert('New Emails Detected');
+        alert('No Emails Detected');
         throw new Error();
     }
 
     for (var i = 0; i < emails.length; i++) {
         //Validate Each Email
-        if (emails[i].trim() === "") {
+        if (emails[i].trim() === "" || !ValidateEmail(emails[i])) {
             alert('Invalid Email Detected: ' + emails[i]);
             throw new Error();
         }
+        else {
+            attendeeEmails += emails[i].trim() + ";"
+        }
     }
-    return emails.join(';');
+
+    return attendeeEmails;
+}
+
+function ValidateNoAttendees(attendees, filterAttendees, externalNamesLength) {
+    if (attendees !== filterAttendees) {
+        alert('Number of Atteneds Does Not Match Number of Emails.');
+        throw new Error();
+    }
+    else if (externalNamesLength > attendees) {
+        alert('Too Many External names');
+        throw new Error();
+    }
 }
 
 function ValidateSubject(subject) {
-    if(subject.trim() === "")
-    {
-        alert('Invalid Subject Detected')
+    if (subject.trim() === "") {
+        SetModalErrorMessage('Invalid Subject Detected');
         throw new Error();
     }
     return subject;
 }
+
+function ValidateEmail(email) {
+    var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    return regex.test(email);
+}
+
+function SetModalErrorMessage(message) {
+    if (message === "") {
+        $('#newBookingErrorMessage').hide();
+    }
+    else {
+        $('#newBookingErrorMessage').text(message);
+        $('#newBookingErrorMessage').show();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////
 
 //Filtering Functions
