@@ -8,9 +8,16 @@ using VORBS.Models.DTOs;
 
 namespace VORBS.Utils
 {
-    public static class AdQueries
+    public class AdQueries
     {
-        public static UserPrincipal GetUserByCurrentUser(string currentIdentity)
+        PrincipalContext context = null;
+
+        public AdQueries()
+        {
+            context = new PrincipalContext(ContextType.Domain);
+        }
+
+        public UserPrincipal GetUserByCurrentUser(string currentIdentity)
         {
             if (currentIdentity == null)           
                 return null;
@@ -18,21 +25,29 @@ namespace VORBS.Utils
             //Remove the domain string
             string pid = currentIdentity.Substring(currentIdentity.IndexOf("\\") + 1);
 
-            PrincipalContext context = new PrincipalContext(ContextType.Domain);
-
             return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, pid);
         }
 
-        public static UserPrincipal GetUserByPid(string pid)
+        public UserPrincipal GetUserByPid(string pid)
         {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain);
-
             return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, pid);
         }
 
-        public static List<UserDTO> UserDetails(string emailAddress) 
+        public string GetUserFullNameByPid(string pid)
         {
-            PrincipalContext context = new PrincipalContext(ContextType.Domain);
+            if (string.IsNullOrWhiteSpace(pid))
+                return "Unknown";
+
+            UserPrincipal user = UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, pid);
+
+            if (user == null)
+                return "Unknown";
+
+            return user.Name;
+        }
+
+        public List<UserDTO> UserDetails(string emailAddress) 
+        {
             UserPrincipal userPrincipal = new UserPrincipal(context);
             userPrincipal.EmailAddress = emailAddress + "*";
             PrincipalSearcher search = new PrincipalSearcher(userPrincipal);            

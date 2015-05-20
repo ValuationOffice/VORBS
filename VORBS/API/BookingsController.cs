@@ -108,7 +108,7 @@ namespace VORBS.API
                 if (User.Identity.Name == null)
                     return new List<BookingDTO>();
 
-                var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                var user = new AdQueries().GetUserByCurrentUser(User.Identity.Name);
 
                 List<Booking> bookings = db.Bookings
                     .Where(x => x.Owner == user.SamAccountName && x.StartDate >= start).ToList()
@@ -142,7 +142,7 @@ namespace VORBS.API
              try
              {
                  newBooking.RoomID = db.Rooms.Single(r => r.RoomName == newBooking.Room.RoomName).ID;
-                 newBooking.Owner = AdQueries.GetUserByCurrentUser(User.Identity.Name).SamAccountName;
+                 newBooking.Owner = new AdQueries().GetUserByCurrentUser(User.Identity.Name).SamAccountName;
 
                  //Reset Room as we dont want to create another room
                  newBooking.Room = null;
@@ -201,18 +201,6 @@ namespace VORBS.API
                 //TODO: Log Exception
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-        }
-
-        [Route("{email}")]
-        [HttpGet]
-        public List<UserDTO> GetAvailableUsers(string email)
-        {
-            List<UserDTO> userDTO = new List<UserDTO>();
-            if (email == null || email == string.Empty)
-                return new List<UserDTO>();
-
-            userDTO = AdQueries.UserDetails(email);
-            return userDTO;
         }
     }
 }

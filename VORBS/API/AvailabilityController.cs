@@ -7,6 +7,7 @@ using System.Web.Http;
 using VORBS.Models;
 using VORBS.DAL;
 using VORBS.Models.DTOs;
+using VORBS.Utils;
 
 namespace VORBS.API
 {
@@ -106,6 +107,7 @@ namespace VORBS.API
         public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom)
         {
             List<RoomDTO> rooms = new List<RoomDTO>();
+            AdQueries queries = new AdQueries();
 
             if (location == null)
                 return new List<RoomDTO>();
@@ -117,10 +119,6 @@ namespace VORBS.API
                 && x.SeatCount >= numberOfPeople
                 //&& (x.Bookings.Where(b => start < b.EndDate)).Count() == 0
             ).ToList();
-
-            //var availableRooms = db.Rooms.Where(r => r.SeatCount >= numberOfPeople 
-            //                                    && r.LocationID == db.Locations.Single(l => l.Name == location).ID)
-            //                                    .ToList();
 
             roomData.AddRange(availableRooms);
 
@@ -137,7 +135,7 @@ namespace VORBS.API
                     BookingDTO bDto = new BookingDTO()
                     {
                         ID = b.ID,
-                        Owner = b.Owner,
+                        Owner = queries.GetUserFullNameByPid(b.Owner), //TODO: Create instance of class for better loading ?
                         StartDate = b.StartDate,
                         EndDate = b.EndDate
                     };
