@@ -151,7 +151,7 @@
             </div>
         </div>
 
-        <!--Address Book Modal (Internal Attendees)-->
+        <!--Address Book Modal (Internal Attendees)-->        
         <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -161,7 +161,7 @@
                     </div>
                     <div class="modal-body">
                         <label>Email:</label>
-                        <input class="form-control" />
+                        <input ng-model="emailVal" ng-change="GetInternalEmails()" class="form-control" />
                         <!--TODO-->
                         <hr />
                         <table class="table table-bordered table-hover table-condensed">
@@ -171,9 +171,9 @@
                                     <th>Email</th>
                                 </tr>
                             </thead>
-                            <tr>
-                                <td></td>
-                                <td></td>
+                            <tr ng-repeat="person in interalPersons">
+                                <td>{{ person.name }}</td>
+                                <td>{{ person.emailAddress }}</td>
                             </tr>
                         </table>
                     </div>

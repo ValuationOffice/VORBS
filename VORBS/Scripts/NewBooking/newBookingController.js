@@ -88,6 +88,18 @@ function NewBookingController($scope, $http, $resource) {
         });
     }
 
+    $('#addressModal').on('show.bs.modal', function () {
+        $scope.interalPersons = Users.queryAll({
+            allUsers: true
+        })
+    });
+
+    $scope.GetInternalEmails = function () {
+        $scope.interalPersons = Users.querySurname({            
+            allUsers: $scope.emailVal
+        });
+    }
+
     $scope.AddExternalName = function () {
 
         var fName = $('#externalFirstNameTextBox').val();
@@ -124,7 +136,7 @@ function NewBookingController($scope, $http, $resource) {
 
         //Validate Subject
         var Subject = ValidateSubject($scope.newBooking.Subject);
-
+        
         $scope.newBooking.StartDate = FormatDateForURL($scope.booking.StartDate, true);
         $scope.newBooking.EndDate = FormatDateForURL($scope.booking.EndDate, true);
 
@@ -165,7 +177,7 @@ function NewBookingController($scope, $http, $resource) {
         endTime: '',
         location: $scope.currentLocation,
         smartRoom: false,
-        numberOfAttendees: 1 
+        numberOfAttendees: 1
     };
 
     $scope.booking = {
@@ -180,10 +192,14 @@ function NewBookingController($scope, $http, $resource) {
         Emails: '',
         ExternalNames: null,
         StartDate: new Date(),
-        EndDate: new Date(),
+        EndDate: new Date(), 
         Pc: false,
         FlipChart: false,
         Projector: false
+    };
+
+    $scope.interalPersons = {
+        Person: { name: '', emailAddress: '' }
     };
 }
 
@@ -191,18 +207,27 @@ function NewBookingController($scope, $http, $resource) {
 function CreateServices($resource) {
     Locations = $resource('/api/locations', {
     }, {
-        query: {
-            method: 'GET', isArray: true
-        }
+        query: { method: 'GET', isArray: true }
+    });
+
+    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', { location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom' },
+    {
+        query: { method: 'GET', isArray: true }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', {
         location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom'
     },
-        {
+    {
             query: {
                 method: 'GET', isArray: true
             }
+    });
+
+    Users = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
+        {
+            queryAll: { method: 'GET', isArray: true },
+            querySurname: { method: 'GET', isArray: true }
         });
 }
 

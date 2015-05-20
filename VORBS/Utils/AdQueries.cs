@@ -17,20 +17,22 @@ namespace VORBS.Utils
             context = new PrincipalContext(ContextType.Domain);
         }
 
-        public UserPrincipal GetUserByCurrentUser(string currentIdentity)
+        public static UserPrincipal GetUserByCurrentUser(string currentIdentity)
         {
+            PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
             if (currentIdentity == null)           
                 return null;
 
             //Remove the domain string
             string pid = currentIdentity.Substring(currentIdentity.IndexOf("\\") + 1);
 
-            return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, pid);
+            return UserPrincipal.FindByIdentity(sContext, IdentityType.SamAccountName, pid);
         }
 
-        public UserPrincipal GetUserByPid(string pid)
+        public static UserPrincipal GetUserByPid(string pid)
         {
-            return UserPrincipal.FindByIdentity(context, IdentityType.SamAccountName, pid);
+            PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
+            return UserPrincipal.FindByIdentity(sContext, IdentityType.SamAccountName, pid);
         }
 
         public string GetUserFullNameByPid(string pid)
@@ -46,15 +48,32 @@ namespace VORBS.Utils
             return user.Name;
         }
 
-        public List<UserDTO> UserDetails(string emailAddress) 
+        public static List<UserDTO> AllUserDetails()
         {
+            PrincipalContext context = new PrincipalContext(ContextType.Domain);
             UserPrincipal userPrincipal = new UserPrincipal(context);
-            userPrincipal.EmailAddress = emailAddress + "*";
+            PrincipalSearcher search = new PrincipalSearcher(userPrincipal);
+            List<UserDTO> users = new List<UserDTO>();
+            foreach (UserPrincipal result in search.FindAll())
+            {
+                if (!string.IsNullOrWhiteSpace(result.EmailAddress))
+                    users.Add(new UserDTO() { EmailAddress = result.EmailAddress, Name = result.Name });
+            }
+
+            return users;
+        }
+
+        public static List<UserDTO> FindUserDetails(string surname)
+        {
+            PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
+            UserPrincipal userPrincipal = new UserPrincipal(sContext);
+            userPrincipal.Surname = surname + "*";
             PrincipalSearcher search = new PrincipalSearcher(userPrincipal);            
             List<UserDTO> user = new List<UserDTO>();
             foreach (UserPrincipal result in search.FindAll())
             {
-                user.Add( new UserDTO() { EmailAddress = result.EmailAddress.ToString(), Name = result.DisplayName.ToString()});
+                if (!string.IsNullOrWhiteSpace(result.EmailAddress))
+                    user.Add(new UserDTO() { EmailAddress = result.EmailAddress, Name = result.Name });
             }
 
             return user;

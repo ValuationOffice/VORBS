@@ -27,11 +27,10 @@ namespace VORBS.Utils
             mailClient.TargetName = "SMTPSVC/devExchange.voaitdev.local";
 
             //mailClient = new SmtpClient();
+            
 
-            AdQueries queries = new AdQueries();
-
-            from = queries.GetUserByPid(from).EmailAddress;
-            to = queries.GetUserByPid(to).EmailAddress;
+            from = AdQueries.GetUserByPid(from).EmailAddress;
+            to = AdQueries.GetUserByPid(to).EmailAddress;
 
 
             message.To.Add(to);
