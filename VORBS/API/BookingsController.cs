@@ -137,13 +137,6 @@ namespace VORBS.API
 
         }
 
-        //[Route("{room}/{startDate:DateTime}/{endDate:DateTime}/{subject}/{attendeEmails}/{externalNames}/{pc:bool}/{flipchart:bool}/{projector:bool}")]
-        //[HttpPost]
-        //public HttpResponseMessage SaveNewBooking(string room, DateTime startDate, DateTime endDate, string subject, string attendeEmails, string externalNames, bool pc, bool flipchart, bool projector)
-        //{
-        //   
-        //}
-
         public HttpResponseMessage SaveNewBooking([FromBody] Booking newBooking)
         {
              try

@@ -34,8 +34,8 @@ function NewBookingController($scope, $http, $resource) {
                 for (var b = 0; b < success[i].bookings.length; b++) {
                     eventData.push({
                         title: success[i].bookings[b].owner,
-                        start: new moment(success[i].bookings[b].startDate),
-                        end: new moment(success[i].bookings[b].endDate)
+                        start: success[i].bookings[b].startDate,
+                        end: success[i].bookings[b].endDate
                     });
                 }
                 var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
@@ -53,7 +53,7 @@ function NewBookingController($scope, $http, $resource) {
                         center: '',
                         right: ''
                     },
-                    //defaultDate: $scope.bookingFilter.startDate,                    
+                    defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),             
                     defaultView: 'agendaDay',
                     minTime: "09:00:00",
                     maxTime: "17:00:00",
@@ -66,7 +66,7 @@ function NewBookingController($scope, $http, $resource) {
 
                         var newEvent = { start: start, end: end };
                         if (isMeetingOverlapping(newEvent, this.calendar)) {
-                            alert('New meeting clashes with existing booking. Please choose a new time!"');
+                            alert('New meeting clashes with existing booking. Please choose a new time!');
                             return;
                         }
 
@@ -124,7 +124,7 @@ function NewBookingController($scope, $http, $resource) {
 
         //Validate Subject
         var Subject = ValidateSubject($scope.newBooking.Subject);
-        
+
         $scope.newBooking.StartDate = FormatDateForURL($scope.booking.StartDate, true);
         $scope.newBooking.EndDate = FormatDateForURL($scope.booking.EndDate, true);
 
@@ -137,15 +137,15 @@ function NewBookingController($scope, $http, $resource) {
             data: JSON.stringify($scope.newBooking),
             url: "api/bookings",
             contentType: "application/json",
+
             success: function (data, status) {
                 alert('Booking Confirmed. Meeting Requests Have Been Sent.');
-                location.reload();
-                //window.location.replace(...)
+                window.location.href = "/MyBookings"; //Redirect to my bookings
             },
             error: function (error) {
-                alert('Unable to Book Meeting Room. Please Contact ITSD. ')
+                alert('Unable to Book Meeting Room. Please Contact ITSD. ');
             }
-        })
+        });
     }
 
     $('#confirmModal').on('hidden.bs.modal', function () {
@@ -165,7 +165,7 @@ function NewBookingController($scope, $http, $resource) {
         endTime: '',
         location: $scope.currentLocation,
         smartRoom: false,
-        numberOfAttendees: 1
+        numberOfAttendees: 1 
     };
 
     $scope.booking = {
@@ -180,29 +180,32 @@ function NewBookingController($scope, $http, $resource) {
         Emails: '',
         ExternalNames: null,
         StartDate: new Date(),
-        EndDate: new Date(), 
+        EndDate: new Date(),
         Pc: false,
         FlipChart: false,
         Projector: false
     };
 }
 
+
 function CreateServices($resource) {
     Locations = $resource('/api/locations', {
     }, {
-        query: { method: 'GET', isArray: true }
+        query: {
+            method: 'GET', isArray: true
+        }
     });
 
-    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', { location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom' },
-    {
-        query: { method: 'GET', isArray: true }
-    });
-
-    Booking = $resource('/api/bookings/:room/:startDate/:endDate/:subject/:attendeeEmails/:externalNames/:pc/:flipchart/:projector',{ room: 'room', startDate: 'startDate', endDate: 'endDate', subject: 'subject', attendeeEmails: 'attendeeEmails', externalNames: 'externalNames', pc: 'pc', flipchart: 'flipchart', projector: 'projector' },
-    {
-        save: { method: 'GET' }
-    });
+    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', {
+        location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom'
+    },
+        {
+            query: {
+                method: 'GET', isArray: true
+            }
+        });
 }
+
 
 //Caladner UI Functions
 
@@ -291,6 +294,12 @@ function FormatDateForURL(date, hasTime) {
 
         return moment(myDate2).utc().format('MM-DD-YYYY');
     }
+}
+
+function FormatDataForSearch(date)
+{
+    var parts = date.split('-');
+    return new Date(parts[2], parts[1] - 1, parts[0]);
 }
 
 function FormatTime(time, date) {

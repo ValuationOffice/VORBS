@@ -111,12 +111,16 @@ namespace VORBS.API
                 return new List<RoomDTO>();
 
             List<Room> roomData = new List<Room>();
-            var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
+            //var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
             var availableRooms = db.Rooms.Where(x =>
                 x.Location.Name == location
                 && x.SeatCount >= numberOfPeople
                 //&& (x.Bookings.Where(b => start < b.EndDate)).Count() == 0
             ).ToList();
+
+            //var availableRooms = db.Rooms.Where(r => r.SeatCount >= numberOfPeople 
+            //                                    && r.LocationID == db.Locations.Single(l => l.Name == location).ID)
+            //                                    .ToList();
 
             roomData.AddRange(availableRooms);
 
