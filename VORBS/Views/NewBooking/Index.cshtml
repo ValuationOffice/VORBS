@@ -171,7 +171,7 @@
                                     <th>Email</th>
                                 </tr>
                             </thead>
-                            <tr ng-repeat="person in interalPersons">
+                            <tr ng-repeat="person in interalPersons" ng-click="AddAdEmail(person.emailAddress)">
                                 <td>{{ person.name }}</td>
                                 <td>{{ person.emailAddress }}</td>
                             </tr>

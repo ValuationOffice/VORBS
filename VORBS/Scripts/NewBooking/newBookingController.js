@@ -53,7 +53,7 @@ function NewBookingController($scope, $http, $resource) {
                         center: '',
                         right: ''
                     },
-                    defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),             
+                    defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),
                     defaultView: 'agendaDay',
                     minTime: "09:00:00",
                     maxTime: "17:00:00",
@@ -89,15 +89,35 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $('#addressModal').on('show.bs.modal', function () {
-        $scope.interalPersons = Users.queryAll({
-            allUsers: true
-        })
+        $scope.GetInternalEmails();
     });
 
     $scope.GetInternalEmails = function () {
-        $scope.interalPersons = Users.querySurname({            
-            allUsers: $scope.emailVal
-        });
+        if ($scope.emailVal === undefined || $scope.emailVal.trim() === "") {
+            $scope.interalPersons = Users.queryAll({
+                allUsers: true
+            })
+        }
+        else {
+            $scope.interalPersons = Users.querySurname({
+                allUsers: $scope.emailVal
+            });
+        }
+    }
+
+    $scope.AddAdEmail = function (email) {
+        //Test to see if Email exists
+        if (AdEmailExist(email.toUpperCase().trim(), $scope.newBooking.Emails.split(' '))) {
+            alert('User Email Already Selected.');
+            return;
+        };
+
+        //Tets to check if last char is space
+        if (!(/\s+$/.test($scope.newBooking.Emails))) {
+            $scope.newBooking.Emails += " ";
+        }
+        $scope.newBooking.Emails += email.trim();
+        alert('User Added!');
     }
 
     $scope.AddExternalName = function () {
@@ -128,15 +148,15 @@ function NewBookingController($scope, $http, $resource) {
         SetModalErrorMessage('');
 
         //Validate Emails
-        var emails = $scope.newBooking.Emails.split(' ');
-        var AttendeeEmails = ValidateEmails(emails);
+        var emails = $scope.newBooking.Emails.trim().split(' ');
+        $scope.newBooking.Emails = ValidateEmails(emails);
 
         //Validate Number of External Names is not graether than attendees
         ValidateNoAttendees(emails.length, $scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
         //Validate Subject
         var Subject = ValidateSubject($scope.newBooking.Subject);
-        
+
         $scope.newBooking.StartDate = FormatDateForURL($scope.booking.StartDate, true);
         $scope.newBooking.EndDate = FormatDateForURL($scope.booking.EndDate, true);
 
@@ -192,7 +212,7 @@ function NewBookingController($scope, $http, $resource) {
         Emails: '',
         ExternalNames: null,
         StartDate: new Date(),
-        EndDate: new Date(), 
+        EndDate: new Date(),
         Pc: false,
         FlipChart: false,
         Projector: false
@@ -219,9 +239,9 @@ function CreateServices($resource) {
         location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom'
     },
     {
-            query: {
-                method: 'GET', isArray: true
-            }
+        query: {
+            method: 'GET', isArray: true
+        }
     });
 
     Users = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
@@ -321,8 +341,7 @@ function FormatDateForURL(date, hasTime) {
     }
 }
 
-function FormatDataForSearch(date)
-{
+function FormatDataForSearch(date) {
     var parts = date.split('-');
     return new Date(parts[2], parts[1] - 1, parts[0]);
 }
@@ -411,6 +430,14 @@ function SetModalErrorMessage(message) {
 function ResetExternalNamesUI() {
     $('#externalFirstNameTextBox').val('');
     $('#externalLastNameTextBox').val('');
+}
+
+function AdEmailExist(email, currentEmails) {
+    for (var i = 0; i < currentEmails.length; i++) {
+        if (email === currentEmails[i].toUpperCase().trim()) {
+            return true;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////
