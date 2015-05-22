@@ -29,6 +29,10 @@ function NewBookingController($scope, $http, $resource) {
         }, function (success) {
             $("#bookingTable").html('');
 
+            if (success.length == 0) {
+                $('#bookingTable').append('<div id="noMeetingsError" class="alert alert-danger alert-dismissible" role="alert">Sorry, there are no rooms available at the required time.</div>');
+            }
+
             for (var i = 0; i < success.length; i++) {
                 var eventData = [];
                 for (var b = 0; b < success[i].bookings.length; b++) {
@@ -40,11 +44,11 @@ function NewBookingController($scope, $http, $resource) {
                 }
                 var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
                 //debugger;
+                roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + success[i].seatCount + ' Attendees"> ' + success[i].seatCount + '</span></span>';
                 roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
-                roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
-                roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-user" title="' + success[i].seatCount + ' Attendees"> ' + success[i].seatCount + '</span></span>';
+                roomDetails = roomDetails + '<span class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';                
 
-                $('#bookingTable').append('<div class="dailyCalendarContainer"><div style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
+                $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
                 var roomName = '[' + success[i].roomName + ']';
                 $("#" + success[i].roomName + "_calendar").fullCalendar({
                     weekends: false,

@@ -64,6 +64,7 @@ textarea {
 
 #bookingTable{
     width: 100%;
+    display:inline-block;
     overflow-x: auto;
 }
 
@@ -72,6 +73,14 @@ textarea {
     float: left;
 }
 
+#attendeesInputFilter {
+    margin-right:-30px;
+}
+
+#searchButton {
+    margin-right:50px;
+    margin-top:20px;
+}
 
 /*ADDED 15/05/2015 CL*/
 .navbar-inverse .navbar-nav > li > a {
@@ -94,4 +103,53 @@ textarea {
   font-weight: bold !important;
   background-color: #080808 !important;
 }
+
+#attendeesBadgeIcon {
+    margin: 0px 50px 2px 50px;       
+}
+
+#roomDetailsBox {
+    margin-bottom:-15px;
+}
+
+#userInfoTable {
+    margin-top:-15px;    
+    width:100%;
+    border-spacing:0;
+}
+
+#userInfoTable tbody, #userInfoTable thead, #userInfoTable tr, 
+#userInfoTable th, #userInfoTable td { 
+    display: block; 
+}
+
+#userInfoTable thead tr {
+    /* fallback */
+    width: 97%;
+    /* minus scroll bar width */
+    width: -webkit-calc(100% - 16px);
+    width:    -moz-calc(100% - 16px);
+    width:         calc(100% - 16px);
+}
+
+#userInfoTable tr:after {  /* clearing float */
+    content: ' ';
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+
+#userInfoTable tbody {
+    overflow-y:auto;
+    height:500px;    
+}
+
+#userInfoTable th, #userInfoTable tbody td { 
+    width:49%;
+    float:left;
+}
+
+
+
+
 
