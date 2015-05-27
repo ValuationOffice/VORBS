@@ -224,5 +224,10 @@
                 minuteStep: 30
             });
         });
+
+        document.getElementById('bookingTable').addEventListener('mousewheel', function (e) {
+            this.scrollLeft -= (e.wheelDelta);
+            e.preventDefault();
+        }, false);
     </script>
 }

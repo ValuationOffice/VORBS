@@ -63,14 +63,17 @@ textarea {
 }
 
 #bookingTable{
-    width: 100%;
-    display:inline-block;
+    width: 1051px;
+    height:600px;
     overflow-x: auto;
+    overflow-y:hidden;
+    white-space:nowrap;
 }
 
 .dailyCalendarContainer {
+    height:590px;
     width: 150px;
-    float: left;
+    display:inline-block;
 }
 
 #attendeesInputFilter {
@@ -105,11 +108,20 @@ textarea {
 }
 
 #attendeesBadgeIcon {
-    margin: 0px 50px 2px 50px;       
+    margin: 0px 14px 5px 15px;
+}
+
+#pcBadgeIcon { 
+    float:left;
+    margin-left:34px;
+}
+
+#phoneBadgeIcon {
+    float:left;
 }
 
 #roomDetailsBox {
-    margin-bottom:-15px;
+    height:45px;
 }
 
 #userInfoTable {
