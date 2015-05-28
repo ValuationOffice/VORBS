@@ -64,7 +64,7 @@ textarea {
 
 #bookingTable{
     width: 1051px;
-    height:600px;
+    height:550px;
     overflow-x: auto;
     overflow-y:hidden;
     white-space:nowrap;
@@ -160,6 +160,8 @@ textarea {
     width:49%;
     float:left;
 }
+
+
 
 
 

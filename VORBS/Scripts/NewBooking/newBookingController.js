@@ -58,13 +58,13 @@ function NewBookingController($scope, $http, $resource) {
                         right: ''
                     },
                     defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),
-                    defaultView: 'agendaDay',
+                    defaultView: 'agendaDay',                    
                     minTime: "09:00:00",
-                    maxTime: "17:00:00",
+                    maxTime: "17:30:00",
                     allDaySlot: false,
                     selectable: true,
                     selectHelper: true,
-                    height: 500,
+                    height: 452,
                     titleFormat: '' + roomName + '',
                     select: function (start, end, allDay) {
 
