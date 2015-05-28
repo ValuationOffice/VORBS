@@ -114,11 +114,10 @@ namespace VORBS.API
 
             List<Room> roomData = new List<Room>();
             //var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
-            var availableRooms = db.Rooms.Where(x =>
-                x.Location.Name == location
-                && x.SeatCount >= numberOfPeople
-                //&& (x.Bookings.Where(b => start < b.EndDate)).Count() == 0
-            ).ToList();
+
+            var availableRooms = db.Rooms.Where(x =>x.Location.Name == location && x.SeatCount >= numberOfPeople)
+                                         .OrderBy(r => r.SeatCount)
+                                         .ToList();
 
             roomData.AddRange(availableRooms);
 
@@ -135,7 +134,7 @@ namespace VORBS.API
                     BookingDTO bDto = new BookingDTO()
                     {
                         ID = b.ID,
-                        Owner = queries.GetUserFullNameByPid(b.Owner), //TODO: Create instance of class for better loading ?
+                        Owner = queries.GetUserFullNameByPid(b.Owner),
                         StartDate = b.StartDate,
                         EndDate = b.EndDate
                     };
