@@ -121,6 +121,7 @@ namespace VORBS.API
                     ID = x.ID,
                     EndDate = x.EndDate,
                     StartDate = x.StartDate,
+                    Subject = x.Subject,
                     Owner = x.Owner,
                     Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }

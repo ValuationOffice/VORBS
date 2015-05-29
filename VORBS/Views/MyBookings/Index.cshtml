@@ -5,22 +5,26 @@
 <div ng-app="myBookings">
     <div id="controllerDiv" ng-controller="MyBookingsController">
 
+        <link href="~/Content/Site.css" rel="stylesheet" />
+
         <h2>My Bookings</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Location</th>
                     <th>Room</th>
-                    <th>Start</th>
-                    <th>End</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Subject</th>
                     <th></th>
                 </tr>
             </thead>
             <tr ng-repeat="booking in bookings">
                 <td>{{ booking.location.name}}</td>
                 <td>{{ booking.room.roomName }}</td>
-                <td>{{ booking.startDateFormatted() }}</td>
-                <td>{{ booking.endDateFormatted() }}</td>
+                <td>{{ booking.DateFormatted() }}</td>
+                <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
+                <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
                 <td><span class="btn glyphicon glyphicon-edit"></span></td>
                 <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-remove"></span></td>
             </tr>
