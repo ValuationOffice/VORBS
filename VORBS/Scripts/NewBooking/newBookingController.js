@@ -22,8 +22,8 @@ function NewBookingController($scope, $http, $resource) {
     $scope.SearchBookings = function () {
         $scope.roomBookings = Available.query({
             location: $scope.bookingFilter.location.name,
-            startDate: FormatDateForURL($scope.bookingFilter.startDate, false),
-            endDate: FormatDateForURL($scope.bookingFilter.startDate, false),
+            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime),
+            endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime),
             smartRoom: $scope.bookingFilter.smartRoom,
             numberOfAttendees: $scope.bookingFilter.numberOfAttendees
         }, function (success) {
@@ -46,7 +46,7 @@ function NewBookingController($scope, $http, $resource) {
                 //debugger;
                 roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + success[i].seatCount + ' Attendees"> ' + success[i].seatCount + '</span></span>';
                 roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
-                roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';                
+                roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
 
                 $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
                 var roomName = '[' + success[i].roomName + ']';
@@ -58,7 +58,7 @@ function NewBookingController($scope, $http, $resource) {
                         right: ''
                     },
                     defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),
-                    defaultView: 'agendaDay',                    
+                    defaultView: 'agendaDay',
                     minTime: "09:00:00",
                     maxTime: "17:30:00",
                     timeFormat: "H:mm",
@@ -163,8 +163,8 @@ function NewBookingController($scope, $http, $resource) {
         //Validate Subject
         var Subject = ValidateSubject($scope.newBooking.Subject);
 
-        $scope.newBooking.StartDate = FormatDateForURL($scope.booking.StartDate, true);
-        $scope.newBooking.EndDate = FormatDateForURL($scope.booking.EndDate, true);
+        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.StartDate, true);
+        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.EndDate, true);
 
         if ($scope.booking.ExternalNames.length > 0) {
             $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
@@ -320,31 +320,22 @@ function convertTo24Hour(time) {
     return time.replace(/(AM|PM)/, '').slice(0, -1);
 }
 
-function FormatDateForURL(date, hasTime) {
+function FormatDateTimeForURL(date) {
 
     if (date === "") {
         alert('Please Enter a Valid Date');
         throw new Error();
     }
 
-    if (hasTime) {
+    var timeDate = date.split(' ');
 
-        var timeDate = date.split(' ');
+    var dateParts = timeDate[0].split('-');
+    var timeParts = timeDate[1].split(':');
 
-        var dateParts = timeDate[0].split('-');
-        var timeParts = timeDate[1].split(':');
+    myDate2 = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+    myDate2.setHours(timeParts[0], timeParts[1], 0);
 
-        myDate2 = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-        myDate2.setHours(timeParts[0], timeParts[1], 0);
-
-        return moment(myDate2).utc().format('MM-DD-YYYY-HHmm');
-    }
-    else {
-        var parts = date.split('-');
-        myDate2 = new Date(parts[2], parts[1] - 1, parts[0]);
-
-        return moment(myDate2).utc().format('MM-DD-YYYY');
-    }
+    return new moment(myDate2).utc().format('MM-DD-YYYY-HHmm');
 }
 
 function FormatDataForSearch(date) {
