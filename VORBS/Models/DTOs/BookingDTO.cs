@@ -9,6 +9,7 @@ namespace VORBS.Models.DTOs
     {
         public int ID { get; set; }
 
+        public string PId { get; set; }
         public string Owner { get; set; }
         public string Subject { get; set; }
 

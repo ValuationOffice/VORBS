@@ -27,15 +27,15 @@ namespace VORBS.API
         }
 
 
-        [Route("{surname}")]
+        [Route("{name}")]
         [HttpGet]
-        public List<UserDTO> GetAvailableUsers(string surname)
+        public List<UserDTO> GetAvailableUsers(string name)
          {            
             List<UserDTO> userDTO = new List<UserDTO>();
-            if (string.IsNullOrWhiteSpace(surname))
+            if (string.IsNullOrWhiteSpace(name))
                 return new List<UserDTO>();
 
-            userDTO = AdQueries.FindUserDetails(surname);
+            userDTO = AdQueries.FindUserDetails(name);
             return userDTO;
         }
 

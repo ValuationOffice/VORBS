@@ -63,11 +63,11 @@ namespace VORBS.Utils
             return users;
         }
 
-        public static List<UserDTO> FindUserDetails(string surname)
+        public static List<UserDTO> FindUserDetails(string name)
         {
             PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
             UserPrincipal userPrincipal = new UserPrincipal(sContext);
-            userPrincipal.Surname = surname + "*";
+            userPrincipal.Name = name + "*";
             PrincipalSearcher search = new PrincipalSearcher(userPrincipal);            
             List<UserDTO> user = new List<UserDTO>();
             foreach (UserPrincipal result in search.FindAll())

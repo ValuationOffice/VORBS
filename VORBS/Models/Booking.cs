@@ -11,6 +11,7 @@ namespace VORBS.Models
         public int ID { get; set; }
         public int RoomID { get; set; }
 
+        public string PId { get; set; }
         public string Owner { get; set; }
         public string Subject { get; set; }
 
