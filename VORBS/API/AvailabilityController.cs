@@ -107,7 +107,6 @@ namespace VORBS.API
         public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom)
         {
             List<RoomDTO> rooms = new List<RoomDTO>();
-            AdQueries queries = new AdQueries();
 
             if (location == null)
                 return new List<RoomDTO>();
@@ -116,8 +115,8 @@ namespace VORBS.API
             //var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
 
             var availableRooms = db.Rooms.Where(x =>x.Location.Name == location && x.SeatCount >= numberOfPeople)
-                                         .OrderBy(r => r.SeatCount)
-                                         .ToList();
+                                .OrderBy(r => r.SeatCount)
+                                .ToList();
 
             roomData.AddRange(availableRooms);
 
@@ -134,7 +133,7 @@ namespace VORBS.API
                     BookingDTO bDto = new BookingDTO()
                     {
                         ID = b.ID,
-                        Owner = queries.GetUserFullNameByPid(b.Owner),
+                        Owner = b.Owner,
                         StartDate = b.StartDate,
                         EndDate = b.EndDate
                     };

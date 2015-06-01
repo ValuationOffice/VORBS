@@ -61,6 +61,8 @@ function NewBookingController($scope, $http, $resource) {
                     defaultView: 'agendaDay',                    
                     minTime: "09:00:00",
                     maxTime: "17:30:00",
+                    timeFormat: "H:mm",
+                    axisFormat: "H:mm",
                     allDaySlot: false,
                     selectable: true,
                     selectHelper: true,
