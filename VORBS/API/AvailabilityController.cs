@@ -114,8 +114,7 @@ namespace VORBS.API
             List<Room> roomData = new List<Room>();
             //var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
 
-            var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople &&
-                                               (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate).Count() == 0)) //Do any bookings overlap
+            var availableRooms = db.Rooms.Where(x =>x.Location.Name == location && x.SeatCount >= numberOfPeople)
                                 .OrderBy(r => r.SeatCount)
                                 .ToList();
 
