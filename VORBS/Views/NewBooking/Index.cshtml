@@ -250,5 +250,13 @@
             if (isNaN(String.fromCharCode(key))) return false;
         }
 
+        $(document).ready(function () {
+            $('input').keydown(function (event) {
+                if (event.keyCode == 32) {
+                    event.preventDefault();
+                }
+            });
+        });
+
     </script>
 }
