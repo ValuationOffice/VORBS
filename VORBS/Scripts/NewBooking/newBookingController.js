@@ -25,7 +25,7 @@ function NewBookingController($scope, $http, $resource) {
             startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime),
             endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime),
             smartRoom: $scope.bookingFilter.smartRoom,
-            numberOfAttendees: $scope.bookingFilter.numberOfAttendees.replace(/[^\d.-]/g,'')
+            numberOfAttendees: $scope.bookingFilter.numberOfAttendees
         }, function (success) {
             $("#bookingTable").html('');
 

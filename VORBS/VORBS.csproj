@@ -1019,7 +1019,7 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\NewBooking\Index.cshtml" />
+    <Content Include="Views\Shared\Index.cshtml" />
     <Content Include="Views\MyBookings\Index.cshtml" />
     <Content Include="Views\ManageBookings\Index.cshtml" />
     <Content Include="Scripts\version.json" />
@@ -1033,6 +1033,7 @@
     <Folder Include="Content\BootStrapDateTimePicker\" />
     <Folder Include="Scripts\BootstrapDateTimePicker\" />
     <Folder Include="Scripts\FullCalendarResourceView\" />
+    <Folder Include="Views\NewBooking\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">

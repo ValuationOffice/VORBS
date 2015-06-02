@@ -42,7 +42,7 @@
 
                 <div class="input-group" id="attendeesInputFilter">
                     <label class="control-label">Number of Attendees</label>
-                    <input id="attendessControl" type="number" min="1" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" ng-trim="false" />
+                    <input id="attendessControl" type="number" min="1" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
                 </div>
 
                 <input id="searchButton" type="button" class="form-control" ng-click="SearchBookings()" value="Search" />
