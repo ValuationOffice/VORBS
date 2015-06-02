@@ -42,7 +42,7 @@
 
                 <div class="input-group" id="attendeesInputFilter">
                     <label class="control-label">Number of Attendees</label>
-                    <input id="attendessControl" type="number" class="form-control" ng-model="bookingFilter.numberOfAttendees" />
+                    <input id="attendessControl" type="number" min="1" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" ng-trim="false" />
                 </div>
 
                 <input id="searchButton" type="button" class="form-control" ng-click="SearchBookings()" value="Search" />
@@ -214,6 +214,7 @@
     <script>
         $(function () {
             $('.datepicker').datepicker({
+                startDate: '-0m',
                 format: 'dd-mm-yyyy',
                 autoClose: true,
                 todayBtn: true,
@@ -228,9 +229,26 @@
             });
         });
 
+        function trim11(input) {
+            str = str.replace(/^\s+/, '');
+            for (var i = str.length - 1; i >= 0; i--) {
+                if (/\S/.test(str.charAt(i))) {
+                    str = str.substring(0, i + 1);
+                    break;
+                }
+            }
+            return str;
+        }
+
         document.getElementById('bookingTable').addEventListener('mousewheel', function (e) {
             this.scrollLeft -= (e.wheelDelta);
             e.preventDefault();
         }, false);
+
+        document.getElementById('attendessControl').onkeydown = function (e) {
+            var key = e.keyCode ? e.keyCode : e.which;
+            if (isNaN(String.fromCharCode(key))) return false;
+        }
+
     </script>
 }
