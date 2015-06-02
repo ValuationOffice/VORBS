@@ -22,8 +22,8 @@ function NewBookingController($scope, $http, $resource) {
     $scope.SearchBookings = function () {
         $scope.roomBookings = Available.query({
             location: $scope.bookingFilter.location.name,
-            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime),
-            endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime),
+            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, true),
+            endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, true),
             smartRoom: $scope.bookingFilter.smartRoom,
             numberOfAttendees: $scope.bookingFilter.numberOfAttendees
         }, function (success) {
@@ -46,7 +46,7 @@ function NewBookingController($scope, $http, $resource) {
                 //debugger;
                 roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + success[i].seatCount + ' Attendees"> ' + success[i].seatCount + '</span></span>';
                 roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
-                roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';                
+                roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
 
                 $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
                 var roomName = '[' + success[i].roomName + ']';
@@ -58,7 +58,7 @@ function NewBookingController($scope, $http, $resource) {
                         right: ''
                     },
                     defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),
-                    defaultView: 'agendaDay',                    
+                    defaultView: 'agendaDay',
                     minTime: "09:00:00",
                     maxTime: "17:30:00",
                     timeFormat: "H:mm",
@@ -71,7 +71,7 @@ function NewBookingController($scope, $http, $resource) {
                     select: function (start, end, allDay) {
 
                         var newEvent = { start: start, end: end };
-                        if (isMeetingOverlapping(newEvent, this.calendar)) {
+                        if (isMeetingOverlapping(newEvent, this.calendar.clientEvents())) {
                             alert('New meeting clashes with existing booking. Please choose a new time!');
                             return;
                         }
@@ -80,8 +80,8 @@ function NewBookingController($scope, $http, $resource) {
                         var room = $scope.GetRoomByName(this.title);
 
                         $scope.newBooking.Room.RoomName = room.roomName;
-                        $scope.booking.StartDate = $scope.bookingFilter.startDate + ' ' + start.utc().format('HH:mm A');
-                        $scope.booking.EndDate = $scope.bookingFilter.startDate + ' ' + end.utc().format('HH:mm A');
+                        $scope.booking.StartTime = start.utc().format('H:mm');
+                        $scope.booking.EndTime = end.utc().format('H:mm');
 
                         $scope.$digest();
                         $("#confirmModal").modal('show');
@@ -150,21 +150,31 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.NewBooking = function () {
-        //Reset Ant Error Message
+        //Reset Any Error Messages
         SetModalErrorMessage('');
 
-        //Validate Emails
-        var emails = $scope.newBooking.Emails.trim().split(' ');
-        $scope.newBooking.Emails = ValidateEmails(emails);
-
         //Validate Number of External Names is not graether than attendees
-        ValidateNoAttendees(emails.length, $scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
+        ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
         //Validate Subject
         var Subject = ValidateSubject($scope.newBooking.Subject);
 
-        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.StartDate, true);
-        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.EndDate, true);
+        //Validate Times
+
+        //Validate that new time does not clash
+        var newEvent = {
+            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, false),
+            end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, false)
+        };
+
+        if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName + "_calendar").fullCalendar('clientEvents'))) {
+            alert('New meeting clashes with existing booking. Please choose a new time!');
+            return;
+        };
+
+        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, true);
+        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, true);
+
 
         if ($scope.booking.ExternalNames.length > 0) {
             $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
@@ -207,8 +217,8 @@ function NewBookingController($scope, $http, $resource) {
     };
 
     $scope.booking = {
-        StartDate: new Date(),
-        EndDate: new Date(),
+        StartTime: '',
+        EndTime: '',
         ExternalNames: []
     };
 
@@ -260,8 +270,7 @@ function CreateServices($resource) {
 
 //Caladner UI Functions
 
-function isMeetingOverlapping(event, calendar) {
-    var array = calendar.clientEvents();
+function isMeetingOverlapping(event, array) {
     for (i in array) {
         if (event.end > array[i].start && event.start < array[i].end) {
             return true;
@@ -320,7 +329,7 @@ function convertTo24Hour(time) {
     return time.replace(/(AM|PM)/, '').slice(0, -1);
 }
 
-function FormatDateTimeForURL(date) {
+function FormatDateTimeForURL(date, Format) {
 
     if (date === "") {
         alert('Please Enter a Valid Date');
@@ -335,7 +344,13 @@ function FormatDateTimeForURL(date) {
     myDate2 = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
     myDate2.setHours(timeParts[0], timeParts[1], 0);
 
-    return new moment(myDate2).utc().format('MM-DD-YYYY-HHmm');
+    if (Format) {
+        return new moment(myDate2).utc().format('MM-DD-YYYY-HHmm');
+    }
+    else {
+        //Workaround for confirmation edit time 
+        return new moment(myDate2).add(1, 'h');
+    }
 }
 
 function FormatDataForSearch(date) {
@@ -394,8 +409,8 @@ function ValidateEmails(emails) {
     return attendeeEmails;
 }
 
-function ValidateNoAttendees(attendees, filterAttendees, externalNamesLength) {
-    if (externalNamesLength > attendees) {
+function ValidateNoAttendees(filterAttendees, externalNamesLength) {
+    if (externalNamesLength > filterAttendees) {
         SetModalErrorMessage('Too Many External Attendees for Meeting Room');
         throw new Error();
     }

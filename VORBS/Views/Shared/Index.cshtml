@@ -69,11 +69,9 @@
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="myModalLabel">New Booking for {{ bookingFilter.startDate }}</h4>
-                        @*<span class="alert alert-danger" id="newBookingErrorMessage" style="display: none;"></span>*@
                     </div>
                     <div class="modal-body">
                         <div class="form">
-                            @*<h6 class="modal-title">Please Enter in the Below Details:</h6>*@
                             <div class="alert alert-danger" id="newBookingErrorMessage" style="display: none;"></div>
                             <div class="form-inline">
                                 <div class="form-group">
@@ -90,12 +88,12 @@
                                 <div class="form-group">
                                     <label class="control-label">Start Time</label>
                                     <span style="padding-left:12px;">
-                                        <input class="form-control" readonly="readonly" ng-model="booking.StartDate">
+                                        <input id="bookingStartTime" class="form-control timepicker" ng-model="booking.StartTime" />
                                     </span>
                                 </div>
                                 <div class="form-group" style="padding-left:10px;">
                                     <label class="control-label">End Time</label>
-                                    <input class="form-control" readonly="readonly" ng-model="booking.EndDate">
+                                    <input id="bookingEndTime" class="form-control timepicker" ng-model="booking.EndTime" />
                                 </div>
                             </div>
                             <br />
@@ -113,11 +111,11 @@
                             <hr />
                             <div class="form-group">
                                 <h3 class="modal-title">Attendees</h3>
-                                <div class="form-group">
+                                @*<div class="form-group">
                                     <label style="font-weight: normal !important;">Attendee Emails</label>
                                     <button type="button" class="btn btn-primary" style="float:left; margin-top:25px; margin-right:5px;" data-toggle="modal" data-target="#addressModal">To</button>
                                     <input class="form-control" ng-model="newBooking.Emails" />
-                                </div>
+                                </div>*@
                                 <label class="control-label">External Attendees</label>
                                 <div class="form-group">
                                     <div class="form-inline">

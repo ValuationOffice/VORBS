@@ -42,8 +42,8 @@ function CreateServices($resource) {
 
     GetBookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },        
-        startTimeFormatted: function () { return moment(this.startDate).format("hh:mm A"); },
-        endTimeFormatted: function () { return moment(this.endDate).format("hh:mm A"); }
+        startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
+        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); }
     };
 
     Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId' },

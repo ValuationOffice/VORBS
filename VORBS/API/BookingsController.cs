@@ -108,10 +108,10 @@ namespace VORBS.API
                 if (User.Identity.Name == null)
                     return new List<BookingDTO>();
 
-                var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1); //TODO: Change?
 
                 List<Booking> bookings = db.Bookings
-                    .Where(x => x.Owner == user.SamAccountName && x.StartDate >= start).ToList()
+                    .Where(x => x.PId == currentPid && x.StartDate >= start).ToList()
                     .OrderBy(x => x.StartDate)
                     .ToList();
 
@@ -143,7 +143,11 @@ namespace VORBS.API
              try
              {
                  newBooking.RoomID = db.Rooms.Single(r => r.RoomName == newBooking.Room.RoomName).ID;
-                 newBooking.Owner = AdQueries.GetUserByCurrentUser(User.Identity.Name).SamAccountName;
+
+                 var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                 
+                 newBooking.Owner = user.Name;
+                 newBooking.PId = user.SamAccountName;
 
                  //Reset Room as we dont want to create another room
                  newBooking.Room = null;
@@ -160,9 +164,6 @@ namespace VORBS.API
                  {
                      //Send Email to secuirty
                  }
-
-                 //Send Meeting Request to all Attnedees
-
 
                  return new HttpResponseMessage(HttpStatusCode.OK);
              }
@@ -185,10 +186,6 @@ namespace VORBS.API
                 db.SaveChanges();
 
                 //Once Booking has been removed; Send Cancealtion Emails
-                //if (booking.Attendes.Count > 0)
-                //{
-                //    //Outlook.SendCancellationRequest("7220451", "7220393");
-                //}
 
                 //if (booking.Equipment.Count > 0)
                 //{
