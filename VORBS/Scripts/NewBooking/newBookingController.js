@@ -26,7 +26,7 @@ function NewBookingController($scope, $http, $resource) {
         if (viewAll === true) {
             $scope.roomBookings = AllRooms.query({
                 location: $scope.bookingFilter.location.name,
-                startDate: new moment($scope.bookingFilter.startDate).format('DD-MM-YYYY')
+                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY')
             }, function (success) {
                 roomResults = success;
                 $scope.RenderBookings(roomResults);
@@ -35,8 +35,8 @@ function NewBookingController($scope, $http, $resource) {
         else {
             $scope.roomBookings = Available.query({
                 location: $scope.bookingFilter.location.name,
-                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, true),
-                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, true),
+                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm'),
+                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm'),
                 smartRoom: $scope.bookingFilter.smartRoom,
                 numberOfAttendees: $scope.bookingFilter.numberOfAttendees
             }, function (success) {
@@ -169,8 +169,8 @@ function NewBookingController($scope, $http, $resource) {
 
         //Validate that new time does not clash
         var newEvent = {
-            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, false),
-            end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, false)
+            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null),
+            end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null)
         };
 
         if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName + "_calendar").fullCalendar('clientEvents'))) {
@@ -178,8 +178,8 @@ function NewBookingController($scope, $http, $resource) {
             return;
         };
 
-        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, true);
-        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, true);
+        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm');
+        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm');
         $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
         if ($scope.booking.ExternalNames.length > 0) {

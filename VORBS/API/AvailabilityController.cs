@@ -171,7 +171,7 @@ namespace VORBS.API
                 ComputerCount = x.ComputerCount,
                 SeatCount = x.SeatCount,
                 SmartRoom = x.SmartRoom,
-                Bookings = x.Bookings.Select(b =>
+                Bookings = x.Bookings.Where(b => b.StartDate.Date == start.Date && b.EndDate.Date == end.Date).Select(b =>
                 {
                     BookingDTO bDto = new BookingDTO()
                     {

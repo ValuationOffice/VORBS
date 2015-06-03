@@ -62,7 +62,7 @@ function ValidateSubject(subject) {
 ////////////////
 
 //Formating (Date/Time)
-function FormatDateTimeForURL(date, Format) {
+function FormatDateTimeForURL(date, formatString) {
 
     if (date === "") {
         alert('Please Enter a Valid Date');
@@ -72,13 +72,16 @@ function FormatDateTimeForURL(date, Format) {
     var timeDate = date.split(' ');
 
     var dateParts = timeDate[0].split('-');
-    var timeParts = timeDate[1].split(':');
-
     myDate2 = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-    myDate2.setHours(timeParts[0], timeParts[1], 0);
 
-    if (Format) {
-        return new moment(myDate2).utc().format('MM-DD-YYYY-HHmm');
+    //If date incudes time add time
+    if (timeDate.length > 1) {
+        var timeParts = timeDate[1].split(':');
+        myDate2.setHours(timeParts[0], timeParts[1], 0);
+    }
+
+    if (formatString !== null) {
+        return new moment(myDate2).utc().format(formatString);
     }
     else {
         //Workaround for confirmation edit time 
