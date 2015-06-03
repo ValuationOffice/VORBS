@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "New Booking";
+}
+<div ng-app="newBooking">
+    <div id="controllerDiv" ng-controller="NewBookingController">
+
+        <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
+        <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
+        <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
+        <link href="~/Content/Site.css" rel="stylesheet" />
+
+        <h2>Book Your Meeting Room</h2>
+        <p>Use the filters provided below to check if your meeting room is available by using the required location, date, time and number of attendees required for your meeting.</p>
+        <hr />
+        <div class="form-inline">
+            <div class="form-group">
+
+                <div class="input-group">
+                    <label class="col-sm-2 control-label">Location</label>
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location"></select>
+                </div>
+
+                <div class="input-group">
+                    <label class="col-sm-2 control-label">Date</label>
+                    <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" />
+                </div>
+
+                <div class="input-group">
+                    <label class="control-label">Time Start</label>
+                    <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" />
+                </div>
+
+                <div class="input-group">
+                    <label class="control-label">Time End</label>
+                    <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" />
+                </div>
+
+                <div class="input-group ">
+                    <label class="control-label">Smart room</label>
+                    <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" />
+                </div>
+
+                <div class="input-group" id="attendeesInputFilter">
+                    <label class="control-label">Number of Attendees</label>
+                    <input id="attendessControl" type="number" min="1" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                </div>
+
+                <input id="searchButton" type="button" class="form-control" ng-click="SearchBookings()" value="Search" />
+
+            </div>
+
+            <hr />
+
+            <h2 id="bookingTitle">Available Rooms</h2>
+
+            <span id="errorMessage"></span>
+
+            <div class="alert alert-info">Please use the meeting rooms responsibly. Only book rooms that are suitable for your meeting size.</div>
+
+            <div id="bookingTable">
+                <!-- Content is rendered here from angular using the search filters -->
+            </div>
+        </div>
+
+        @Html.Partial("Modals/NewBookingModal", null)
+
+        @Html.Partial("Modals/ActiveDirectoryModal", null)
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/moment.js"></script>
+
+    <script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
+
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/angular-resource.min.js"></script>
+
+    <script src="~/Scripts/NewBooking/moduleManager.js"></script>
+    <script src="~/Scripts/NewBooking/newBookingController.js"></script>
+    <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
+
+    <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
+    <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+
+    <script>
+        $(function () {
+            $('.datepicker').datepicker({
+                startDate: '-0m',
+                format: 'dd-mm-yyyy',
+                autoClose: true,
+                todayBtn: true,
+                todayHighlight: true,
+                weekStart: 1
+            })
+
+            $('.timepicker').timepicker({
+                showInputs: false,
+                minuteStep: 30,
+                showMeridian: false
+            });
+        });
+
+        function trim11(input) {
+            str = str.replace(/^\s+/, '');
+            for (var i = str.length - 1; i >= 0; i--) {
+                if (/\S/.test(str.charAt(i))) {
+                    str = str.substring(0, i + 1);
+                    break;
+                }
+            }
+            return str;
+        }
+
+        document.getElementById('bookingTable').addEventListener('mousewheel', function (e) {
+            this.scrollLeft -= (e.wheelDelta);
+            e.preventDefault();
+        }, false);
+
+        document.getElementById('attendessControl').onkeydown = function (e) {
+            var key = e.keyCode ? e.keyCode : e.which;
+            if (isNaN(String.fromCharCode(key))) return false;
+        }
+
+        $(document).ready(function () {
+            $('input').keydown(function (event) {
+                if (event.keyCode == 32) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+    </script>
+}

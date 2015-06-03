@@ -9,20 +9,19 @@ namespace VORBS.Models.DTOs
     {
         public int ID { get; set; }
 
-        public string PId { get; set; }
+        public string PID { get; set; }
         public string Owner { get; set; }
         public string Subject { get; set; }
 
         public RoomDTO Room { get; set; }
         public LocationDTO Location { get; set; }
 
-        public string Emails { get; set; }
+        public int NumberOfAttendees { get; set; }
         public string ExternalNames { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public bool PC { get; set; }
         public bool Flipchart { get; set; }
         public bool Projector { get; set; }
     }

@@ -25,10 +25,12 @@
                 <td>{{ booking.DateFormatted() }}</td>
                 <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                 <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
-                <td><span class="btn glyphicon glyphicon-edit"></span></td>
+                <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
                 <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-remove"></span></td>
             </tr>
         </table>
+
+        @Html.Partial("Modals/EditBookingModal", null)
 
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -58,4 +60,15 @@
 
     <script src="~/Scripts/MyBookings/moduleManager.js"></script>
     <script src="~/Scripts/MyBookings/myBookingsController.js"></script>
+    <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
+
+    <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
+    <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
 }
+
+<script>
+    document.getElementById('attendessControl').onkeydown = function (e) {
+        var key = e.keyCode ? e.keyCode : e.which;
+        if (isNaN(String.fromCharCode(key))) return false;
+    };
+</script>

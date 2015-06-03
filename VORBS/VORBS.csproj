@@ -201,6 +201,7 @@
     <Content Include="Scripts\angular-touch.min.js" />
     <Content Include="Scripts\angular.js" />
     <Content Include="Scripts\angular.min.js" />
+    <Content Include="Scripts\Shared Functions\bookingFunctions.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\angular-messages.min.js.map" />
@@ -1019,7 +1020,7 @@
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Shared\Index.cshtml" />
+    <Content Include="Views\NewBooking\Index.cshtml" />
     <Content Include="Views\MyBookings\Index.cshtml" />
     <Content Include="Views\ManageBookings\Index.cshtml" />
     <Content Include="Scripts\version.json" />
@@ -1027,13 +1028,15 @@
     <Content Include="Views\Test\UI_2.cshtml" />
     <Content Include="Views\Test\UI_3.cshtml" />
     <Content Include="Views\Test\UI2.cshtml" />
+    <Content Include="Views\Shared\Modals\NewBookingModal.cshtml" />
+    <Content Include="Views\Shared\Modals\EditBookingModal.cshtml" />
+    <Content Include="Views\Shared\Modals\ActiveDirectoryModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\BootStrapDateTimePicker\" />
     <Folder Include="Scripts\BootstrapDateTimePicker\" />
     <Folder Include="Scripts\FullCalendarResourceView\" />
-    <Folder Include="Views\NewBooking\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">

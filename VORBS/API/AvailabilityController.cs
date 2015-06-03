@@ -116,7 +116,7 @@ namespace VORBS.API
 
             var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople &&
                                                (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate).Count() == 0)) //Do any bookings overlap
-                                .OrderBy(r => r.SeatCount)
+                                .OrderBy(r => r.SeatCount).ThenBy(r => r.SmartRoom)
                                 .ToList();
 
             roomData.AddRange(availableRooms);
@@ -143,6 +143,16 @@ namespace VORBS.API
             }));
 
             return rooms;
+        }
+
+        internal int GetBestAvaiableRoomForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom)
+        {
+            var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople &&
+                                               (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate).Count() == 0)) //Do any bookings overlap
+                                .OrderBy(r => r.SeatCount).ThenBy(r => r.SmartRoom)
+                                .Select(r => r.ID);
+
+             return availableRooms.FirstOrDefault();
         }
 
     }

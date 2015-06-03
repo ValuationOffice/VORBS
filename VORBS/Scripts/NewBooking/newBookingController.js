@@ -98,6 +98,10 @@ function NewBookingController($scope, $http, $resource) {
         $scope.GetInternalEmails();
     });
 
+    $('#confirmModal').on('show.bs.modal', function () {
+        SetModalErrorMessage('');         //Reset Any Error Messages
+    });
+
     $scope.GetInternalEmails = function () {
         if ($scope.emailVal === undefined || $scope.emailVal.trim() === "") {
             $scope.interalPersons = Users.queryAll({
@@ -126,33 +130,15 @@ function NewBookingController($scope, $http, $resource) {
         alert('User Added!');
     }
 
-    $scope.AddExternalName = function () {
-
-        var fName = $('#externalFirstNameTextBox').val();
-        var lName = $('#externalLastNameTextBox').val();
-
-        if (fName === null || lName === null) {
-            //TODO: Validation - Duplicate - Null
-        }
-
-        $scope.booking.ExternalNames.push(fName + ' ' + lName);
-
-        ResetExternalNamesUI();
+    $scope.AddExternalAttendee = function () {
+        $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
     }
 
-    $scope.RemoveExternalName = function (fullName) {
-        for (var i = 0; i < $scope.booking.ExternalNames.length; i++) {
-            if ($scope.booking.ExternalNames[i] === fullName) {
-                $scope.booking.ExternalNames.splice(i, 1);
-                break;
-            }
-        }
+    $scope.RemoveExternalAttendee = function (fullName) {
+        $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
     }
 
     $scope.NewBooking = function () {
-        //Reset Any Error Messages
-        SetModalErrorMessage('');
-
         //Validate Number of External Names is not graether than attendees
         ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
@@ -174,7 +160,7 @@ function NewBookingController($scope, $http, $resource) {
 
         $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, true);
         $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, true);
-
+        $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
         if ($scope.booking.ExternalNames.length > 0) {
             $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
@@ -200,7 +186,6 @@ function NewBookingController($scope, $http, $resource) {
         $scope.newBooking.Subject = '',
         $scope.newBooking.Emails = '',
         $scope.booking.ExternalNames = [],
-        $scope.newBooking.Pc = false,
         $scope.newBooking.FlipChart = false,
         $scope.newBooking.Projector = false
 
@@ -225,11 +210,10 @@ function NewBookingController($scope, $http, $resource) {
     $scope.newBooking = {
         Room: { RoomName: '' },
         Subject: '',
-        Emails: '',
+        NumberOfAttendees: 1,
         ExternalNames: null,
         StartDate: new Date(),
         EndDate: new Date(),
-        Pc: false,
         FlipChart: false,
         Projector: false
     };
@@ -329,30 +313,6 @@ function convertTo24Hour(time) {
     return time.replace(/(AM|PM)/, '').slice(0, -1);
 }
 
-function FormatDateTimeForURL(date, Format) {
-
-    if (date === "") {
-        alert('Please Enter a Valid Date');
-        throw new Error();
-    }
-
-    var timeDate = date.split(' ');
-
-    var dateParts = timeDate[0].split('-');
-    var timeParts = timeDate[1].split(':');
-
-    myDate2 = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-    myDate2.setHours(timeParts[0], timeParts[1], 0);
-
-    if (Format) {
-        return new moment(myDate2).utc().format('MM-DD-YYYY-HHmm');
-    }
-    else {
-        //Workaround for confirmation edit time 
-        return new moment(myDate2).add(1, 'h');
-    }
-}
-
 function FormatDataForSearch(date) {
     var parts = date.split('-');
     return new Date(parts[2], parts[1] - 1, parts[0]);
@@ -409,39 +369,9 @@ function ValidateEmails(emails) {
     return attendeeEmails;
 }
 
-function ValidateNoAttendees(filterAttendees, externalNamesLength) {
-    if (externalNamesLength > filterAttendees) {
-        SetModalErrorMessage('Too Many External Attendees for Meeting Room');
-        throw new Error();
-    }
-}
-
-function ValidateSubject(subject) {
-    if (subject.trim() === "") {
-        SetModalErrorMessage('Invalid Subject Detected');
-        throw new Error();
-    }
-    return subject;
-}
-
 function ValidateEmail(email) {
     var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return regex.test(email);
-}
-
-function SetModalErrorMessage(message) {
-    if (message === "") {
-        $('#newBookingErrorMessage').hide();
-    }
-    else {
-        $('#newBookingErrorMessage').text(message);
-        $('#newBookingErrorMessage').show();
-    }
-}
-
-function ResetExternalNamesUI() {
-    $('#externalFirstNameTextBox').val('');
-    $('#externalLastNameTextBox').val('');
 }
 
 function AdEmailExist(email, currentEmails) {
