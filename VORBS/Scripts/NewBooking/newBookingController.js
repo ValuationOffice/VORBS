@@ -50,8 +50,6 @@ function NewBookingController($scope, $http, $resource) {
 
         $("#bookingTable").html('');
 
-        $('#bookingTable').append('<div class="alert alert-info">Please use the meeting rooms responsibly. Only book rooms that are suitable for your meeting size.</div>');
-
         if (roomResults.length == 0) {
             $('#bookingTable').append('<div id="noMeetingsError" class="alert alert-danger alert-dismissible" role="alert">Sorry, there are no rooms available at the required time.</div>');
         }
