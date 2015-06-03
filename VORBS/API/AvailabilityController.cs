@@ -17,6 +17,47 @@ namespace VORBS.API
         private VORBSContext db = new VORBSContext();
 
         [HttpGet]
+        [Route("{location}/{start:DateTime}")]
+        public List<RoomDTO> GetAllRoomBookingsForLocation(string location, DateTime start)
+        {
+            List<RoomDTO> rooms = new List<RoomDTO>();
+
+            if (location == null)
+                return new List<RoomDTO>();
+
+            List<Room> roomData = new List<Room>();
+
+            var availableRooms = db.Rooms.Where(x => x.Location.Name == location )
+                    .OrderBy(r => r.SeatCount)
+                    .ToList();
+
+            roomData.AddRange(availableRooms);
+
+            roomData.ForEach(x => rooms.Add(new RoomDTO()
+            {
+                ID = x.ID,
+                RoomName = x.RoomName,
+                PhoneCount = x.PhoneCount,
+                ComputerCount = x.ComputerCount,
+                SeatCount = x.SeatCount,
+                SmartRoom = x.SmartRoom,
+                Bookings = x.Bookings.Where(b => b.StartDate.Date == start.Date).Select(b =>
+                {
+                    BookingDTO bDto = new BookingDTO()
+                    {
+                        ID = b.ID,
+                        Owner = b.Owner,
+                        StartDate = b.StartDate,
+                        EndDate = b.EndDate
+                    };
+                    return bDto;
+                }).ToList()
+            }));
+
+            return rooms;
+        }
+
+        [HttpGet]
         [Route("{location}/{start:DateTime}/{end:DateTime}")]
         public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end)
         {
@@ -60,6 +101,7 @@ namespace VORBS.API
             return rooms;
         }
 
+        
         [HttpGet]
         [Route("{location}/{start:DateTime}/{numberOfPeople:int}/{smartRoom:bool}")]
         public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, int numberOfPeople, bool smartRoom)

@@ -5,6 +5,8 @@
 <div ng-app="myBookings">
     <div id="controllerDiv" ng-controller="MyBookingsController">
 
+        <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
+        <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
         <link href="~/Content/Site.css" rel="stylesheet" />
 
         <h2>My Bookings</h2>
@@ -26,7 +28,7 @@
                 <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                 <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
                 <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
-                <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-remove"></span></td>
+                <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
             </tr>
         </table>
 
@@ -64,11 +66,33 @@
 
     <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
     <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+
+    <script>
+        $(function () {
+            $('.datepicker').datepicker({
+                startDate: '-0m',
+                format: 'dd-mm-yyyy',
+                autoClose: true,
+                todayBtn: true,
+                todayBtn: 'linked',
+                todayHighlight: true,
+                weekStart: 1
+            });
+
+            $('.timepicker').timepicker({
+                showInputs: false,
+                minuteStep: 30,
+                showMeridian: false,
+            });
+        });
+
+        document.getElementById('attendessControl').onkeydown = function (e) {
+            var key = e.keyCode ? e.keyCode : e.which;
+            if (isNaN(String.fromCharCode(key))) return false;
+        };
+
+
+
+    </script>
 }
 
-<script>
-    document.getElementById('attendessControl').onkeydown = function (e) {
-        var key = e.keyCode ? e.keyCode : e.which;
-        if (isNaN(String.fromCharCode(key))) return false;
-    };
-</script>
