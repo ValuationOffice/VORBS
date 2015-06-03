@@ -27,6 +27,10 @@ textarea {
     width: 400px;
 }
 
+#timepicker2 {
+    z-index:2050 !important;
+}
+
 #logo_text #logoBanner{
     background-color: #008770;
     width: 5px;
@@ -166,6 +170,14 @@ textarea {
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+}
+
+#myTab .tab-content {
+    margin-top:20px;
+}
+
+#viewAllButton {
+    margin-left: 70%;
 }
 
 

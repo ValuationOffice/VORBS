@@ -19,79 +19,101 @@ function NewBookingController($scope, $http, $resource) {
         }
     }
 
-    $scope.SearchBookings = function () {
-        $scope.roomBookings = Available.query({
-            location: $scope.bookingFilter.location.name,
-            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, true),
-            endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, true),
-            smartRoom: $scope.bookingFilter.smartRoom,
-            numberOfAttendees: $scope.bookingFilter.numberOfAttendees
-        }, function (success) {
-            $("#bookingTable").html('');
+    $scope.SearchBookings = function (viewAll) {
 
-            if (success.length == 0) {
-                $('#bookingTable').append('<div id="noMeetingsError" class="alert alert-danger alert-dismissible" role="alert">Sorry, there are no rooms available at the required time.</div>');
-            }
+        var roomResults;
 
-            for (var i = 0; i < success.length; i++) {
-                var eventData = [];
-                for (var b = 0; b < success[i].bookings.length; b++) {
-                    eventData.push({
-                        title: success[i].bookings[b].owner,
-                        start: success[i].bookings[b].startDate,
-                        end: success[i].bookings[b].endDate
-                    });
-                }
-                var roomDetails = '<h2 style="text-align: center;">' + success[i].roomName + '</h2>';
-                //debugger;
-                roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + success[i].seatCount + ' Attendees"> ' + success[i].seatCount + '</span></span>';
-                roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + success[i].computerCount + ' PC\'s"> ' + success[i].computerCount + '</span></span>';
-                roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + success[i].phoneCount + ' Phones"> ' + success[i].phoneCount + '</span></span>';
+        if (viewAll === true) {
+            $scope.roomBookings = AllRooms.query({
+                location: $scope.bookingFilter.location.name,
+                startDate: new moment($scope.bookingFilter.startDate).format('DD-MM-YYYY')
+            }, function (success) {
+                roomResults = success;
+                $scope.RenderBookings(roomResults);
+            });
+        }
+        else {
+            $scope.roomBookings = Available.query({
+                location: $scope.bookingFilter.location.name,
+                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, true),
+                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, true),
+                smartRoom: $scope.bookingFilter.smartRoom,
+                numberOfAttendees: $scope.bookingFilter.numberOfAttendees
+            }, function (success) {
+                roomResults = success;
+                $scope.RenderBookings(roomResults);
+            });
+        }
+    }
 
-                $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + success[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
-                var roomName = '[' + success[i].roomName + ']';
-                $("#" + success[i].roomName + "_calendar").fullCalendar({
-                    weekends: false,
-                    header: {
-                        left: '',
-                        center: '',
-                        right: ''
-                    },
-                    defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),
-                    defaultView: 'agendaDay',
-                    minTime: "09:00:00",
-                    maxTime: "17:30:00",
-                    timeFormat: "H:mm",
-                    axisFormat: "H:mm",
-                    allDaySlot: false,
-                    selectable: true,
-                    selectHelper: true,
-                    height: 452,
-                    titleFormat: '' + roomName + '',
-                    select: function (start, end, allDay) {
+    $scope.RenderBookings = function (roomResults) {
 
-                        var newEvent = { start: start, end: end };
-                        if (isMeetingOverlapping(newEvent, this.calendar.clientEvents())) {
-                            alert('New meeting clashes with existing booking. Please choose a new time!');
-                            return;
-                        }
+        $("#bookingTable").html('');
 
-                        var $scope = angular.element($("#controllerDiv")).scope();
-                        var room = $scope.GetRoomByName(this.title);
+        $('#bookingTable').append('<div class="alert alert-info">Please use the meeting rooms responsibly. Only book rooms that are suitable for your meeting size.</div>');
 
-                        $scope.newBooking.Room.RoomName = room.roomName;
-                        $scope.booking.StartTime = start.utc().format('H:mm');
-                        $scope.booking.EndTime = end.utc().format('H:mm');
+        if (roomResults.length == 0) {
+            $('#bookingTable').append('<div id="noMeetingsError" class="alert alert-danger alert-dismissible" role="alert">Sorry, there are no rooms available at the required time.</div>');
+        }
 
-                        $scope.$digest();
-                        $("#confirmModal").modal('show');
-                    },
-                    events: eventData
+        for (var i = 0; i < roomResults.length; i++) {
+            var eventData = [];
+            for (var b = 0; b < roomResults[i].bookings.length; b++) {
+                eventData.push({
+                    title: roomResults[i].bookings[b].owner,
+                    start: roomResults[i].bookings[b].startDate,
+                    end: roomResults[i].bookings[b].endDate
                 });
-
             }
+            var roomDetails = '<h2 style="text-align: center;">' + roomResults[i].roomName + '</h2>';
+            //debugger;
+            roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + roomResults[i].seatCount + ' Attendees"> ' + roomResults[i].seatCount + '</span></span>';
+            roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + roomResults[i].computerCount + ' PC\'s"> ' + roomResults[i].computerCount + '</span></span>';
+            roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + roomResults[i].phoneCount + ' Phones"> ' + roomResults[i].phoneCount + '</span></span>';
 
-        });
+            $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + roomResults[i].roomName + '_calendar" class="dailyCalendar"></div></div>');
+            var roomName = '[' + roomResults[i].roomName + ']';
+            $("#" + roomResults[i].roomName + "_calendar").fullCalendar({
+                weekends: false,
+                header: {
+                    left: '',
+                    center: '',
+                    right: ''
+                },
+                defaultDate: FormatDataForSearch($scope.bookingFilter.startDate),
+                defaultView: 'agendaDay',
+                minTime: "09:00:00",
+                maxTime: "17:30:00",
+                timeFormat: "H:mm",
+                axisFormat: "H:mm",
+                allDaySlot: false,
+                selectable: true,
+                selectHelper: true,
+                height: 452,
+                titleFormat: '' + roomName + '',
+                select: function (start, end, allDay) {
+
+                    var newEvent = {
+                        start: start, end: end
+                    };
+                    if (isMeetingOverlapping(newEvent, this.calendar.clientEvents())) {
+                        alert('New meeting clashes with existing booking. Please choose a new time!');
+                        return;
+                    }
+
+                    var $scope = angular.element($("#controllerDiv")).scope();
+                    var room = $scope.GetRoomByName(this.title);
+
+                    $scope.newBooking.Room.RoomName = room.roomName;
+                    $scope.booking.StartTime = start.utc().format('H:mm');
+                    $scope.booking.EndTime = end.utc().format('H:mm');
+
+                    $scope.$digest();
+                    $("#confirmModal").modal('show');
+                },
+                events: eventData
+            });
+        }
     }
 
     $('#addressModal').on('show.bs.modal', function () {
@@ -208,7 +230,9 @@ function NewBookingController($scope, $http, $resource) {
     };
 
     $scope.newBooking = {
-        Room: { RoomName: '' },
+        Room: {
+            RoomName: ''
+        },
         Subject: '',
         NumberOfAttendees: 1,
         ExternalNames: null,
@@ -219,7 +243,9 @@ function NewBookingController($scope, $http, $resource) {
     };
 
     $scope.interalPersons = {
-        Person: { name: '', emailAddress: '' }
+        Person: {
+            name: '', emailAddress: ''
+        }
     };
 }
 
@@ -227,12 +253,9 @@ function NewBookingController($scope, $http, $resource) {
 function CreateServices($resource) {
     Locations = $resource('/api/locations', {
     }, {
-        query: { method: 'GET', isArray: true }
-    });
-
-    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', { location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom' },
-    {
-        query: { method: 'GET', isArray: true }
+        query: {
+            method: 'GET', isArray: true
+        }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', {
@@ -244,10 +267,34 @@ function CreateServices($resource) {
         }
     });
 
-    Users = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
+    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', {
+        location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom'
+    },
+    {
+        query: {
+            method: 'GET', isArray: true
+        }
+    });
+
+    AllRooms = $resource('/api/availability/:location/:startDate', {
+        location: 'location', startDate: 'startDate'
+    },
         {
-            queryAll: { method: 'GET', isArray: true },
-            querySurname: { method: 'GET', isArray: true }
+            query: {
+                method: 'GET', isArray: true
+            }
+        });
+
+    Users = $resource('/api/users/:allUsers', {
+        allUsers: 'allUsers'
+    },
+        {
+            queryAll: {
+                method: 'GET', isArray: true
+            },
+            querySurname: {
+                method: 'GET', isArray: true
+            }
         });
 }
 
