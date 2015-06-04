@@ -112,7 +112,13 @@ textarea {
 }
 
 #attendeesBadgeIcon {
-    margin: 0px 14px 5px 15px;
+    margin: 0px 10px 5px 19px;
+}
+
+#smartroomBadgeIcon {
+    margin: 0px 9px 0px 0px;
+    padding: 3px 10px 3px 14px;
+
 }
 
 #pcBadgeIcon { 

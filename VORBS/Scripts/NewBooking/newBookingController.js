@@ -65,7 +65,11 @@ function NewBookingController($scope, $http, $resource) {
             }
             var roomDetails = '<h2 style="text-align: center;">' + roomResults[i].roomName + '</h2>';
             //debugger;
+
             roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + roomResults[i].seatCount + ' Attendees"> ' + roomResults[i].seatCount + '</span></span>';
+            if ($scope.bookingFilter.location.rooms[i].smartRoom == false) {
+                roomDetails = roomDetails + '<span id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-camera"></span></span>'
+            };
             roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + roomResults[i].computerCount + ' PC\'s"> ' + roomResults[i].computerCount + '</span></span>';
             roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + roomResults[i].phoneCount + ' Phones"> ' + roomResults[i].phoneCount + '</span></span>';
 
