@@ -1,0 +1,166 @@
+﻿
+@{
+    ViewBag.Title = "Administration";
+}
+
+<h2>Administration</h2>
+<p>This administration panel enables you administer all content in this application, including managing users, existing bookings, add/remove locations and rooms.</p>
+
+
+
+
+<div id="content">
+    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+        <li class="active"><a href="#Bookings" data-toggle="tab">Bookings</a></li>
+        <li><a href="#users" data-toggle="tab">Users</a></li>
+        <li><a href="#locations" data-toggle="tab">Locations</a></li>
+        <li><a href="#rooms" data-toggle="tab">Rooms</a></li>
+    </ul>
+
+    <div id="my-tab-content" class="tab-content">
+
+        <div class="tab-pane active" id="Bookings">
+            <br />
+            <p>Manage your bookings.</p>
+            <div ng-app="myBookings">
+                <div id="controllerDiv" ng-controller="MyBookingsController">
+
+                    <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
+                    <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
+                    <link href="~/Content/Site.css" rel="stylesheet" />
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>Room</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tr ng-repeat="booking in bookings">
+                            <td>{{ booking.location.name}}</td>
+                            <td>{{ booking.room.roomName }}</td>
+                            <td>{{ booking.DateFormatted() }}</td>
+                            <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
+                            <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
+                            <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
+                            <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
+                        </tr>
+                    </table>
+
+                    @Html.Partial("Modals/EditBookingModal", null)
+
+                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    <h4 class="modal-title" id="myModalLabel">Confirm Deletion</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete this meeting?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" ng-click="DeleteBooking()">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @section scripts{
+                <script src="~/Scripts/moment.js"></script>
+                <script src="~/Scripts/angular.min.js"></script>
+                <script src="~/Scripts/angular-resource.min.js"></script>
+
+                <script src="~/Scripts/MyBookings/moduleManager.js"></script>
+                <script src="~/Scripts/MyBookings/myBookingsController.js"></script>
+                <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
+
+                <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
+                <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+
+                <script>
+                    $(function () {
+                        $('.datepicker').datepicker({
+                            startDate: '-0m',
+                            format: 'dd-mm-yyyy',
+                            autoClose: true,
+                            todayBtn: true,
+                            todayBtn: 'linked',
+                            todayHighlight: true,
+                            weekStart: 1
+                        });
+
+                        $('.timepicker').timepicker({
+                            showInputs: false,
+                            minuteStep: 30,
+                            showMeridian: false,
+                        });
+                    });
+
+                    document.getElementById('attendessControl').onkeydown = function (e) {
+                        var key = e.keyCode ? e.keyCode : e.which;
+                        if (isNaN(String.fromCharCode(key))) return false;
+                    };
+
+
+
+                </script>
+            }
+        </div>
+
+        <div class="tab-pane" id="users">
+            <br />
+            <p>Manage users.</p>
+        </div>
+        <div class="tab-pane" id="locations">
+            <br />
+            <p>Manage locations.</p>
+        </div>
+        <div class="tab-pane" id="rooms">
+            <br />
+            <p>Manage rooms.</p>
+        </div>
+    </div>
+</div>
+<br />
+@*<hr />
+<table class="table">
+    <tr>
+        <td>
+            <div class="panel panel-default">
+                <div class="panel-heading">Bookings</div>
+                <div class="panel-body">
+                    Panel content
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="panel panel-default">
+                <div class="panel-heading">Users</div>
+                <div class="panel-body">
+                    Panel content
+                </div>
+            </div>
+        </td>
+        <td>
+            <div class="panel panel-default">
+                <div class="panel-heading">Locations</div>
+                <div class="panel-body">
+                    Panel content
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>*@
+<script type="text/javascript">
+    jQuery(document).ready(function ($) {
+        $('#tabs').tab();
+    });
+</script>

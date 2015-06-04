@@ -131,7 +131,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\UsersController.cs" />
+    <Compile Include="Controllers\AdministrationController.cs" />
+    <Compile Include="Models\DTOs\AdminDTO.cs" />
     <Compile Include="Models\DTOs\UserDTO.cs" />
+    <Compile Include="Models\Admin.cs" />
     <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
     <Compile Include="API\BookingsController.cs" />
@@ -1031,10 +1034,12 @@
     <Content Include="Views\Shared\Modals\NewBookingModal.cshtml" />
     <Content Include="Views\Shared\Modals\EditBookingModal.cshtml" />
     <Content Include="Views\Shared\Modals\ActiveDirectoryModal.cshtml" />
+    <Content Include="Views\Administration\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\BootStrapDateTimePicker\" />
+    <Folder Include="Scripts\Administration\" />
     <Folder Include="Scripts\BootstrapDateTimePicker\" />
     <Folder Include="Scripts\FullCalendarResourceView\" />
   </ItemGroup>
