@@ -41,7 +41,8 @@
                 <ul class="nav navbar-nav">
                     <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "NewBooking" ? "active" : "")">@Html.ActionLink("New Booking", "Index", "NewBooking")</li>
                     <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "MyBookings" ? "active" : "")">@Html.ActionLink("My Bookings", "Index", "MyBookings")</li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ManageBookings" ? "active" : "")">@Html.ActionLink("Manage Bookings", "Index", "ManageBookings")</li>
+                    <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Administration", "Index", "Administration")</li>
+                    @*<li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ManageBookings" ? "active" : "")">@Html.ActionLink("Manage Bookings", "Index", "ManageBookings")</li>*@
                 </ul>
             </div>
         </div>
