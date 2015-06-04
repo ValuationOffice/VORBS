@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Administration";
 }
 
@@ -109,8 +108,9 @@
                         if (isNaN(String.fromCharCode(key))) return false;
                     };
 
-
-
+                    jQuery(document).ready(function ($) {
+                        $('#tabs').tab();
+                    });
                 </script>
             }
         </div>
@@ -130,37 +130,37 @@
     </div>
 </div>
 <br />
+
+
+
+
 @*<hr />
-<table class="table">
-    <tr>
-        <td>
-            <div class="panel panel-default">
-                <div class="panel-heading">Bookings</div>
-                <div class="panel-body">
-                    Panel content
+    <table class="table">
+        <tr>
+            <td>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Bookings</div>
+                    <div class="panel-body">
+                        Panel content
+                    </div>
                 </div>
-            </div>
-        </td>
-        <td>
-            <div class="panel panel-default">
-                <div class="panel-heading">Users</div>
-                <div class="panel-body">
-                    Panel content
+            </td>
+            <td>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Users</div>
+                    <div class="panel-body">
+                        Panel content
+                    </div>
                 </div>
-            </div>
-        </td>
-        <td>
-            <div class="panel panel-default">
-                <div class="panel-heading">Locations</div>
-                <div class="panel-body">
-                    Panel content
+            </td>
+            <td>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Locations</div>
+                    <div class="panel-body">
+                        Panel content
+                    </div>
                 </div>
-            </div>
-        </td>
-    </tr>
-</table>*@
-<script type="text/javascript">
-    jQuery(document).ready(function ($) {
-        $('#tabs').tab();
-    });
-</script>
+            </td>
+        </tr>
+    </table>*@
+

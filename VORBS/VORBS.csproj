@@ -130,6 +130,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\AdminController.cs" />
     <Compile Include="API\UsersController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
     <Compile Include="Models\DTOs\AdminDTO.cs" />
@@ -181,6 +182,9 @@
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
     <Content Include="Icon.png" />
+    <Content Include="Scripts\Administration\moduleManager.js" />
+    <Content Include="Scripts\Administration\roomsController.js" />
+    <Content Include="Scripts\Administration\usersController.js" />
     <Content Include="Scripts\angular-animate.js" />
     <Content Include="Scripts\angular-animate.min.js" />
     <Content Include="Scripts\angular-aria.js" />
@@ -1039,7 +1043,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\BootStrapDateTimePicker\" />
-    <Folder Include="Scripts\Administration\" />
     <Folder Include="Scripts\BootstrapDateTimePicker\" />
     <Folder Include="Scripts\FullCalendarResourceView\" />
   </ItemGroup>
