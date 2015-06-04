@@ -35,8 +35,8 @@ function NewBookingController($scope, $http, $resource) {
         else {
             $scope.roomBookings = Available.query({
                 location: $scope.bookingFilter.location.name,
-                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, true),
-                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, true),
+                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm'),
+                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm'),
                 smartRoom: $scope.bookingFilter.smartRoom,
                 numberOfAttendees: $scope.bookingFilter.numberOfAttendees
             }, function (success) {
