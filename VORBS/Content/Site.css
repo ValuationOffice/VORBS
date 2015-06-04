@@ -80,13 +80,13 @@ textarea {
     display:inline-block;
 }
 
-#attendeesInputFilter {
+/*#attendeesInputFilter {
     margin-right:-30px;
-}
+}*/
 
 #searchButton {
-    margin-right:50px;
-    margin-top:20px;
+    margin-left:30px;
+    margin-top:10px;
 }
 
 /*ADDED 15/05/2015 CL*/
@@ -185,6 +185,21 @@ textarea {
 #viewAllButton {
     margin-left: 70%;
 }
+
+.input-group.bootstrap-touchspin {
+    width:250px;
+    float:left;
+    margin-top:40px;
+}
+#attendeesInputFilter label {
+    margin-top: 10px;
+    margin-left:-235px;
+}
+
+.bootstrap-timepicker-widget{
+    z-index: 99999;
+}
+
 
 
 

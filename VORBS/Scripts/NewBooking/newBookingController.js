@@ -26,7 +26,7 @@ function NewBookingController($scope, $http, $resource) {
         if (viewAll === true) {
             $scope.roomBookings = AllRooms.query({
                 location: $scope.bookingFilter.location.name,
-                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY')
+                startDate: new moment($scope.bookingFilter.startDate).format('DD-MM-YYYY')
             }, function (success) {
                 roomResults = success;
                 $scope.RenderBookings(roomResults);
@@ -35,8 +35,8 @@ function NewBookingController($scope, $http, $resource) {
         else {
             $scope.roomBookings = Available.query({
                 location: $scope.bookingFilter.location.name,
-                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm'),
-                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm'),
+                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, true),
+                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, true),
                 smartRoom: $scope.bookingFilter.smartRoom,
                 numberOfAttendees: $scope.bookingFilter.numberOfAttendees
             }, function (success) {

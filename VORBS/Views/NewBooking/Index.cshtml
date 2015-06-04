@@ -9,6 +9,8 @@
         <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
         <link href="~/Content/Site.css" rel="stylesheet" />
 
+        <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+
         <h2>Book Your Meeting Room</h2>
         <p>Use the filters provided below to check if your meeting room is available by using the required location, date, time and number of attendees required for your meeting.</p>
         <hr />
@@ -29,7 +31,7 @@
 
                 <div class="input-group">
                     <label class="control-label">Time Start</label>
-                    <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" />
+                    <input id="startTimePicker" class="form-control timepicker"ng-model="bookingFilter.startTime" />
                 </div>
 
                 <div class="input-group">
@@ -37,14 +39,14 @@
                     <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" />
                 </div>
 
-                <div class="input-group ">
+                <div class="input-group">
                     <label class="control-label">Smart room</label>
                     <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" />
                 </div>
 
-                <div class="input-group" id="attendeesInputFilter">
+                <div id="attendeesInputFilter">
                     <label class="control-label">Number of Attendees</label>
-                    <input id="attendessControl" type="number" min="1" class="form-control" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                    <input type="number" id="attendeesControl" name="attendees" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
                     @*<input type="number" id="spinner" name="value" />*@
                 </div>
 
@@ -86,6 +88,9 @@
     <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
     <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
 
+    <script src="~/Scripts/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.js"></script>
+    
+
     <script>
         $(function () {
             $('.datepicker').datepicker({
@@ -101,7 +106,7 @@
             $('.timepicker').timepicker({
                 showInputs: false,
                 minuteStep: 30,
-                showMeridian: false,                
+                showMeridian: false,
             });
         });
 
@@ -116,15 +121,28 @@
             return str;
         }
 
+        $('#attendeesControl').TouchSpin({
+            verticalbuttons: true,
+            min: 1,
+            initval: 1
+        });
+
         document.getElementById('bookingTable').addEventListener('mousewheel', function (e) {
             this.scrollLeft -= (e.wheelDelta);
             e.preventDefault();
         }, false);
 
-        document.getElementById('attendessControl').onkeydown = function (e) {
-            var key = e.keyCode ? e.keyCode : e.which;
-            if (isNaN(String.fromCharCode(key))) return false;
-        };
+        
+        //$('#attendeesControl').on('keydown', function (e) {
+        //    if (e.keyCode !== 0) {
+        //        e.preventDefault();
+        //    }
+        //});
+
+        //document.getElementById('attendessControl').onkeydown = function (e) {
+        //    var key = e.keyCode ? e.keyCode : e.which;
+        //    if (isNaN(String.fromCharCode(key))) return false;
+        //};
 
         $(document).ready(function () {
             $('input').keydown(function (event) {
@@ -132,6 +150,23 @@
                     event.preventDefault();
                 }
             });
+            
+            $("#attendeesControl").keydown(function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+
         });
 
         
