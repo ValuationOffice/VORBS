@@ -111,7 +111,11 @@ function NewBookingController($scope, $http, $resource) {
                     $scope.booking.EndTime = end.utc().format('H:mm');
 
                     $scope.$digest();
-                    $("#confirmModal").modal('show');
+
+                    $("#confirmModal #bookingModalStartTime").timepicker('setTime', start.utc().format('H:mm'));
+                    $("#confirmModal #bookingModalEndTime").timepicker('setTime', end.utc().format('H:mm'));
+
+                    $("#confirmModal").modal('show');                    
                 },
                 events: eventData
             });
