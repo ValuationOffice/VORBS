@@ -163,6 +163,11 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.NewBooking = function () {
+
+        //Change the "new booking" button to stop multiple bookings
+        $("#newBookingConfirmButton").prop('disabled', 'disabled');
+        $("#newBookingConfirmButton").html('Booking now. Please wait..');
+
         //Validate Number of External Names is not graether than attendees
         ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
@@ -202,6 +207,10 @@ function NewBookingController($scope, $http, $resource) {
             },
             error: function (error) {
                 alert('Unable to Book Meeting Room. Please Contact ITSD. ');
+
+                //Change the "new booking" button to stop multiple bookings
+                $("#newBookingConfirmButton").prop('disabled', '');
+                $("#newBookingConfirmButton").html('Confirm Booking');
             }
         });
     }
