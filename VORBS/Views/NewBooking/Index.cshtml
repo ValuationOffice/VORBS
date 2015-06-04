@@ -14,7 +14,7 @@
         <h2>Book Your Meeting Room</h2>
         <p>Use the filters provided below to check if your meeting room is available by using the required location, date, time and number of attendees required for your meeting.</p>
         <hr />
-        <div class="form-inline">
+        <div class="form-inline" id="searchFilter">
             <div class="form-group">
 
                 <div class="input-group">
@@ -145,7 +145,7 @@
         //};
 
         $(document).ready(function () {
-            $('input').keydown(function (event) {
+            $('#searchFilter input').keydown(function (event) {
                 if (event.keyCode == 32) {
                     event.preventDefault();
                 }
