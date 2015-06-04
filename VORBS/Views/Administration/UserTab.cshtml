@@ -1,0 +1,98 @@
+﻿<div id="controllerDiv" ng-controller="UsersController">
+
+    <h3>User Management</h3>
+    <hr />
+
+    <div class="form-inline">
+        <div class="form-group">
+
+            <div id="adminErrorMessage" style="display: none;" class="alert alert-danger"></div>
+
+            <div class="input-group">
+                <label class="col-sm-2 control-label">PID</label>
+                <input id="pidTextBox" maxlength="7" class="form-control" data-toggle="modal" data-target="#activeDirecotryModal" ng-model="adminUser.PID" />
+            </div>
+
+            <div class="input-group">
+                <label class="col-sm-2 control-label">Location</label>
+                <select class="form-control" ng-options="location.name for location in Locations" ng-model="adminUser.Location">
+                    <option value="" selected disabled>Select a location...</option>
+                </select>
+            </div>
+
+            <div class="input-group ">
+                <label class="control-label">Permission</label>
+                <select class="form-control" ng-model="adminUser.PermissionLevel">
+                    <option value="1">Admin</option>
+                    <option value="2">Super Admin</option>
+                </select>
+            </div>
+        </div>
+
+        <br />
+        <br />
+
+        <div class="form-group">
+
+            <div class="input-group">
+                <label class="control-label">First Name</label>
+                <input id="firstNameTextBox" class="form-control" ng-model="adminUser.FirstName" />
+            </div>
+
+            <div class="input-group">
+                <label class="control-label">Surname</label>
+                <input id="lastNameTextBox" class="form-control" ng-model="adminUser.LastName" />
+            </div>
+
+            <div class="input-group">
+                <label class="control-label">Email</label>
+                <input id="emailTextBox" class="form-control" ng-model="adminUser.Email" />
+            </div>
+
+            <input id="searchButton" type="button" class="form-control" ng-click="AddAdmin()" value="Add" />
+        </div>
+
+    </div>
+
+    <hr />
+
+    <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Location</th>
+            <th>Email</th>
+            <th>Permission</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tr ng-repeat="admin in admins">
+        <td>{{ admin.firstName + ' ' + admin.lastName }}</td>
+        <td>{{ admin.location }}</td>
+        <td>{{ admin.email }}</td>
+        <td>{{ admin.permissionLevelText() }}</td>
+        <td><span data-toggle="modal" data-target="#editAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-edit"></span></td>
+        <td><span data-toggle="modal" data-target="#deleteAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-trash"></span></td>
+    </tr>
+    </table>
+
+    <div class="modal fade" id="deleteAdminModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Confirm Deletion</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this administrator?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" ng-click="DeleteAdmin()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("Modals/ActiveDirectoryModal")
+</div>

@@ -122,7 +122,7 @@ function NewBookingController($scope, $http, $resource) {
         }
     }
 
-    $('#addressModal').on('show.bs.modal', function () {
+    $('#activeDirecotryModal').on('show.bs.modal', function () {
         $scope.GetInternalEmails();
     });
 
@@ -429,11 +429,6 @@ function ValidateEmails(emails) {
     }
 
     return attendeeEmails;
-}
-
-function ValidateEmail(email) {
-    var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-    return regex.test(email);
 }
 
 function AdEmailExist(email, currentEmails) {

@@ -1044,6 +1044,8 @@
     <Content Include="Views\Shared\Modals\EditBookingModal.cshtml" />
     <Content Include="Views\Shared\Modals\ActiveDirectoryModal.cshtml" />
     <Content Include="Views\Administration\Index.cshtml" />
+    <Content Include="Views\Administration\UserTab.cshtml" />
+    <Content Include="Views\Administration\BookingTab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

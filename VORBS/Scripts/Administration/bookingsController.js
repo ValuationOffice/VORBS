@@ -1,8 +1,8 @@
-﻿myBookings.controller('bookingsController', ['$scope', '$http', '$resource', MyBookingsController]);
+﻿administration.controller('MyBookingsController', ['$scope', '$http', '$resource', MyBookingsController]);
 
 function MyBookingsController($scope, $http, $resource) {
 
-    CreateServices($resource);
+    CreateBookingServices($resource);
 
     $scope.bookings = GetBookings.query({
         startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
@@ -143,11 +143,11 @@ function MyBookingsController($scope, $http, $resource) {
     }
 }
 
-function CreateServices($resource) {
+function CreateBookingServices($resource) {
     GetBookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
-    {
-        query: { method: 'GET', isArray: true }
-    });
+   {
+       query: { method: 'GET', isArray: true }
+   });
 
     GetBookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
@@ -160,6 +160,7 @@ function CreateServices($resource) {
         query: { method: 'GET' },
         remove: { method: 'DELETE' }
     });
+
 }
 
 function FormatTimeDate(dateTime, returnDate) {

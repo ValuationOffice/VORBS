@@ -48,35 +48,47 @@ namespace VORBS.Utils
             return user.Name;
         }
 
-        public static List<UserDTO> AllUserDetails()
+        public static List<AdminDTO> AllUserDetails()
         {
             PrincipalContext context = new PrincipalContext(ContextType.Domain);
             UserPrincipal userPrincipal = new UserPrincipal(context);
             PrincipalSearcher search = new PrincipalSearcher(userPrincipal);
-            List<UserDTO> users = new List<UserDTO>();
+            List<AdminDTO> users = new List<AdminDTO>();
             foreach (UserPrincipal result in search.FindAll())
             {
-                if (!string.IsNullOrWhiteSpace(result.EmailAddress))
-                    users.Add(new UserDTO() { EmailAddress = result.EmailAddress, Name = result.Name });
+                if (!string.IsNullOrWhiteSpace(result.SamAccountName))
+                    users.Add(new AdminDTO()
+                    {
+                        FirstName = result.GivenName,
+                        LastName = result.Surname,
+                        PID = result.SamAccountName,
+                        Email = result.EmailAddress
+                    });
             }
 
             return users;
         }
 
-        public static List<UserDTO> FindUserDetails(string name)
+        public static List<AdminDTO> FindUserDetails(string name)
         {
             PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
             UserPrincipal userPrincipal = new UserPrincipal(sContext);
-            userPrincipal.Name = name + "*";
-            PrincipalSearcher search = new PrincipalSearcher(userPrincipal);            
-            List<UserDTO> user = new List<UserDTO>();
+            userPrincipal.Surname = name + "*";
+            PrincipalSearcher search = new PrincipalSearcher(userPrincipal);
+            List<AdminDTO> users = new List<AdminDTO>();
             foreach (UserPrincipal result in search.FindAll())
             {
-                if (!string.IsNullOrWhiteSpace(result.EmailAddress))
-                    user.Add(new UserDTO() { EmailAddress = result.EmailAddress, Name = result.Name });
+                if (!string.IsNullOrWhiteSpace(result.SamAccountName))
+                    users.Add(new AdminDTO() 
+                    { 
+                        FirstName = result.GivenName,
+                        LastName = result.Surname,
+                        PID = result.SamAccountName,
+                        Email = result.EmailAddress
+                    });
             }
 
-            return user;
+            return users;
         }
     }
 }

@@ -19,9 +19,9 @@ namespace VORBS.API
 
         [Route("{allUsers:bool}")]
         [HttpGet]
-        public List<UserDTO> GetAllUsers() 
+        public List<AdminDTO> GetAllUsers() 
         {
-            List<UserDTO> usersDTO = new List<UserDTO>();
+            List<AdminDTO> usersDTO = new List<AdminDTO>();
             usersDTO = AdQueries.AllUserDetails();
             return usersDTO;
         }
@@ -29,11 +29,11 @@ namespace VORBS.API
 
         [Route("{name}")]
         [HttpGet]
-        public List<UserDTO> GetAvailableUsers(string name)
-         {            
-            List<UserDTO> userDTO = new List<UserDTO>();
+        public List<AdminDTO> GetAvailableUsers(string name)
+         {
+             List<AdminDTO> userDTO = new List<AdminDTO>();
             if (string.IsNullOrWhiteSpace(name))
-                return new List<UserDTO>();
+                return new List<AdminDTO>();
 
             userDTO = AdQueries.FindUserDetails(name);
             return userDTO;

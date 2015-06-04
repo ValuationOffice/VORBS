@@ -113,13 +113,11 @@ function MyBookingsController($scope, $http, $resource) {
                 bookingId: $scope.bookingId
             },
             function (success) {
-                //TODO: Change ?
                 location.reload();
             },
             function (error) {
                 //TODO:Log Error
-                alert('Unable to Delete Booking. Please Try Again or Contact ITSD.');
-                location.reload();
+                alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.message);
             }
         );
     }

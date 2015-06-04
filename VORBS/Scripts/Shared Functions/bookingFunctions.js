@@ -59,11 +59,16 @@ function ValidateSubject(subject) {
     }
     return subject;
 }
+
+function ValidateEmail(email) {
+    var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    return regex.test(email);
+}
+
 ////////////////
 
 //Formating (Date/Time)
 function FormatDateTimeForURL(date, formatString) {
-
     if (date === "") {
         alert('Please Enter a Valid Date');
         throw new Error();

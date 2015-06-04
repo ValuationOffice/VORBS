@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using VORBS.DAL;
+using VORBS.Models;
 using VORBS.Models.DTOs;
 
 namespace VORBS.API
@@ -15,38 +16,99 @@ namespace VORBS.API
         private VORBSContext db = new VORBSContext();
 
         [HttpGet]
-        [Route("{allUsers}")]
-        public List<AdminDTO> GetAllAdminUsers(string allUsers)
+        [Route("{allAdmins}")]
+        public List<AdminDTO> GetAllAdminUsers(string allAdmins)
         {
-            List<AdminDTO> users = new List<AdminDTO>();
-
             try
             {
-                if (allUsers.Equals("userId"))
+                if (!allAdmins.Equals("adminId"))
+                    return new List<AdminDTO>();
+
+                List<AdminDTO> adminsDTO = new List<AdminDTO>();
+
+                List<Admin> admins = db.Admins.ToList();
+
+                admins.ForEach(a => adminsDTO.Add(new AdminDTO()
                 {
+                    ID = a.ID,
+                    PID = a.PID,
+                    FirstName = a.FirstName,
+                    LastName = a.LastName,
+                    Email = a.Email,
+                    Location = a.Location,
+                    PermissionLevel = a.PermissionLevel
+                }));
 
-                    
-                }
+                return adminsDTO;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                //TODO: Log Exception
+                return new List<AdminDTO>();
             }
-
-            return users;
         }
 
         [HttpGet]
-        [Route("{userId:int}")]
-        public AdminDTO GetAdminUserById(int userId)
+        [Route("{adminId:int}")]
+        public AdminDTO GetAdminUserById(int adminId)
         {
             try
             {
-                return null;//db.
+                Admin admin = db.Admins.Single(a => a.ID == adminId);
+
+                return new AdminDTO()
+                {
+                    ID = admin.ID,
+                    PID = admin.PID,
+                    FirstName = admin.FirstName,
+                    LastName = admin.LastName,
+                    Email = admin.Email,
+                    Location = admin.Location,
+                    PermissionLevel = admin.PermissionLevel
+                };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                //TODO: Log Exception
                 return null;
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage AddNewAdmin(Admin admin)
+        {
+            try
+            {
+                if (db.Admins.Count(a => a.PID == admin.PID) > 0)
+                    return Request.CreateResponse(HttpStatusCode.Conflict);
+
+                db.Admins.Add(admin);
+                db.SaveChanges();
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log Exception
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("{adminId:int}")]
+        public HttpResponseMessage DeleteAdminUserById(int adminId)
+        {
+            try
+            {
+                db.Admins.Remove(db.Admins.Single(a => a.ID == adminId));
+                db.SaveChanges();
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log Exception
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

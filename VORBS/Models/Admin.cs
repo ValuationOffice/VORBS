@@ -7,9 +7,12 @@ namespace VORBS.Models
 {
     public class Admin
     {
-        public int Id { get; set; }
-        public string pId { get; set; }
-        public string Username { get; set; }
+        public int ID { get; set; }
+        public string PID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Location { get; set; }
+        public string Email { get; set; }
         public int PermissionLevel { get; set; }
     }
 }
