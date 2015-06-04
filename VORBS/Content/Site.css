@@ -74,6 +74,10 @@ textarea {
     white-space:nowrap;
 }
 
+#myBookingsTable {
+    margin-top:25px;
+}
+
 .dailyCalendarContainer {
     height:590px;
     width: 150px;
@@ -169,6 +173,15 @@ textarea {
 #userInfoTable th, #userInfoTable tbody td { 
     width:49%;
     float:left;
+}
+
+#myBookingsTable #userInfoTable th, #userInfoTable tbody td { 
+    width:14%;
+    float:left;
+}
+
+#myBookingsTable tbody tr:first-child td {
+    border:none;
 }
 
 #subjectInfo {

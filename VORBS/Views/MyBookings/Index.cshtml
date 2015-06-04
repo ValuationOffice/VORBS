@@ -10,27 +10,32 @@
         <link href="~/Content/Site.css" rel="stylesheet" />
 
         <h2>My Bookings</h2>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Location</th>
-                    <th>Room</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Subject</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tr ng-repeat="booking in bookings">
-                <td>{{ booking.location.name}}</td>
-                <td>{{ booking.room.roomName }}</td>
-                <td>{{ booking.DateFormatted() }}</td>
-                <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
-                <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
-                <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
-                <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
-            </tr>
-        </table>
+        <div id="myBookingsTable">
+            <table id="userInfoTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Room</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Subject</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="booking in bookings">
+                        <td>{{ booking.location.name}}</td>
+                        <td>{{ booking.room.roomName }}</td>
+                        <td>{{ booking.DateFormatted() }}</td>
+                        <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
+                        <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
+                        <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
+                        <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         @Html.Partial("Modals/EditBookingModal", null)
 
