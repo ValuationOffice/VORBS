@@ -185,6 +185,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\Administration\moduleManager.js" />
+    <Content Include="Scripts\Administration\bookingsController.js" />
     <Content Include="Scripts\Administration\roomsController.js" />
     <Content Include="Scripts\Administration\usersController.js" />
     <Content Include="Scripts\angular-animate.js" />
