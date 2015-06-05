@@ -61,7 +61,8 @@ function MyBookingsController($scope, $http, $resource) {
         autoClose: true,
         todayBtn: true,
         todayHighlight: true,
-        weekStart: 1
+        weekStart: 1,
+        daysOfWeekDisabled: [0, 6]
     });
 
     $('.timepicker').timepicker({

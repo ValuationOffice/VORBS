@@ -231,10 +231,16 @@ textarea {
     z-index: 99999;
 }
 
+/* TYPEAHEAD DROPDOWN ACTIVE */
 
-
-
-
-
-
-
+.typeahead + .dropdown-menu .active > a,
+.typeahead + .dropdown-menu .active > a:hover {
+    color: #ffffff;
+    background-color: #FF77FF;
+    background-image: -moz-linear-gradient(top, #FF77FF, #FF44FF);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FF77FF), to(#FF44FF));
+    background-image: -webkit-linear-gradient(top, #FF77FF, #FF44FF);
+    background-image: -o-linear-gradient(top, #FF77FF, #FF44FF);
+    background-image: linear-gradient(to bottom, #FF77FF, #FF44FF);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF77FF', endColorstr='#FF44FF', GradientType=0);
+}

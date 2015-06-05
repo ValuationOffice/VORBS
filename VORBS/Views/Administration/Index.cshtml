@@ -8,12 +8,12 @@
 <div id="content" ng-app="administration">
 
     <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-        <li class="active" id="bookingTab"><a href="#Bookings" data-toggle="tab">Bookings</a></li>
+        <li class="active" id="bookingTab"><a href="#bookings" data-toggle="tab">Bookings</a></li>
         @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 2))
         {
-        <li id="userTab"><a href="#users" data-toggle="tab">Users</a></li>
-        <li id="locationTab"><a href="#locations" data-toggle="tab">Locations</a></li>
-        <li id="roomTab"><a href="#rooms" data-toggle="tab">Rooms</a></li>
+            <li id="userTab"><a href="#users" data-toggle="tab">Users</a></li>
+            <li id="locationTab"><a href="#locations" data-toggle="tab">Locations</a></li>
+            <li id="roomTab"><a href="#rooms" data-toggle="tab">Rooms</a></li>
             <li id="reportsTab"><a href="#reports" data-toggle="tab">Reports</a></li>
         }
     </ul>
@@ -26,17 +26,17 @@
         </div>
         @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 2))
         {
-        <div class="tab-pane" id="users">
-            @Html.Partial("UserTab")
-        </div>
+            <div class="tab-pane" id="users">
+                @Html.Partial("UserTab")
+            </div>
 
-        <div class="tab-pane" id="locations">
-            <p>Manage locations.</p>
-        </div>
+            <div class="tab-pane" id="locations">
+                <p>Manage locations.</p>
+            </div>
 
-        <div class="tab-pane" id="rooms">
-            <p>Manage rooms.</p>
-        </div>
+            <div class="tab-pane" id="rooms">
+                <p>Manage rooms.</p>
+            </div>
 
             <div class="tab-pane" id="reports">
                 <p>Reports</p>
@@ -62,16 +62,19 @@
     <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
     <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
 
+    <script src="~/Scripts/bloodhound.min.js"></script>
+    <script src="~/Scripts/typeahead.jquery.min.js"></script>
+    <script src="~/Scripts/typeahead.bundle.min.js"></script>
+
     <script>
         $(function () {
             $('.datepicker').datepicker({
-                startDate: '-0m',
                 format: 'dd-mm-yyyy',
                 autoClose: true,
                 todayBtn: true,
-                todayBtn: 'linked',
                 todayHighlight: true,
-                weekStart: 1
+                weekStart: 1,
+                daysOfWeekDisabled: [0, 6]
             });
 
             $('.timepicker').timepicker({

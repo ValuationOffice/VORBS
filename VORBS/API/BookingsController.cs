@@ -99,40 +99,6 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        [Route("{start:DateTime}")]
-        [HttpGet]
-        public List<BookingDTO> GetAllRoomBookings(DateTime start)
-        {
-
-            try
-            {
-                List<Booking> bookings = db.Bookings
-                    .Where(x => x.StartDate >= start).ToList()
-                    .OrderBy(x => x.StartDate)
-                    .ToList();
-
-                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
-                {
-                    ID = x.ID,
-                    EndDate = x.EndDate,
-                    StartDate = x.StartDate,
-                    Subject = x.Subject,
-                    Owner = x.Owner,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-                }));
-
-
-                return bookingsDTO;
-            }
-            catch (Exception ex)
-            {
-                //TODO: Log Error
-                return null;
-            }
-        }
-
         [Route("{start:DateTime}/{person}")]
         [HttpGet]
         public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start, string person)
@@ -245,7 +211,7 @@ namespace VORBS.API
         }
 
         [HttpPost]
-        [Route("{existingBookingId:int}/adminId")]
+        [Route("{existingBookingId:int}")]
         public HttpResponseMessage EditExistingBooking(int existingBookingId, Booking editBooking)
         {
             try
@@ -336,5 +302,38 @@ namespace VORBS.API
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [Route("{owner}/{start:DateTime}")]
+        [HttpGet]
+        public List<BookingDTO> GetBookingByOwner(string owner, DateTime start)
+        {
+            try
+            {
+                List<Booking> bookings = db.Bookings
+                    .Where(x => DbFunctions.TruncateTime(x.StartDate) == start.Date && x.Owner == owner).ToList()
+                    .OrderBy(x => x.StartDate)
+                    .ToList();
+
+                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Subject = x.Subject,
+                    Owner = x.Owner,
+                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
+
+                return bookingsDTO;
+            }
+            catch (Exception ex)
+            {
+                //TODO: Log Exception
+                return new List<BookingDTO>();
+            }
+        }
+
     }
 }

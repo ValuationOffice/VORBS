@@ -111,5 +111,18 @@ namespace VORBS.API
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        public List<string> GetAllBookingOwners()
+        {
+            try
+            {
+                return db.Bookings.Select(b => b.Owner).Distinct().ToList();
+            }
+            catch (Exception)
+            {
+                return new List<string>();
+            }
+        }
     }
 }

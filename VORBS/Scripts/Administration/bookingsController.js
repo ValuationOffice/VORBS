@@ -4,9 +4,7 @@ function MyBookingsController($scope, $http, $resource) {
 
     CreateBookingServices($resource);
 
-    $scope.bookings = GetAllBookings.query({
-        startDate: new moment().utc().format("MM-DD-YYYY-HHmm")
-    });
+    $scope.owners = Owner.getAll({});
 
     $scope.bookingId = 0;
 
@@ -54,19 +52,14 @@ function MyBookingsController($scope, $http, $resource) {
         ResetExternalNamesUI();
     });
 
-    $('.datepicker').datepicker({
-        startDate: '-0m',
-        format: 'dd-mm-yyyy',
-        autoClose: true,
-        todayBtn: true,
-        todayHighlight: true,
-        weekStart: 1
-    });
-
-    $('.timepicker').timepicker({
-        showInputs: false,
-        minuteStep: 30,
-        showMeridian: false
+    $('#fullNameTextBox').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+    },
+    {
+        name: 'owners',
+        source: SubstringMatcher($scope.owners)
     });
 
     $scope.EditBooking = function () {
@@ -123,6 +116,25 @@ function MyBookingsController($scope, $http, $resource) {
         );
     }
 
+    $scope.SearchBooking = function () {
+        SetAdminErrorMessage('');
+
+        //Validate Full Name
+        if ($('#fullNameTextBox').typeahead('val').trim() <= 0) {
+            SetAdminErrorMessage("Invalid Full Name");
+        }
+
+        $scope.bookings = GetBooking.query({
+            owner: $('#fullNameTextBox').typeahead('val'),
+            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY')
+        },
+        function (success) {
+            if (success.length === 0) {
+                SetAdminErrorMessage('No Bookings for ' + $('#fullNameTextBox').typeahead('val') + ' on the ' + $scope.bookingFilter.startDate);
+            }
+        });
+    }
+
     $scope.newBooking = {
         Room: { RoomName: '' },
         Subject: '',
@@ -140,24 +152,55 @@ function MyBookingsController($scope, $http, $resource) {
         date: new Date(),
         externalNames: []
     }
+
+    $scope.bookingFilter = {
+        fullName: '',
+        startDate: new moment().utc().format('DD-MM-YYYY')
+    }
 }
 
 function CreateBookingServices($resource) {
-    GetAllBookings = $resource('/api/bookings/:startDate', { startDate: 'startDate' },
-   {
-       query: { method: 'GET', isArray: true }
-   });
-
-    GetAllBookings.prototype = {
-        DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
-        startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
-        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); }
-    };
-
     Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId', adminId: 'adminId' },
     {
         query: { method: 'GET' },
         remove: { method: 'DELETE' }
     });
 
+    GetBooking = $resource('api/bookings/:owner/:start', { owner: 'owner', start: 'start' },
+    {
+        query: {method: 'GET', isArray: true }
+    });
+
+    GetBooking.prototype = {
+        DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
+        startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
+        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); }
+    };
+
+    Owner = $resource('/api/admin', {},
+    {
+        getAll: { method: 'GET', isArray: true }
+    });
 }
+
+function SubstringMatcher(strs) {
+    return function findMatches(q, cb) {
+        var matches, substringRegex;
+
+        // an array that will be populated with substring matches
+        matches = [];
+
+        // regex used to determine if a string contains the substring `q`
+        substrRegex = new RegExp(q, 'i');
+
+        // iterate through the pool of strings and for any string that
+        // contains the substring `q`, add it to the `matches` array
+        $.each(strs, function (i, str) {
+            if (substrRegex.test(str)) {
+                matches.push(str);
+            }
+        });
+
+        cb(matches);
+    };
+};
