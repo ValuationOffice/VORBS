@@ -160,17 +160,3 @@ function CreateServices($resource) {
         remove: { method: 'DELETE' }
     });
 }
-
-function FormatTimeDate(dateTime, returnDate) {
-    if (dateTime === "") {
-        alert('Please Enter a Valid Date');
-        throw new Error();
-    }
-
-    if (returnDate) {
-        return new moment(dateTime).format('DD-MM-YYYY');
-    }
-    else {
-        return new moment(dateTime).format('H:mm');
-    }
-}

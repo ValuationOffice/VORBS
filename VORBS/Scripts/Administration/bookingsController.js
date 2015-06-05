@@ -4,9 +4,8 @@ function MyBookingsController($scope, $http, $resource) {
 
     CreateBookingServices($resource);
 
-    $scope.bookings = GetBookings.query({
-        startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
-        //person: '7220451' //TODO: Change To get UserName
+    $scope.bookings = GetAllBookings.query({
+        startDate: new moment().utc().format("MM-DD-YYYY-HHmm")
     });
 
     $scope.bookingId = 0;
@@ -144,35 +143,21 @@ function MyBookingsController($scope, $http, $resource) {
 }
 
 function CreateBookingServices($resource) {
-    GetBookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
+    GetAllBookings = $resource('/api/bookings/:startDate', { startDate: 'startDate' },
    {
        query: { method: 'GET', isArray: true }
    });
 
-    GetBookings.prototype = {
+    GetAllBookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
         startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
         endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); }
     };
 
-    Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId' },
+    Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId', adminId: 'adminId' },
     {
         query: { method: 'GET' },
         remove: { method: 'DELETE' }
     });
 
-}
-
-function FormatTimeDate(dateTime, returnDate) {
-    if (dateTime === "") {
-        alert('Please Enter a Valid Date');
-        throw new Error();
-    }
-
-    if (returnDate) {
-        return new moment(dateTime).format('DD-MM-YYYY');
-    }
-    else {
-        return new moment(dateTime).format('H:mm');
-    }
 }

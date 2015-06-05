@@ -20,6 +20,9 @@ function UsersController($scope, $http, $resource) {
             SetAdminErrorMessage('Invalid Location.');
             return;
         }
+        else {
+            $scope.adminUser.Location = $scope.adminUser.Location.name;
+        }
 
         //Validate First & Last Name
         if ($scope.adminUser.FirstName === "" || $scope.adminUser.LastName === "") {
@@ -42,9 +45,11 @@ function UsersController($scope, $http, $resource) {
                 alert('User Added Sucesfully!');
                 location.reload();
 
-                $('#userTab').addClass('active');
-                $('#bookingTab').removeClass('active');
+                //$('#bookingTab').removeClass('active');
+                //$('#bookings').removeClass('active');
 
+                //$('#users').addClass('active');
+                //$('#userTab').addClass('active');
             },
             error: function (error) {
                 if (error.status == 409) {
@@ -59,8 +64,8 @@ function UsersController($scope, $http, $resource) {
         SetAdminErrorMessage('');
     }
 
-    $scope.EditAdmin = function () {
-
+    $scope.EditAdmin = function (id) {
+        
     }
 
     $scope.DeleteAdmin = function () {
@@ -97,8 +102,6 @@ function UsersController($scope, $http, $resource) {
         $scope.adminUser.FirstName = user.firstName;
         $scope.adminUser.LastName = user.lastName;
         $scope.adminUser.Email = user.email;
-
-        alert('User Added!');
 
         $('#activeDirecotryModal').modal('hide');
     }

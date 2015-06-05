@@ -56,7 +56,9 @@ namespace VORBS.Utils
             List<AdminDTO> users = new List<AdminDTO>();
             foreach (UserPrincipal result in search.FindAll())
             {
-                if (!string.IsNullOrWhiteSpace(result.SamAccountName))
+                if (!string.IsNullOrWhiteSpace(result.SamAccountName) &&
+                   (!string.IsNullOrEmpty(result.GivenName) || !string.IsNullOrEmpty(result.Surname)))
+
                     users.Add(new AdminDTO()
                     {
                         FirstName = result.GivenName,
@@ -78,7 +80,9 @@ namespace VORBS.Utils
             List<AdminDTO> users = new List<AdminDTO>();
             foreach (UserPrincipal result in search.FindAll())
             {
-                if (!string.IsNullOrWhiteSpace(result.SamAccountName))
+                if (!string.IsNullOrWhiteSpace(result.SamAccountName) && 
+                   (!string.IsNullOrEmpty(result.GivenName) || !string.IsNullOrEmpty(result.Surname)))
+
                     users.Add(new AdminDTO() 
                     { 
                         FirstName = result.GivenName,

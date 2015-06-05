@@ -1,6 +1,7 @@
 ﻿<div id="controllerDiv" ng-controller="UsersController">
 
-    <h3>User Management</h3>
+    <h4>User Management</h4>
+    <p>Add, Edit or Delete Admin Users below.</p>
     <hr />
 
     <div class="form-inline">
@@ -71,7 +72,7 @@
         <td>{{ admin.location }}</td>
         <td>{{ admin.email }}</td>
         <td>{{ admin.permissionLevelText() }}</td>
-        <td><span data-toggle="modal" data-target="#editAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-edit"></span></td>
+        @*<td><span data-toggle="modal" data-target="#editAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-edit"></span></td>*@
         <td><span data-toggle="modal" data-target="#deleteAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-trash"></span></td>
     </tr>
     </table>
