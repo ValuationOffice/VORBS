@@ -6,14 +6,11 @@ using System.Web.Mvc;
 
 namespace VORBS.Controllers
 {
-    [VORBS.Security.VorbsAuthorise(1)]
-    public class AdministrationController : Controller
+    public class ErrorsController : Controller
     {
-        //
-        // GET: /Administration/
-        public ActionResult Index()
+        public ActionResult Unauthorised()
         {
             return View();
         }
-	}
+    }
 }

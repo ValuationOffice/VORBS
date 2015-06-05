@@ -133,9 +133,11 @@
     <Compile Include="API\AdminController.cs" />
     <Compile Include="API\UsersController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
+    <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Models\DTOs\AdminDTO.cs" />
     <Compile Include="Models\DTOs\UserDTO.cs" />
     <Compile Include="Models\Admin.cs" />
+    <Compile Include="Security\Authorisation.cs" />
     <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
     <Compile Include="API\BookingsController.cs" />
@@ -1046,6 +1048,7 @@
     <Content Include="Views\Administration\Index.cshtml" />
     <Content Include="Views\Administration\UserTab.cshtml" />
     <Content Include="Views\Administration\BookingTab.cshtml" />
+    <Content Include="Views\Errors\Unauthorised.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

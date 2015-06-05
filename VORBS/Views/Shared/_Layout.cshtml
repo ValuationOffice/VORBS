@@ -21,7 +21,7 @@
 
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            
+
             <div class="navbar-header">
                 <div id="logo_text" align="center">
                     <div id="logoBanner">&nbsp</div>
@@ -42,8 +42,11 @@
                 <ul class="nav navbar-nav">
                     <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "NewBooking" ? "active" : "")">@Html.ActionLink("New Booking", "Index", "NewBooking")</li>
                     <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "MyBookings" ? "active" : "")">@Html.ActionLink("My Bookings", "Index", "MyBookings")</li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Administration", "Index", "Administration")</li>
-                    @*<li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "ManageBookings" ? "active" : "")">@Html.ActionLink("Manage Bookings", "Index", "ManageBookings")</li>*@
+
+                    @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Administration", "Index", "Administration")</li>
+                    }                    
                 </ul>
             </div>
         </div>
