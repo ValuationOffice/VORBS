@@ -22,6 +22,19 @@ namespace VORBS.DAL
             locations.ForEach(l => context.Locations.Add(l));
             context.SaveChanges();
 
+            var admins = new List<Admin>()
+            {
+                new Admin(){ ID = 1, FirstName = "Admin1", LastName = "Admin1", Location = "Location1", Email = "fakeemail1@mail.com", PermissionLevel = 2, PID = "0000001" },
+                new Admin(){ ID = 2, FirstName = "Admin2", LastName = "Admin2", Location = "Location1", Email = "fakeemail2@mail.com", PermissionLevel = 2, PID = "0000002" },
+                new Admin(){ ID = 3, FirstName = "Admin3", LastName = "Admin3", Location = "Location1", Email = "fakeemail3@mail.com", PermissionLevel = 2, PID = "0000003" },
+                new Admin(){ ID = 4, FirstName = "Admin4", LastName = "Admin4", Location = "Location1", Email = "fakeemail4@mail.com", PermissionLevel = 2, PID = "0000004" },
+                new Admin(){ ID = 5, FirstName = "Sam", LastName = "Kort", Location = "Location1", Email = "sam.kort@voa.gsi.gov.uk", PermissionLevel = 2, PID = "9993708" },
+                new Admin(){ ID = 6, FirstName = "Admin5", LastName = "Admin5", Location = "Location1", Email = "fakeemail5@mail.com", PermissionLevel = 2, PID = "0000005" }
+            };
+
+            admins.ForEach(a => context.Admins.Add(a));
+            context.SaveChanges();
+
             var rooms = new List<Room>()
             {
                 new Room(){ LocationID =  1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false }
