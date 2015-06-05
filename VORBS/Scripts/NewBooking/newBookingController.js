@@ -64,7 +64,7 @@ function NewBookingController($scope, $http, $resource) {
                 });
             }
 
-            if (roomResults[i].smartRoom === false) {
+            if (roomResults[i].smartRoom === true) {
                 var roomDetails = '<h3 style="text-align: center;">' +roomResults[i].roomName + '<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span></h3>';  
                 }
             else {
