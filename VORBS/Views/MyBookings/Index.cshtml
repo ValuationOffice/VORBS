@@ -27,7 +27,7 @@
                     <tr ng-repeat="booking in bookings">
                         <td>{{ booking.location.name}}</td>
                         <td>{{ booking.room.roomName }}</td>
-                        <td>{{ booking.startDate | date : 'MM/dd/yy' }}</td>
+                        <td>{{ booking.DateFormatted() }}</td>
                         <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                         <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
                         <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
