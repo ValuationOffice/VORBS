@@ -167,6 +167,10 @@
                 }
             });
 
+            $("#confirmModal input").on("blur", function () {
+                $(this).val($(this).val().trim())
+            });
+
         });
 
     </script>
