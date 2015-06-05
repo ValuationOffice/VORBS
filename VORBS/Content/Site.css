@@ -120,9 +120,8 @@ textarea {
 }
 
 #smartroomBadgeIcon {
-    margin: 0px 9px 0px 0px;
-    padding: 3px 10px 3px 14px;
-
+    vertical-align:middle;
+    margin-bottom:3px;
 }
 
 #pcBadgeIcon { 
@@ -138,18 +137,31 @@ textarea {
     height:45px;
 }
 
-#userInfoTable {
+#adminLocationsTable {
+    margin-top: 40px;
+}
+
+#locationFilterOptions {
+    margin-left:5px;
+}
+
+#locationFilterOptions select {
+    margin-left: 10px;
+    width:200px;
+}
+
+.userInfoTable {
     margin-top:-15px;    
     width:100%;
     border-spacing:0;
 }
 
-#userInfoTable tbody, #userInfoTable thead, #userInfoTable tr, 
-#userInfoTable th, #userInfoTable td { 
+.userInfoTable tbody, .userInfoTable thead, .userInfoTable tr, 
+.userInfoTable th, .userInfoTable td { 
     display: block; 
 }
 
-#userInfoTable thead tr {
+.userInfoTable thead tr {
     /* fallback */
     width: 97%;
     /* minus scroll bar width */
@@ -158,29 +170,34 @@ textarea {
     width:         calc(100% - 16px);
 }
 
-#userInfoTable tr:after {  /* clearing float */
+.userInfoTable tr:after {  /* clearing float */
     content: ' ';
     display: block;
     visibility: hidden;
     clear: both;
 }
 
-#userInfoTable tbody {
+.userInfoTable tbody {
     overflow-y:auto;
     height:500px;    
 }
 
-#userInfoTable th, #userInfoTable tbody td { 
+.userInfoTable th, .userInfoTable tbody td { 
     width:49%;
     float:left;
 }
 
-#myBookingsTable #userInfoTable th, #userInfoTable tbody td { 
+#myBookingsTable .userInfoTable th, #myBookingsTable .userInfoTable tbody td { 
     width:14%;
     float:left;
 }
 
-#myBookingsTable tbody tr:first-child td {
+#adminLocationsTable .userInfoTable th, #adminLocationsTable .userInfoTable tbody td {
+    width:20%;
+    float:left;
+}
+
+.userInfoTable tbody tr:first-child td {
     border:none;
 }
 
@@ -204,6 +221,7 @@ textarea {
     float:left;
     margin-top:40px;
 }
+
 #attendeesInputFilter label {
     margin-top: 10px;
     margin-left:-235px;
