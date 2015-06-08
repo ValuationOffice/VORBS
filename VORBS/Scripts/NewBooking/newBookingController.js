@@ -130,10 +130,6 @@ function NewBookingController($scope, $http, $resource) {
         }
     }
 
-    $('#confirmModal').on('show.bs.modal', function () {
-        SetModalErrorMessage('');         //Reset Any Error Messages
-    });
-
     $('#activeDirecotryModal').on('show.bs.modal', function () {
         $scope.GetAdNames();
     });
@@ -166,6 +162,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.NewBooking = function () {
+        SetModalErrorMessage(''); //Reset Any Error Messages
 
         //Change the "new booking" button to stop multiple bookings
         $("#newBookingConfirmButton").prop('disabled', 'disabled');
@@ -485,7 +482,7 @@ function validateSearchFilters() {
 
     timeValidationMessage = ValidateStartEndTime($('#startTimePicker').val(), $('#endTimePicker').val())
 
-    if (timeValidationMessage !== null) {
+    if (timeValidationMessage !== "") {
         $("#searchFilter #endTime").addClass('has-error');
         $("#searchFilter #startTime").addClass('has-error');
         errors.push(timeValidationMessage);

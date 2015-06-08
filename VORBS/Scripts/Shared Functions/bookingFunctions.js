@@ -46,6 +46,10 @@ function RemoveExternalName(fullName, attendeeArray) {
 
 //Validation
 function ValidateNoAttendees(filterAttendees, externalNamesLength) {
+    if (filterAttendees === null) {
+        SetModalErrorMessage('Invalid Number Of Attendees.');
+        throw new Error();
+    }
     if (externalNamesLength > filterAttendees) {
         SetModalErrorMessage('The Number of Attendees for this Meeting Exceeds the Room Capacity.');
         throw new Error();
@@ -64,7 +68,7 @@ function ValidateStartEndTime(start, end) {
         return "Start Time cannont be ahead of End Time";
     }
 
-    return null;
+    return "";
 }
 
 function ValidateSubject(subject) {

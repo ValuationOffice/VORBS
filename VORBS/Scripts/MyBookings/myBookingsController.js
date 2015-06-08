@@ -24,9 +24,6 @@ function MyBookingsController($scope, $http, $resource) {
     }
 
     $('#editModal').on('show.bs.modal', function () {
-        //Reset Any Error Messages
-        SetModalErrorMessage('');
-
         $scope.editBooking = Booking.query({
             bookingId: $scope.bookingId
         },
@@ -72,6 +69,15 @@ function MyBookingsController($scope, $http, $resource) {
     });
 
     $scope.EditBooking = function () {
+        //Reset Any Error Messages
+        SetModalErrorMessage('');
+
+        //Validate Start Date
+        if ($scope.booking.date === "") {
+            SetModalErrorMessage('Invalid Date.');
+            return;
+        }
+
         //Validate Number of External Names is not graether than attendees
         ValidateNoAttendees($scope.newBooking.NumberOfAttendees, $scope.booking.ExternalNames.length);
 
@@ -79,6 +85,11 @@ function MyBookingsController($scope, $http, $resource) {
         var Subject = ValidateSubject($scope.newBooking.Subject);
 
         //Validate Times
+        var timeValidation = ValidateStartEndTime($scope.booking.startTime, $scope.booking.endTime);
+        if (timeValidation !== "") {
+            SetModalErrorMessage(timeValidation);
+            return;
+        }
 
         //Create Date String
         $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm');
@@ -99,10 +110,10 @@ function MyBookingsController($scope, $http, $resource) {
             },
             error: function (error) {
                 if (error.status = 409) {
-                    SetModalErrorMessage(error.responseJSON.message);
+                    SetModalErrorMessage(error.responseJSON);
                 }
                 else {
-                    alert('Unable to edit Meeting Room. Please Contact ITSD. ' + error.responseJSON.message);
+                    alert('Unable to edit Meeting Room. Please Contact ITSD. ' + error.responseJSON);
                 }
             }
         });
