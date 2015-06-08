@@ -24,6 +24,9 @@ function MyBookingsController($scope, $http, $resource) {
     }
 
     $('#editModal').on('show.bs.modal', function () {
+        //Reset Any Error Messages
+        SetModalErrorMessage('');
+
         $scope.editBooking = Booking.query({
             bookingId: $scope.bookingId
         },

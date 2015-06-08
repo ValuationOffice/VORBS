@@ -59,12 +59,12 @@ function ValidateNoAttendees(filterAttendees, externalNamesLength) {
 function ValidateStartEndTime(start, end) {
 
     var timeSplit = start.split(':');
-    startDate = new Date().setHours(timeSplit[0], timeSplit[1]);
+    var startDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]).add(30, 'm');
 
     timeSplit = end.split(':');
-    endDate = new Date().setHours(timeSplit[0], timeSplit[1]);
+    var endDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]);
 
-    if (startDate > endDate) {
+    if (startDate.isAfter(endDate)) {
         return "Start Time cannont be ahead of End Time";
     }
 

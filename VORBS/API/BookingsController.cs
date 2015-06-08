@@ -239,12 +239,8 @@ namespace VORBS.API
                         //No Rooms Avaliable
                         return Request.CreateErrorResponse(HttpStatusCode.Conflict, "No Rooms Avaialbe Using Current Date/Time/Attendees.");
                     }
-
-                    if (existingRoom.ID != roomId)
-                    {
-                        //Change the room id
-                        editBooking.RoomID = roomId;
-                    }
+                    
+                    editBooking.RoomID = roomId;
                 }
                 else
                     editBooking.RoomID = existingBooking.RoomID;
