@@ -130,40 +130,31 @@ function NewBookingController($scope, $http, $resource) {
         }
     }
 
-    $('#activeDirecotryModal').on('show.bs.modal', function () {
-        $scope.GetInternalEmails();
-    });
-
     $('#confirmModal').on('show.bs.modal', function () {
         SetModalErrorMessage('');         //Reset Any Error Messages
     });
 
-    $scope.GetInternalEmails = function () {
+    $('#activeDirecotryModal').on('show.bs.modal', function () {
+        $scope.GetAdNames();
+    });
+
+    $scope.GetAdNames = function () {
         if ($scope.emailVal === undefined || $scope.emailVal.trim() === "") {
-            $scope.interalPersons = Users.queryAll({
+            $scope.adAdminUsers = Users.queryAll({
                 allUsers: true
             })
         }
         else {
-            $scope.interalPersons = Users.querySurname({
+            $scope.adAdminUsers = Users.querySurname({
                 allUsers: $scope.emailVal
             });
         }
     }
 
-    $scope.AddAdEmail = function (email) {
-        //Test to see if Email exists
-        if (AdEmailExist(email.toUpperCase().trim(), $scope.newBooking.Emails.split(' '))) {
-            alert('User Email Already Selected.');
-            return;
-        };
-
-        //Tets to check if last char is space
-        if (!(/\s+$/.test($scope.newBooking.Emails))) {
-            $scope.newBooking.Emails += " ";
-        }
-        $scope.newBooking.Emails += email.trim();
-        alert('User Added!');
+    $scope.AddAdEmail = function (adUser) {
+        $scope.newBooking.Owner = adUser.firstName + ' ' + adUser.lastName;
+        $scope.newBooking.PID = adUser.pid;
+        $('#activeDirecotryModal').modal('hide');
     }
 
     $scope.AddExternalAttendee = function () {
@@ -253,22 +244,16 @@ function NewBookingController($scope, $http, $resource) {
     };
 
     $scope.newBooking = {
-        Room: {
-            RoomName: ''
-        },
+        Room: { RoomName: '' },
         Subject: '',
         NumberOfAttendees: 1,
         ExternalNames: null,
         StartDate: new Date(),
         EndDate: new Date(),
         FlipChart: false,
-        Projector: false
-    };
-
-    $scope.interalPersons = {
-        Person: {
-            name: '', emailAddress: ''
-        }
+        Projector: false,
+        PID: '',
+        Owner: ''
     };
 }
 
@@ -520,4 +505,10 @@ function IncrementTime(time, minutes) {
 
     return "'" + timeSplit[0] + ":" + minutes + " " + amPm[1] + "'";
 }
+
+$(document).ready(function () {
+    $("#onBehlafOfTextBox").keydown(function (e) {
+        e.preventDefault();
+    });
+});
 ///////////////////////////////////////////////////////////////////

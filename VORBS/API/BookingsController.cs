@@ -180,10 +180,14 @@ namespace VORBS.API
             {
                 newBooking.RoomID = db.Rooms.Single(r => r.RoomName == newBooking.Room.RoomName).ID;
 
-                var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                //Get the current user
+                if (string.IsNullOrWhiteSpace(newBooking.PID))
+                {
+                    var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
-                newBooking.Owner = user.Name;
-                newBooking.PID = user.SamAccountName;
+                    newBooking.Owner = user.Name;
+                    newBooking.PID = user.SamAccountName;
+                }
 
                 //Reset Room as we dont want to create another room
                 newBooking.Room = null;
