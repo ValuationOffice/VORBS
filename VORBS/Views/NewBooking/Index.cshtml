@@ -17,7 +17,7 @@
         <div class="form-inline" id="searchFilter">
             <div class="form-group">
 
-                <div class="input-group">
+                <div class="input-group" id="searchLocation">
                     <label class="col-sm-2 control-label">Location</label>
                     <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location">
                         <option value="" selected disabled>Select a location...</option>
@@ -51,7 +51,11 @@
                 </div>
 
                 <input id="searchButton" type="button" class="form-control" ng-click="SearchBookings(false)" value="Search" />
-
+                <p>
+                    <div class="alert alert-danger" id="searchFilterErrorCont" style="display: none;">
+                        <ul id="searchFilterErrorList"></ul>
+                    </div>
+                </p>
             </div>
 
             <hr />

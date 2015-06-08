@@ -23,27 +23,31 @@ function NewBookingController($scope, $http, $resource) {
 
         var roomResults;
 
-        if (viewAll === true) {
-            $scope.roomBookings = AllRooms.query({
-                location: $scope.bookingFilter.location.name,
-                startDate: new moment($scope.bookingFilter.startDate).format('DD-MM-YYYY')
-            }, function (success) {
-                roomResults = success;
-                $scope.RenderBookings(roomResults);
-            });
+        var isValid = validateSearchFilters();
+        if (isValid) {
+            if (viewAll === true) {
+                $scope.roomBookings = AllRooms.query({
+                    location: $scope.bookingFilter.location.name,
+                    startDate: new moment($scope.bookingFilter.startDate).format('DD-MM-YYYY')
+                }, function (success) {
+                    roomResults = success;
+                    $scope.RenderBookings(roomResults);
+                });
+            }
+            else {
+                $scope.roomBookings = Available.query({
+                    location: $scope.bookingFilter.location.name,
+                    startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm'),
+                    endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm'),
+                    smartRoom: $scope.bookingFilter.smartRoom,
+                    numberOfAttendees: $scope.bookingFilter.numberOfAttendees
+                }, function (success) {
+                    roomResults = success;
+                    $scope.RenderBookings(roomResults);
+                });
+            }
         }
-        else {
-            $scope.roomBookings = Available.query({
-                location: $scope.bookingFilter.location.name,
-                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm'),
-                endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm'),
-                smartRoom: $scope.bookingFilter.smartRoom,
-                numberOfAttendees: $scope.bookingFilter.numberOfAttendees
-            }, function (success) {
-                roomResults = success;
-                $scope.RenderBookings(roomResults);
-            });
-        }
+        
     }
 
     $scope.RenderBookings = function (roomResults) {
@@ -469,6 +473,38 @@ function ValidateDates(start, end) {
         alert('Start Date Can Not Be Ahead Of End Date');
         throw new Error();
     }
+}
+
+function validateSearchFilters() {
+    var valid = true;
+
+    $("#searchFilterErrorList").html('');
+    $("#searchFilterErrorCont").css('display', 'none');
+    var errors = [];
+
+    if ($("#searchFilter #searchLocation select")[0].selectedIndex == 0) {
+        $("#searchFilter #searchLocation").addClass('has-error');
+        errors.push('Must specify a location');
+        valid = false;
+    } else {
+        $("#searchFilter #searchLocation").removeClass('has-error');
+    }
+
+    if ($("#searchFilter #attendeesInputFilter input").val().trim() == "") {
+        $("#searchFilter #attendeesInputFilter").addClass('has-error');
+        errors.push('Please enter number of attendees');
+        valid = false;
+    } else {
+        $("#searchFilter #attendeesInputFilter").removeClass('has-error');
+    }
+
+    if (!valid) {
+        for (var i = 0; i < errors.length; i++) {
+            $("#searchFilterErrorList").append('<li>' + errors[i] + '</li>');
+        }
+        $("#searchFilterErrorCont").css('display', 'block');
+    }
+    return valid;
 }
 
 function IncrementTime(time, minutes) {
