@@ -9,7 +9,6 @@
     <div class="form-inline">
         <div class="form-group">
 
-            <div id="adminErrorMessage" style="display: none;" class="alert alert-danger"></div>
 
             <div class="input-group">
                 <label class="control-label">Full Name</label>
@@ -19,7 +18,7 @@
             </div>
 
             <div class="input-group">
-                <label class="col-sm-2 control-label">Date</label>
+                <label class="control-label">Date</label>
                 <input id="startDatePicker" class="form-control datepicker" placeholder="Booking Date" ng-model="bookingFilter.startDate" />
             </div>
 
@@ -50,6 +49,8 @@
             <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
         </tr>
     </table>
+   
+    <div id="adminErrorMessage" style="display: none;" class="alert alert-danger"></div>
 
     @Html.Partial("Modals/EditBookingModal", null)
 
