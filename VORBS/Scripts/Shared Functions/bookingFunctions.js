@@ -52,6 +52,21 @@ function ValidateNoAttendees(filterAttendees, externalNamesLength) {
     }
 }
 
+function ValidateStartEndTime(start, end) {
+
+    var timeSplit = start.split(':');
+    startDate = new Date().setHours(timeSplit[0], timeSplit[1]);
+
+    timeSplit = end.split(':');
+    endDate = new Date().setHours(timeSplit[0], timeSplit[1]);
+
+    if (startDate > endDate) {
+        return "Start Time cannont be ahead of End Time";
+    }
+
+    return null;
+}
+
 function ValidateSubject(subject) {
     if (subject.trim() === "") {
         SetModalErrorMessage('Invalid Subject Detected');

@@ -483,6 +483,19 @@ function validateSearchFilters() {
         $("#searchFilter #attendeesInputFilter").removeClass('has-error');
     }
 
+    timeValidationMessage = ValidateStartEndTime($('#startTimePicker').val(), $('#endTimePicker').val())
+
+    if (timeValidationMessage !== null) {
+        $("#searchFilter #endTime").addClass('has-error');
+        $("#searchFilter #startTime").addClass('has-error');
+        errors.push(timeValidationMessage);
+        valid = false;
+    }
+    else {
+        $("#searchFilter #startTime").removeClass('has-error');
+        $("#searchFilter #endTime").removeClass('has-error');
+    }
+
     if (!valid) {
         for (var i = 0; i < errors.length; i++) {
             $("#searchFilterErrorList").append('<li>' + errors[i] + '</li>');
