@@ -48,6 +48,7 @@
           'click.timepicker': $.proxy(this.highlightUnit, this),
           'keydown.timepicker': $.proxy(this.elementKeydown, this),
           'blur.timepicker': $.proxy(this.blurElement, this),
+          'focusout.timepicker': $.proxy(this.focusout, this),
           'mousewheel.timepicker DOMMouseScroll.timepicker': $.proxy(this.mousewheel, this)
         });
       } else {
@@ -56,6 +57,7 @@
             'focus.timepicker': $.proxy(this.showWidget, this),
             'click.timepicker': $.proxy(this.showWidget, this),
             'blur.timepicker': $.proxy(this.blurElement, this),
+            'focusout.timepicker': $.proxy(this.focusout, this),
             'mousewheel.timepicker DOMMouseScroll.timepicker': $.proxy(this.mousewheel, this)
           });
         } else {
@@ -64,6 +66,7 @@
             'click.timepicker': $.proxy(this.highlightUnit, this),
             'keydown.timepicker': $.proxy(this.elementKeydown, this),
             'blur.timepicker': $.proxy(this.blurElement, this),
+            'focusout.timepicker': $.proxy(this.focusout, this),
             'mousewheel.timepicker DOMMouseScroll.timepicker': $.proxy(this.mousewheel, this)
           });
         }
@@ -92,6 +95,10 @@
       this.highlightedUnit = null;
       this.updateFromElementVal();
     },
+    
+    focusout: function () {    
+           this.hideWidget();
+        },
 
     clear: function() {
       this.hour = '';
@@ -253,47 +260,47 @@
         meridianTemplate = '<span class="bootstrap-timepicker-meridian"></span>';
       }
 
-      templateContent = '<table>'+
-         '<tr>'+
-           '<td><a href="#" data-action="incrementHour"><i class="icon-chevron-up"></i></a></td>'+
-           '<td class="separator">&nbsp;</td>'+
-           '<td><a href="#" data-action="incrementMinute"><i class="icon-chevron-up"></i></a></td>'+
-           (this.showSeconds ?
-             '<td class="separator">&nbsp;</td>'+
-             '<td><a href="#" data-action="incrementSecond"><i class="icon-chevron-up"></i></a></td>'
-           : '') +
-           (this.showMeridian ?
-             '<td class="separator">&nbsp;</td>'+
-             '<td class="meridian-column"><a href="#" data-action="toggleMeridian"><i class="icon-chevron-up"></i></a></td>'
-           : '') +
-         '</tr>'+
-         '<tr>'+
-           '<td>'+ hourTemplate +'</td> '+
-           '<td class="separator">:</td>'+
-           '<td>'+ minuteTemplate +'</td> '+
-           (this.showSeconds ?
-            '<td class="separator">:</td>'+
-            '<td>'+ secondTemplate +'</td>'
-           : '') +
-           (this.showMeridian ?
-            '<td class="separator">&nbsp;</td>'+
-            '<td>'+ meridianTemplate +'</td>'
-           : '') +
-         '</tr>'+
-         '<tr>'+
-           '<td><a href="#" data-action="decrementHour"><i class="icon-chevron-down"></i></a></td>'+
-           '<td class="separator"></td>'+
-           '<td><a href="#" data-action="decrementMinute"><i class="icon-chevron-down"></i></a></td>'+
-           (this.showSeconds ?
-            '<td class="separator">&nbsp;</td>'+
-            '<td><a href="#" data-action="decrementSecond"><i class="icon-chevron-down"></i></a></td>'
-           : '') +
-           (this.showMeridian ?
-            '<td class="separator">&nbsp;</td>'+
-            '<td><a href="#" data-action="toggleMeridian"><i class="icon-chevron-down"></i></a></td>'
-           : '') +
-         '</tr>'+
-       '</table>';
+      templateContent = '<table>' +
+               '<tr>' +
+                 '<td><a href="#" data-action="incrementHour"><span class="glyphicon glyphicon-chevron-up"></span></a></td>' +
+                 '<td class="separator">&nbsp;</td>' +
+                 '<td><a href="#" data-action="incrementMinute"><span class="glyphicon glyphicon-chevron-up"></span></a></td>' +
+                 (this.showSeconds ?
+                   '<td class="separator">&nbsp;</td>' +
+                   '<td><a href="#" data-action="incrementSecond"><span class="glyphicon glyphicon-chevron-up"></span></a></td>'
+                 : '') +
+                 (this.showMeridian ?
+                   '<td class="separator">&nbsp;</td>' +
+                   '<td class="meridian-column"><a href="#" data-action="toggleMeridian"><span class="glyphicon glyphicon-chevron-up"></span></a></td>'
+                 : '') +
+               '</tr>' +
+               '<tr>' +
+                 '<td>' + hourTemplate + '</td> ' +
+                 '<td class="separator">:</td>' +
+                 '<td>' + minuteTemplate + '</td> ' +
+                 (this.showSeconds ?
+                  '<td class="separator">:</td>' +
+                  '<td>' + secondTemplate + '</td>'
+                 : '') +
+                 (this.showMeridian ?
+                  '<td class="separator">&nbsp;</td>' +
+                  '<td>' + meridianTemplate + '</td>'
+                 : '') +
+               '</tr>' +
+               '<tr>' +
+                 '<td><a href="#" data-action="decrementHour"><span class="glyphicon glyphicon-chevron-down"></span></a></td>' +
+                 '<td class="separator"></td>' +
+                 '<td><a href="#" data-action="decrementMinute"><span class="glyphicon glyphicon-chevron-down"></span></a></td>' +
+                 (this.showSeconds ?
+                  '<td class="separator">&nbsp;</td>' +
+                  '<td><a href="#" data-action="decrementSecond"><span class="glyphicon glyphicon-chevron-down"></span></a></td>'
+                 : '') +
+                 (this.showMeridian ?
+                  '<td class="separator">&nbsp;</td>' +
+                  '<td><a href="#" data-action="toggleMeridian"><span class="glyphicon glyphicon-chevron-down"></span></a></td>'
+                 : '') +
+               '</tr>' +
+             '</table>';
 
       switch(this.template) {
       case 'modal':
