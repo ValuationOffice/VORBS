@@ -2,7 +2,6 @@
 
     <h4>User Management</h4>
     <p>Add, Edit or Delete Admin Users below.</p>
-    <hr />
 
     <div class="form-inline">
         <div class="form-group">
@@ -10,12 +9,12 @@
             <div id="adminErrorMessage" style="display: none;" class="alert alert-danger"></div>
 
             <div class="input-group">
-                <label class="col-sm-2 control-label">PID</label>
+                <label class="control-label">PID</label>
                 <input id="pidTextBox" maxlength="7" class="form-control" data-toggle="modal" data-target="#activeDirecotryModal" ng-model="adminUser.PID" />
             </div>
 
             <div class="input-group">
-                <label class="col-sm-2 control-label">Location</label>
+                <label class="control-label">Location</label>
                 <select class="form-control" ng-options="location.name for location in Locations" ng-model="adminUser.Location">
                     <option value="" selected disabled>Select a location...</option>
                 </select>

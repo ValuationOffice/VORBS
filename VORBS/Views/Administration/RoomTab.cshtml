@@ -1,0 +1,85 @@
+﻿@model VORBS.Models.Room
+
+<div id="controllerDiv" ng-controller="RoomsController">
+
+    <h4>Room Management</h4>
+    <p>Add, Edit or Delete Rooms below.</p>
+
+    <div class="form-inline">
+
+        <div class="form-group">
+            <div class="input-group">
+                <label class="control-label ">Location</label>
+                <select class="form-control" ng-options="location.name for location in Locations" ng-model="adminUser.Location">
+                    <option value="" selected disabled>Select a location...</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label class="control-label">Room Name</label>
+                <input id="roomName" class="form-control" placeholder="Room Name" ng-model="bookingFilter.startDate" />
+            </div>
+
+            <div class="input-group ">
+                <label class="control-label">Computer(s)</label>
+                <select class="form-control" ng-model="adminUser.PermissionLevel">
+                    <option value="0">Yes</option>
+                    <option value="1">No</option>
+                </select>
+            </div>
+
+            <div class="input-group ">
+                <label class="control-label">Phone(s)</label>
+                <select class="form-control" ng-model="adminUser.PermissionLevel">
+                    <option value="0">Yes</option>
+                    <option value="1">No</option>
+                </select>
+            </div>
+            
+            <div class="input-group ">
+                <label class="control-label">Seat(s)</label>
+                <select class="form-control" ng-model="adminUser.PermissionLevel">
+                    <option value="0">Yes</option>
+                    <option value="1">No</option>
+                </select>
+            </div>
+
+            <div class="input-group ">
+                <label class="control-label">Smart Room</label>
+                <select class="form-control" ng-model="adminUser.PermissionLevel">
+                    <option value="0">Yes</option>
+                    <option value="1">No</option>
+                </select>
+            </div>
+
+            <br />
+            <br />
+            <input id="addButton" type="button" class="form-control" value="Add" />
+
+            <br />
+            <br />
+
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Room Name</th>
+                        <th>No. of Computers</th>
+                        <th>Phone Installed</th>
+                        <th>No. of Seat</th>
+                        <th>Smart Room</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tr ng-repeat="booking in bookings">
+                    <td>{{ booking.room.roomName }}</td>
+                    <td>{{ booking.DateFormatted() }}</td>
+                    <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
+                    <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
+                    <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
+                    <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+</div>

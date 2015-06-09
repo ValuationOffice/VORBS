@@ -1055,6 +1055,7 @@
     <Content Include="Views\Administration\UserTab.cshtml" />
     <Content Include="Views\Administration\BookingTab.cshtml" />
     <Content Include="Views\Errors\Unauthorised.cshtml" />
+    <Content Include="Views\Administration\RoomTab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

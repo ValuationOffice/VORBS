@@ -21,12 +21,14 @@
     <div id="my-tab-content" class="tab-content">
 
         <div class="tab-pane active" id="bookings">
+            <br />
             @Html.Partial("BookingTab")
 
         </div>
         @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 2))
         {
             <div class="tab-pane" id="users">
+                <br />
                 @Html.Partial("UserTab")
             </div>
 
@@ -35,7 +37,8 @@
             </div>
 
             <div class="tab-pane" id="rooms">
-                <p>Manage rooms.</p>
+                <br />
+                @Html.Partial("RoomTab")
             </div>
 
             <div class="tab-pane" id="reports">
