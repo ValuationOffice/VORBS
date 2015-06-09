@@ -168,51 +168,58 @@ function NewBookingController($scope, $http, $resource) {
         $("#newBookingConfirmButton").prop('disabled', 'disabled');
         $("#newBookingConfirmButton").html('Booking now. Please wait..');
 
-        //Validate Number of External Names is not graether than attendees
-        ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
+        try {
+            //Validate Number of External Names is not graether than attendees
+            ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
-        //Validate Subject
-        var Subject = ValidateSubject($scope.newBooking.Subject);
+            //Validate Subject
+            var Subject = ValidateSubject($scope.newBooking.Subject);
 
-        //Validate Times
+            //Validate Times
 
-        //Validate that new time does not clash
-        var newEvent = {
-            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null),
-            end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null)
-        };
+            //Validate that new time does not clash
+            var newEvent = {
+                start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null),
+                end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null)
+            };
 
-        if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName + "_calendar").fullCalendar('clientEvents'))) {
-            alert('New meeting clashes with existing booking. Please choose a new time!');
-            return;
-        };
+            if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName + "_calendar").fullCalendar('clientEvents'))) {
+                alert('New meeting clashes with existing booking. Please choose a new time!');
+                return;
+            };
 
-        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm');
-        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm');
-        $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
+            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm');
+            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm');
+            $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
-        if ($scope.booking.ExternalNames.length > 0) {
-            $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
-        }
-
-        $.ajax({
-            type: "POST",
-            data: JSON.stringify($scope.newBooking),
-            url: "api/bookings",
-            contentType: "application/json",
-
-            success: function (data, status) {
-                alert('Booking Confirmed. Meeting Requests Have Been Sent.');
-                window.location.href = "/MyBookings"; //Redirect to my bookings
-            },
-            error: function (error) {
-                alert('Unable to Book Meeting Room. Please Contact ITSD. ');
-
-                //Change the "new booking" button to stop multiple bookings
-                $("#newBookingConfirmButton").prop('disabled', '');
-                $("#newBookingConfirmButton").html('Confirm Booking');
+            if ($scope.booking.ExternalNames.length > 0) {
+                $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
             }
-        });
+
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify($scope.newBooking),
+                url: "api/bookings",
+                contentType: "application/json",
+
+                success: function (data, status) {
+                    alert('Booking Confirmed. Meeting Requests Have Been Sent.');
+                    window.location.href = "/MyBookings"; //Redirect to my bookings
+                },
+                error: function (error) {
+                    alert('Unable to Book Meeting Room. Please Contact ITSD. ');
+
+                    //Change the "new booking" button to stop multiple bookings
+                    $("#newBookingConfirmButton").prop('disabled', '');
+                    $("#newBookingConfirmButton").html('Confirm Booking');
+                }
+            });
+        } catch (e) {
+            //Change the "new booking" button to stop multiple bookings
+            $("#newBookingConfirmButton").prop('disabled', '');
+            $("#newBookingConfirmButton").html('Confirm Booking');
+        }
+        
     }
 
     $('#confirmModal').on('hidden.bs.modal', function () {
