@@ -44,12 +44,6 @@ function UsersController($scope, $http, $resource) {
             success: function () {
                 alert('User Added Sucesfully!');
                 location.reload();
-
-                //$('#bookingTab').removeClass('active');
-                //$('#bookings').removeClass('active');
-
-                //$('#users').addClass('active');
-                //$('#userTab').addClass('active');
             },
             error: function (error) {
                 if (error.status == 409) {
