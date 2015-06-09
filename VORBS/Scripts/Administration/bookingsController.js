@@ -180,7 +180,7 @@ function CreateBookingServices($resource) {
         remove: { method: 'DELETE' }
     });
 
-    GetBooking = $resource('api/bookings/:owner/:start', { owner: 'owner', start: 'start' },
+    GetBooking = $resource('/api/bookings/:owner/:start', { owner: 'owner', start: 'start' },
     {
         query: {method: 'GET', isArray: true }
     });

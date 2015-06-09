@@ -69,6 +69,8 @@
     <script src="~/Scripts/typeahead.jquery.min.js"></script>
     <script src="~/Scripts/typeahead.bundle.min.js"></script>
 
+    <script src="~/Scripts/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.js"></script>
+
     <script>
         $(function () {
             $('.datepicker').datepicker({
@@ -86,11 +88,6 @@
                 showMeridian: false,
             });
         });
-
-        document.getElementById('attendessControl').onkeydown = function (e) {
-            var key = e.keyCode ? e.keyCode : e.which;
-            if (isNaN(String.fromCharCode(key))) return false;
-        };
 
         jQuery(document).ready(function ($) {
             $('#tabs').tab();
