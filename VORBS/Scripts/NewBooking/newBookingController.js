@@ -175,8 +175,6 @@ function NewBookingController($scope, $http, $resource) {
             //Validate Subject
             var Subject = ValidateSubject($scope.newBooking.Subject);
 
-            //Validate Times
-
             //Validate that new time does not clash
             var newEvent = {
                 start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null),
@@ -259,6 +257,8 @@ function NewBookingController($scope, $http, $resource) {
         PID: '',
         Owner: ''
     };
+
+    $scope.bookingFilter.endTime = IncrementCurrentTime(30);
 }
 
 
@@ -509,18 +509,18 @@ function validateSearchFilters() {
     return valid;
 }
 
-function IncrementTime(time, minutes) {
-    var timeSplit = time.split(':');
-    var amPm = timeSplit[1].split(" ");
+function IncrementCurrentTime(addMins) {
+    var start = new moment();
+    var diff = 30 - start.minute()
 
-    minutes = parseInt(amPm[0]) + minutes
-
-    if (minutes >= 60) {
-        minutes -= 60;
-        ("0" + minutes).slice(-2);
+    if (diff > 0) {
+        start.add(diff, 'm');
+    }
+    else {
+        start.add(60 - start.minute(), 'm');
     }
 
-    return "'" + timeSplit[0] + ":" + minutes + " " + amPm[1] + "'";
+   return moment(start).add("minutes", addMins).format("H:mm");
 }
 
 $(document).ready(function () {

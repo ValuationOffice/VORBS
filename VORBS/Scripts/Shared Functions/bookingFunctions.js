@@ -42,9 +42,6 @@ function RemoveExternalName(fullName, attendeeArray) {
     return attendeeArray;
 }
 
-////////////////
-
-//Validation
 function ValidateNoAttendees(filterAttendees, externalNamesLength) {
     if (filterAttendees === null) {
         SetModalErrorMessage('Invalid Number Of Attendees.');
@@ -56,21 +53,6 @@ function ValidateNoAttendees(filterAttendees, externalNamesLength) {
     }
 }
 
-function ValidateStartEndTime(start, end) {
-
-    var timeSplit = start.split(':');
-    var startDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]).add(30, 'm');
-
-    timeSplit = end.split(':');
-    var endDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]);
-
-    if (startDate.isAfter(endDate)) {
-        return "Start Time cannont be ahead of End Time";
-    }
-
-    return "";
-}
-
 function ValidateSubject(subject) {
     if (subject.trim() === "") {
         SetModalErrorMessage('Invalid Subject Detected');
@@ -78,6 +60,30 @@ function ValidateSubject(subject) {
     }
     return subject;
 }
+
+////////////////
+
+//Validation
+function ValidateStartEndTime(start, end) {
+
+    var timeSplit = start.split(':');
+    var startDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]);
+
+    timeSplit = end.split(':');
+    var endDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]);
+
+    var timeDiff = endDate.diff(startDate, 'm');
+
+    if (timeDiff < 0) {
+        return "Start time can't be ahead of end time";
+    }
+    else if (timeDiff === 0) {
+        return "Identical times can't be used as a valid search";
+    } 
+
+    return "";
+}
+
 
 function ValidateEmail(email) {
     var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
