@@ -173,7 +173,15 @@ function NewBookingController($scope, $http, $resource) {
             ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
             //Validate Subject
-            var Subject = ValidateSubject($scope.newBooking.Subject);
+            ValidateSubject($scope.newBooking.Subject);
+
+            //Validate Time
+            var timeValidation = ValidateStartEndTime($scope.booking.StartTime, $scope.booking.EndTime);
+            if (timeValidation !== "") {
+                SetModalErrorMessage(timeValidation);
+                EnableNewBookingButton();
+                return;
+            }
 
             //Validate that new time does not clash
             var newEvent = {
@@ -182,7 +190,8 @@ function NewBookingController($scope, $http, $resource) {
             };
 
             if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName + "_calendar").fullCalendar('clientEvents'))) {
-                alert('New meeting clashes with existing booking. Please choose a new time!');
+                SetModalErrorMessage('New meeting clashes with existing booking. Please choose a new time!');
+                EnableNewBookingButton();
                 return;
             };
 
@@ -206,19 +215,18 @@ function NewBookingController($scope, $http, $resource) {
                 },
                 error: function (error) {
                     alert('Unable to Book Meeting Room. Please Contact ITSD. ');
-
-                    //Change the "new booking" button to stop multiple bookings
-                    $("#newBookingConfirmButton").prop('disabled', '');
-                    $("#newBookingConfirmButton").html('Confirm Booking');
+                    EnableNewBookingButton();
                 }
             });
         } catch (e) {
-            //Change the "new booking" button to stop multiple bookings
-            $("#newBookingConfirmButton").prop('disabled', '');
-            $("#newBookingConfirmButton").html('Confirm Booking');
+            EnableNewBookingButton();
         }
         
     }
+
+    $('#confirmModal').on('show.bs.modal', function () {
+        SetModalErrorMessage(''); //Reset Any Error Messages
+    })
 
     $('#confirmModal').on('hidden.bs.modal', function () {
         $scope.newBooking.Subject = '',
@@ -322,39 +330,10 @@ function isMeetingOverlapping(event, array) {
     return false;
 }
 
-function InitiateCalendar() {
-    $(function () {
-        $('#calendar').fullCalendar({
-            weekends: false,
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek,agendaDay'
-            },
-            events: function (start, end, timezone, callback) {
-                var $scope = angular.element($("#controllerDiv")).scope();
-                $.ajax({
-                    url: '/api/bookings/' + moment.utc(start, "DD-MM-YYYY").format("MM-DD-YYYY") + '/' + moment.utc(end, "DD-MM-YYYY").format("MM-DD-YYYY") + '/' + $scope.currentRoom.roomName,
-                    dataType: 'json',
-                    type: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify($scope.currentLocation),
-                    success: function (data) {
-                        var events = [];
-                        for (var i = 0; i < data.length; i++) {
-                            events.push({
-                                title: data[i].owner,
-                                start: data[i].startDate,
-                                end: data[i].endDate
-                            });
-                        }
-                        callback(events);
-                    }
-                });
-
-            }
-        });
-    });
+function EnableNewBookingButton() {
+    //Change the "new booking" button to stop multiple bookings
+    $("#newBookingConfirmButton").prop('disabled', '');
+    $("#newBookingConfirmButton").html('Confirm Booking');
 }
 ///////////////////////////////////////////////////////////////////
 
@@ -433,34 +412,6 @@ function AdEmailExist(email, currentEmails) {
         if (email === currentEmails[i].toUpperCase().trim()) {
             return true;
         }
-    }
-}
-
-///////////////////////////////////////////////////////////////////
-
-//Filtering Functions
-
-function ValidateAttendess(attendees) {
-
-    if (attendees === null) {
-        throw new Error();
-    }
-    else if (isNaN(attendees)) {
-        alert('Invalid Number');
-        throw new Error();
-    }
-    else if (attendees <= 0) {
-        alert('Attendees Can Not Be Negative');
-        throw new Error();
-    }
-    return attendees;
-}
-
-function ValidateDates(start, end) {
-    //ToDo: Add Equals then
-    if (start > end) {
-        alert('Start Date Can Not Be Ahead Of End Date');
-        throw new Error();
     }
 }
 
