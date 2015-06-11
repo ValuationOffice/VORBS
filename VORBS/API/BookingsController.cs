@@ -112,7 +112,7 @@ namespace VORBS.API
                 string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1); //TODO: Change?
 
                 List<Booking> bookings = db.Bookings
-                    .Where(x => x.PID == currentPid && x.StartDate >= start).ToList()
+                    .Where(x => x.PID == currentPid && x.EndDate >= start).ToList()
                     .OrderBy(x => x.StartDate)
                     .ToList();
 
@@ -223,27 +223,6 @@ namespace VORBS.API
                 //Find Existing Booking
                 Booking existingBooking = db.Bookings.Single(b => b.ID == existingBookingId);
                 editBooking.ID = existingBookingId;
-
-                //Check Room Avaliablity 
-                //Only check avaliablity if date/time/attendes has been updated. TODO: Refactor
-                if (!(editBooking.StartDate.Equals(existingBooking.StartDate) && editBooking.EndDate.Equals(existingBooking.EndDate) &&
-                    editBooking.NumberOfAttendees.Equals(existingBooking.NumberOfAttendees)))
-                {
-                    AvailabilityController av = new AvailabilityController();
-                    Room existingRoom = db.Rooms.First(r => r.ID == existingBooking.RoomID);
-
-                    int roomId = av.GetBestAvaiableRoomForLocation(existingRoom.Location.Name, editBooking.StartDate, editBooking.EndDate, editBooking.NumberOfAttendees, false); //TODO: change smart room
-
-                    if (roomId == 0)
-                    {
-                        //No Rooms Avaliable
-                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, "No Rooms Avaialbe Using Current Date/Time/Attendees.");
-                    }
-                    
-                    editBooking.RoomID = roomId;
-                }
-                else
-                    editBooking.RoomID = existingBooking.RoomID;
 
                 //TODO: Maybe change when booking on behalf of user
                 editBooking.Owner = existingBooking.Owner;

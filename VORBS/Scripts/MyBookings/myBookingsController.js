@@ -26,6 +26,8 @@ function MyBookingsController($scope, $http, $resource) {
     $('#editModal').on('show.bs.modal', function () {
         //Reset Any Error Messages
         SetModalErrorMessage('');
+        ResetExternalNamesUI();
+        SetEditActiveTab('editBooking');
 
         $scope.editBooking = Booking.query({
             bookingId: $scope.bookingId
@@ -33,9 +35,9 @@ function MyBookingsController($scope, $http, $resource) {
         function (sucess) {
             $scope.newBooking.Room.RoomName = $scope.editBooking.room.roomName;
             $scope.newBooking.Subject = $scope.editBooking.subject;
-            $scope.newBooking.NumberOfAttendees = $scope.editBooking.numberOfAttendees;
             $scope.newBooking.FlipChart = $scope.editBooking.flipchart;
             $scope.newBooking.Projector = $scope.editBooking.projector;
+            $scope.newBooking.RoomID = $scope.editBooking.room.id;
 
             if ($scope.editBooking.externalNames !== null) {
                 $scope.booking.ExternalNames = $scope.editBooking.externalNames.split(';');
@@ -44,34 +46,21 @@ function MyBookingsController($scope, $http, $resource) {
                 $scope.booking.ExternalNames = []; //Reset External Name List
             }
 
+            $scope.booking.numberOfAttendees = $scope.editBooking.numberOfAttendees;
             $scope.booking.startTime = FormatTimeDate($scope.editBooking.startDate, false);
             $scope.booking.endTime = FormatTimeDate($scope.editBooking.endDate, false);
             $scope.booking.date = FormatTimeDate($scope.editBooking.startDate, true);
+
+            //Store the vital existing booking data
+            $scope.existingBooking.numberOfAttendees = $scope.booking.numberOfAttendees;
+            $scope.existingBooking.startTime = $scope.booking.startTime;
+            $scope.existingBooking.endTime = $scope.booking.endTime;
+            $scope.existingBooking.date = $scope.booking.date;
         }
       )
     });
 
-    $('#editModal').on('show.bs.modal', function () {
-        ResetExternalNamesUI();
-    });
-
-    $('.datepicker').datepicker({
-        startDate: '-0m',
-        format: 'dd-mm-yyyy',
-        autoClose: true,
-        todayBtn: true,
-        todayHighlight: true,
-        weekStart: 1,
-        daysOfWeekDisabled: [0, 6]
-    });
-
-    $('.timepicker').timepicker({
-        showInputs: false,
-        minuteStep: 30,
-        showMeridian: false
-    });
-
-    $scope.EditBooking = function () {
+    $scope.CheckEditBooking = function () {
         //Reset Any Error Messages
         SetModalErrorMessage('');
 
@@ -82,7 +71,8 @@ function MyBookingsController($scope, $http, $resource) {
         }
 
         //Validate Number of External Names is not graether than attendees
-        ValidateNoAttendees($scope.newBooking.NumberOfAttendees, $scope.booking.ExternalNames.length);
+        ValidateNoAttendees($scope.booking.numberOfAttendees, $scope.booking.ExternalNames.length);
+        $scope.newBooking.NumberOfAttendees = $scope.booking.numberOfAttendees;
 
         //Validate Subject
         var Subject = ValidateSubject($scope.newBooking.Subject);
@@ -102,24 +92,42 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
         }
 
-        $.ajax({
-            type: "POST",
-            data: JSON.stringify($scope.newBooking),
-            url: "api/bookings/" + $scope.bookingId,
-            contentType: "application/json",
-            success: function (data, status) {
-                alert('Booking Edited. Confirmation Email Have Been Sent.');
-                window.location.href = "/MyBookings"; //Redirect to my bookings
+        //Validate if Date/Time/Attendees has changed
+        if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
+            ($scope.booking.startTime === $scope.existingBooking.startTime) && ($scope.booking.endTime === $scope.existingBooking.endTime)) {
+            SaveEditBooking($scope.bookingId, $scope.newBooking);
+        }
+        else {
+            $scope.availableRooms = Available.query({
+                location: $scope.editBooking.location.name,
+                startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm'),
+                endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm'),
+                smartRoom: false,
+                numberOfAttendees: $scope.booking.numberOfAttendees,
+                existingBookingId: $scope.bookingId
             },
-            error: function (error) {
-                if (error.status = 409) {
-                    SetModalErrorMessage(error.responseJSON);
+            function (success) {
+                if ($scope.availableRooms.length === 0) {
+                    SetModalErrorMessage('No Rooms Avaliable using the below Date/Time/Attendees.');
+                }
+                else if ($scope.availableRooms[0].roomName === $scope.newBooking.Room.RoomName) {
+                    SaveEditBooking($scope.bookingId, $scope.newBooking);
                 }
                 else {
-                    alert('Unable to edit Meeting Room. Please Contact ITSD. ' + error.responseJSON);
+                    SetEditActiveTab('confirmEditBooking');
+                    $scope.currentRoom = $scope.availableRooms[0];
                 }
-            }
-        });
+            },
+            function (error) {
+                //TODO:Log Error
+                alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
+            });
+        }
+    }
+
+    $scope.EditBooking = function () {
+        $scope.newBooking.RoomID = $scope.currentRoom.id;
+        SaveEditBooking($scope.bookingId, $scope.newBooking);
     }
 
     $scope.DeleteBooking = function () {
@@ -137,10 +145,26 @@ function MyBookingsController($scope, $http, $resource) {
         );
     }
 
+    $('.datepicker').datepicker({
+        startDate: '-0m',
+        format: 'dd-mm-yyyy',
+        autoClose: true,
+        todayHighlight: true,
+        weekStart: 1,
+        daysOfWeekDisabled: [0, 6]
+    });
+
+    $('.timepicker').timepicker({
+        showInputs: false,
+        minuteStep: 30,
+        showMeridian: false
+    });
+
     $scope.newBooking = {
         Room: { RoomName: '' },
         Subject: '',
         NumberOfAttendees: 0,
+        RoomID: 0,
         ExternalNames: null,
         StartDate: new Date(),
         EndDate: new Date(),
@@ -152,12 +176,27 @@ function MyBookingsController($scope, $http, $resource) {
         startTime: '',
         endTime: '',
         date: new Date(),
+        numberOfAttendees: 0,
         externalNames: []
+    }
+
+    $scope.existingBooking = {
+        startTime: '',
+        endTime: '',
+        date: new Date(),
+        numberOfAttendees: 0
     }
 }
 
 
 function CreateServices($resource) {
+    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom/:existingBookingId', {
+        location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom', existingBookingId: 'existingBookingId'
+    },
+    {
+        query: { method: 'GET', isArray: true }
+    });
+
     GetBookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
     {
         query: { method: 'GET', isArray: true }

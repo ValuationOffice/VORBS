@@ -187,15 +187,47 @@ namespace VORBS.API
             return rooms;
         }
 
-        internal int GetBestAvaiableRoomForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom)
+        [HttpGet]
+        [Route("{location}/{start:DateTime}/{end:DateTime}/{numberOfPeople:int}/{smartRoom:bool}/{existingBookignId:int}")]
+        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom, int existingBookignId)
         {
+            List<RoomDTO> rooms = new List<RoomDTO>();
+
+            if (location == null)
+                return new List<RoomDTO>();
+
+            List<Room> roomData = new List<Room>();
+            //var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
+
             var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople &&
-                                               (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate).Count() == 0)) //Do any bookings overlap
+                                               (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate && b.ID != existingBookignId).Count() == 0)) //Do any bookings overlap
                                 .OrderBy(r => r.SeatCount).ThenBy(r => r.SmartRoom)
-                                .Select(r => r.ID);
+                                .ToList();
 
-             return availableRooms.FirstOrDefault();
+            roomData.AddRange(availableRooms);
+
+            roomData.ForEach(x => rooms.Add(new RoomDTO()
+            {
+                ID = x.ID,
+                RoomName = x.RoomName,
+                PhoneCount = x.PhoneCount,
+                ComputerCount = x.ComputerCount,
+                SeatCount = x.SeatCount,
+                SmartRoom = x.SmartRoom,
+                Bookings = x.Bookings.Where(b => b.StartDate.Date == start.Date && b.EndDate.Date == end.Date).Select(b =>
+                {
+                    BookingDTO bDto = new BookingDTO()
+                    {
+                        ID = b.ID,
+                        Owner = b.Owner,
+                        StartDate = b.StartDate,
+                        EndDate = b.EndDate
+                    };
+                    return bDto;
+                }).ToList()
+            }));
+
+            return rooms;
         }
-
     }
 }

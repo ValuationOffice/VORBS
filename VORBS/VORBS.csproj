@@ -1056,6 +1056,7 @@
     <Content Include="Views\Administration\BookingTab.cshtml" />
     <Content Include="Views\Errors\Unauthorised.cshtml" />
     <Content Include="Views\Administration\RoomTab.cshtml" />
+    <Content Include="Views\Shared\Modals\ConfirmEditBookingModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -61,10 +61,35 @@ function ValidateSubject(subject) {
     return subject;
 }
 
+function SetEditActiveTab(tabId) {
+    $('#editBookingTabs a[href="#' + tabId + '"]').tab('show');
+}
+
+function SaveEditBooking(existingId, editBooking) {
+    $.ajax({
+        type: "POST",
+        data: JSON.stringify(editBooking),
+        url: "api/bookings/" + existingId,
+        contentType: "application/json",
+        success: function (data, status) {
+            alert('Edit Booking Confimed. Confirmation Email has beeen sent.');
+            location.reload();
+        },
+        error: function (error) {
+            alert('Unable to edit Meeting Room. Please Contact ITSD. ' + error.message);
+        }
+    });
+}
+
+
 ////////////////
 
 //Validation
 function ValidateStartEndTime(start, end) {
+
+    if (start === "" || end === "") {
+        return "Invalid Start/End Time";
+    }
 
     var timeSplit = start.split(':');
     var startDate = new moment().hour(timeSplit[0]).minute(timeSplit[1]);
@@ -74,12 +99,18 @@ function ValidateStartEndTime(start, end) {
 
     var timeDiff = endDate.diff(startDate, 'm');
 
-    if (timeDiff < 0) {
+    if (startDate.hours() < 9 || startDate.hours() >= 18) {
+        return "Start time has to be between 9:00 & 17:30";
+    }
+    else if (endDate.hours() < 9 || endDate.hours() >= 18) {
+        return "End time has to be between 9:00 & 17:30";
+    }
+    else if (timeDiff < 0) {
         return "Start time can't be ahead of end time";
     }
     else if (timeDiff === 0) {
         return "Identical times can't be used as a valid search";
-    } 
+    }
 
     return "";
 }

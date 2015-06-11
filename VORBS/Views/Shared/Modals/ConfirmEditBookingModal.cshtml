@@ -1,0 +1,33 @@
+﻿<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title" id="myModalLabel">Confirm Edit Booking</h4>
+</div>
+<div class="modal-body">
+    <p>You metting room has changed to <b>{{currentRoom.roomName}}</b>, please confirm that you are happpy with this selection ?</p>
+
+    <table>
+        <tr>
+            <td><span class="glyphicon glyphicon-user badge" title="Seat Count"> {{currentRoom.seatCount}}</span> Max Attendees</td>
+        </tr>
+        <tr>
+            <td><span class="glyphicon glyphicon-hdd badge" title="PCs"> {{currentRoom.computerCount}}</span> PCs</td>
+        </tr>
+        <tr>
+            <td><span class="glyphicon glyphicon-earphone badge" title="Telephones"> {{currentRoom.phoneCount}}</span> Telephones</td>
+        </tr>
+        <tr>
+            <td><span class="glyphicon glyphicon-facetime-video badge" title="Is SMART room"> </span> {{currentRoom.smartRoom}}</td>
+        </tr>
+</table>
+
+    <hr />
+
+    <p>Alternately Please select a metting room from the dropdown:</p>
+
+    <select class="form-control" ng-options="room.roomName for room in availableRooms" ng-model="currentRoom">
+    </select>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" onclick="SetEditActiveTab('editBooking')">Back</button>
+    <button type="button" class="btn btn-primary" ng-click="EditBooking()">Confirm</button>
+</div>
