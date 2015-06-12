@@ -83,8 +83,8 @@ function MyBookingsController($scope, $http, $resource) {
         }
 
         //Create Date String
-        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm');
-        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm');
+        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true);
+        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true);
 
         if ($scope.booking.ExternalNames.length > 0) {
             $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
@@ -137,7 +137,7 @@ function MyBookingsController($scope, $http, $resource) {
 
         $scope.bookings = GetBooking.query({
             owner: $('#fullNameTextBox').typeahead('val'),
-            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY')
+            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY', true)
         },
         function (success) {
             if (success.length === 0) {

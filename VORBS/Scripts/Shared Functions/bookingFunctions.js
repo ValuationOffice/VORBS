@@ -124,7 +124,7 @@ function ValidateEmail(email) {
 ////////////////
 
 //Formating (Date/Time)
-function FormatDateTimeForURL(date, formatString) {
+function FormatDateTimeForURL(date, formatString, toUtc) {
     if (date === "") {
         alert('Please Enter a Valid Date');
         throw new Error();
@@ -142,7 +142,10 @@ function FormatDateTimeForURL(date, formatString) {
     }
 
     if (formatString !== null) {
-        return new moment(myDate2).utc().format(formatString);
+        if (toUtc) {
+            return new moment(myDate2).utc().format(formatString);
+        }
+        return new moment(myDate2).format(formatString);
     }
     else {
         //Workaround for confirmation edit time 

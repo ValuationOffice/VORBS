@@ -85,7 +85,7 @@ function MyBookingsController($scope, $http, $resource) {
         }
 
         //Create Date String
-        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm');
+        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true);
         $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm');
 
         if ($scope.booking.ExternalNames.length > 0) {
@@ -100,8 +100,8 @@ function MyBookingsController($scope, $http, $resource) {
         else {
             $scope.availableRooms = Available.query({
                 location: $scope.editBooking.location.name,
-                startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm'),
-                endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm'),
+                startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true),
+                endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true),
                 smartRoom: false,
                 numberOfAttendees: $scope.booking.numberOfAttendees,
                 existingBookingId: $scope.bookingId
