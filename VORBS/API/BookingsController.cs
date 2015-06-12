@@ -178,7 +178,7 @@ namespace VORBS.API
         {
             try
             {
-                newBooking.RoomID = db.Rooms.Single(r => r.RoomName == newBooking.Room.RoomName).ID;
+                newBooking.RoomID = newBooking.Room.ID;
 
                 //Get the current user
                 if (string.IsNullOrWhiteSpace(newBooking.PID))

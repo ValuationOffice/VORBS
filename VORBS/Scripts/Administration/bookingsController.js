@@ -23,6 +23,7 @@ function MyBookingsController($scope, $http, $resource) {
     $('#editModal').on('show.bs.modal', function () {
         //Reset Any Error Messages
         SetModalErrorMessage('');
+        ResetExternalNamesUI();
 
         $scope.editBooking = Booking.query({
             bookingId: $scope.bookingId
@@ -46,10 +47,6 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.booking.date = FormatTimeDate($scope.editBooking.startDate, true);
         }
       )
-    });
-
-    $('#editModal').on('show.bs.modal', function () {
-        ResetExternalNamesUI();
     });
 
     $('#fullNameTextBox').typeahead({

@@ -26,7 +26,7 @@
                 <tbody>
                     <tr ng-repeat="booking in bookings">
                         <td>{{ booking.location.name}}</td>
-                        <td>{{ booking.room.roomName }}</td>
+                        <td>{{ booking.roomNameFormatted() }}</td>
                         <td>{{ booking.DateFormatted() }}</td>
                         <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                         <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>

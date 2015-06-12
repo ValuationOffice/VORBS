@@ -69,10 +69,10 @@ function NewBookingController($scope, $http, $resource) {
             }
 
             if (roomResults[i].smartRoom === true) {
-                var roomDetails = '<h3 style="text-align: center;">' +roomResults[i].roomName + '<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span></h3>';  
+                var roomDetails = '<h3 style="text-align: center;">' +roomResults[i].roomName.replace('_', '.') + '<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span></h3>';  
                 }
             else {
-                var roomDetails = '<h3 style="text-align: center;">' + roomResults[i].roomName + '</h3>';
+                var roomDetails = '<h3 style="text-align: center;">' + roomResults[i].roomName.replace('_', '.') + '</h3>';
             }
                 
             //debugger;
@@ -114,7 +114,9 @@ function NewBookingController($scope, $http, $resource) {
                     var $scope = angular.element($("#controllerDiv")).scope();
                     var room = $scope.GetRoomByName(this.title);
 
-                    $scope.newBooking.Room.RoomName = room.roomName;
+                    $scope.newBooking.Room = room;
+                    $scope.newBooking.Room.RoomName = room.roomName.replace('_', '.');
+
                     $scope.booking.StartTime = start.utc().format('H:mm');
                     $scope.booking.EndTime = end.utc().format('H:mm');
 
@@ -173,7 +175,7 @@ function NewBookingController($scope, $http, $resource) {
             ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
 
             //Validate Subject
-            ValidateSubject($scope.newBooking.Subject);
+            //ValidateSubject($scope.newBooking.Subject);
 
             //Validate Time
             var timeValidation = ValidateStartEndTime($scope.booking.StartTime, $scope.booking.EndTime);
@@ -189,7 +191,7 @@ function NewBookingController($scope, $http, $resource) {
                 end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null)
             };
 
-            if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName + "_calendar").fullCalendar('clientEvents'))) {
+            if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName.replace('.', '_') + "_calendar").fullCalendar('clientEvents'))) {
                 SetModalErrorMessage('New meeting clashes with existing booking. Please choose a new time!');
                 EnableNewBookingButton();
                 return;

@@ -33,7 +33,7 @@ function MyBookingsController($scope, $http, $resource) {
             bookingId: $scope.bookingId
         },
         function (sucess) {
-            $scope.newBooking.Room.RoomName = $scope.editBooking.room.roomName;
+            $scope.newBooking.Room.RoomName = $scope.editBooking.room.roomName.replace('_', '.');
             $scope.newBooking.Subject = $scope.editBooking.subject;
             $scope.newBooking.FlipChart = $scope.editBooking.flipchart;
             $scope.newBooking.Projector = $scope.editBooking.projector;
@@ -75,7 +75,7 @@ function MyBookingsController($scope, $http, $resource) {
         $scope.newBooking.NumberOfAttendees = $scope.booking.numberOfAttendees;
 
         //Validate Subject
-        var Subject = ValidateSubject($scope.newBooking.Subject);
+        //var Subject = ValidateSubject($scope.newBooking.Subject);
 
         //Validate Times
         var timeValidation = ValidateStartEndTime($scope.booking.startTime, $scope.booking.endTime);
@@ -110,7 +110,7 @@ function MyBookingsController($scope, $http, $resource) {
                 if ($scope.availableRooms.length === 0) {
                     SetModalErrorMessage('No Rooms Avaliable using the below Date/Time/Attendees.');
                 }
-                else if ($scope.availableRooms[0].roomName === $scope.newBooking.Room.RoomName) {
+                else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
                     SaveEditBooking($scope.bookingId, $scope.newBooking);
                 }
                 else {
@@ -197,6 +197,10 @@ function CreateServices($resource) {
         query: { method: 'GET', isArray: true }
     });
 
+    Available.prototype = {
+        roomNameFormatted: function () { return this.roomName.replace('_', '.'); }
+    };
+
     GetBookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
     {
         query: { method: 'GET', isArray: true }
@@ -205,7 +209,8 @@ function CreateServices($resource) {
     GetBookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
         startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
-        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); }
+        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
+        roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
     };
 
     Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId' },
