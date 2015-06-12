@@ -23,11 +23,13 @@ function MyBookingsController($scope, $http, $resource) {
         $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
     }
 
-    $('#editModal').on('show.bs.modal', function () {
+    $scope.LoadEditBooking = function (bookingId) {
         //Reset Any Error Messages
         SetModalErrorMessage('');
         ResetExternalNamesUI();
         SetEditActiveTab('editBooking');
+
+        $scope.SetBookingId(bookingId);
 
         $scope.editBooking = Booking.query({
             bookingId: $scope.bookingId
@@ -58,7 +60,7 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.existingBooking.date = $scope.booking.date;
         }
       )
-    });
+    }
 
     $scope.CheckEditBooking = function () {
         //Reset Any Error Messages

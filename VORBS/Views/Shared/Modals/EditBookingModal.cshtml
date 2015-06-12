@@ -39,10 +39,8 @@
                                         <input style="width:180px;" id="bookingDate" class="form-control datepicker" ng-model="booking.date" />
                                     </span>
                                 </div>
-                                <span style="padding-left:15px;">
-                                    <label style="margin-left:-3px;" class="control-label">Attendees</label>
-                                    <input id="attendessControl" type="number" min="1" style="margin-left:27px;" class="form-control" ng-model="booking.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
-                                </span>
+                                <label style="margin-left:-3px;" class="control-label">Attendees</label>
+                                <input id="attendees" type="number" min="1" style="margin-left:27px;" class="form-control" ng-model="booking.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
                             </div>
                             <br />
                             <div class="form-inline">
