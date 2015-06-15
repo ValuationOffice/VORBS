@@ -25,6 +25,8 @@ namespace VORBS.Models
 
         public bool Flipchart { get; set; }
         public bool Projector { get; set; }
+
+        public bool DssAssist { get; set; }
     }
 }
 

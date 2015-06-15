@@ -137,6 +137,7 @@
     <Compile Include="Models\DTOs\AdminDTO.cs" />
     <Compile Include="Models\DTOs\UserDTO.cs" />
     <Compile Include="Models\Admin.cs" />
+    <Compile Include="Models\LocationCredentials.cs" />
     <Compile Include="Security\Authorisation.cs" />
     <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
@@ -164,7 +165,7 @@
     <Compile Include="Models\Room.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\CustomHelpers.cs" />
-    <Compile Include="Utils\Outlook.cs" />
+    <Compile Include="Utils\EmailHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -1048,6 +1049,12 @@
     <Content Include="Views\Test\UI_2.cshtml" />
     <Content Include="Views\Test\UI_3.cshtml" />
     <Content Include="Views\Test\UI2.cshtml" />
+    <Content Include="Views\EmailTemplates\NewBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\AdminNewBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\EdittedBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\AdminEdittedBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\CancelledBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\AdminCancelledBooking.cshtml" />
     <Content Include="Views\Shared\Modals\NewBookingModal.cshtml" />
     <Content Include="Views\Shared\Modals\EditBookingModal.cshtml" />
     <Content Include="Views\Shared\Modals\ActiveDirectoryModal.cshtml" />
@@ -1057,6 +1064,9 @@
     <Content Include="Views\Errors\Unauthorised.cshtml" />
     <Content Include="Views\Administration\RoomTab.cshtml" />
     <Content Include="Views\Shared\Modals\ConfirmEditBookingModal.cshtml" />
+    <Content Include="Views\EmailTemplates\FacilitiesNewBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\SecurityNewBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\DSSNewBooking.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

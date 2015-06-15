@@ -114,6 +114,12 @@ function NewBookingController($scope, $http, $resource) {
                     var $scope = angular.element($("#controllerDiv")).scope();
                     var room = $scope.GetRoomByName(this.title);
 
+                    if (!room.smartRoom) {
+                        $("#dssAssistChoice").css('display', 'none');
+                    } else {
+                        $("#dssAssistChoice").css('display', 'block');
+                    }
+
                     $scope.newBooking.Room = room;
                     $scope.newBooking.Room.RoomName = room.roomName.replace('_', '.');
 
@@ -265,7 +271,8 @@ function NewBookingController($scope, $http, $resource) {
         FlipChart: false,
         Projector: false,
         PID: '',
-        Owner: ''
+        Owner: '',
+        DSSAssist: false
     };
 
     $scope.bookingFilter.endTime = IncrementCurrentTime(30);

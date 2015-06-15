@@ -13,5 +13,10 @@ namespace VORBS.Models
 
         public string Name { get; set; }
         public virtual ICollection<Room> Rooms { get; set; }
+
+        public bool Active { get; set; }
+
+        public virtual ICollection<LocationCredentials> LocationCredentials { get; set; }
+
     }
 }
