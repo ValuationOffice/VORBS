@@ -147,21 +147,6 @@ function MyBookingsController($scope, $http, $resource) {
         );
     }
 
-    $('.datepicker').datepicker({
-        startDate: '-0m',
-        format: 'dd-mm-yyyy',
-        autoClose: true,
-        todayHighlight: true,
-        weekStart: 1,
-        daysOfWeekDisabled: [0, 6]
-    });
-
-    $('.timepicker').timepicker({
-        showInputs: false,
-        minuteStep: 30,
-        showMeridian: false
-    });
-
     $scope.newBooking = {
         Room: { RoomName: '' },
         Subject: '',
