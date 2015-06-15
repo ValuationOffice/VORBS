@@ -66,19 +66,42 @@ function SetEditActiveTab(tabId) {
 }
 
 function SaveEditBooking(existingId, editBooking) {
-    $.ajax({
-        type: "POST",
-        data: JSON.stringify(editBooking),
-        url: "api/bookings/" + existingId,
-        contentType: "application/json",
-        success: function (data, status) {
-            alert('Edit booking confimed. Confirmation email has beeen sent.');
-            location.reload();
-        },
-        error: function (error) {
-            alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
-        }
-    });
+    try {
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(editBooking),
+            url: "api/bookings/" + existingId,
+            contentType: "application/json",
+            success: function (data, status) {
+                alert('Edit booking confimed. Confirmation email has beeen sent.');
+                location.reload();
+            },
+            error: function (error) {
+                EnableEditBookingButton();
+                alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
+            }
+        });
+    } catch (e) {
+        EnableEditBookingButton();
+    }
+}
+
+function EnableAcceptBookingButton() {
+    //Change the "new booking" button to stop multiple bookings
+    $("#acceptBookingConfirmButton").prop('disabled', '');
+    $("#acceptBookingConfirmButton").html('Accept');
+}
+
+function EnableConfirmBookingButton() {
+    //Change the "new booking" button to stop multiple bookings
+    $("#confirmBookingConfirmButton").prop('disabled', '');
+    $("#confirmBookingConfirmButton").html('Confirm');
+}
+
+function EnableDeleteBookingButton() {
+    //Change the "new booking" button to stop multiple bookings
+    $("#deleteBookingConfirmButton").prop('disabled', '');
+    $("#deleteBookingConfirmButton").html('Delete');
 }
 
 
@@ -192,7 +215,7 @@ $(document).ready(function () {
         // Ensure that it is a number and stop the keypress
         if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
             e.preventDefault();
-}
+        }
     });
 })
 

@@ -83,9 +83,6 @@ function MyBookingsController($scope, $http, $resource) {
         ValidateNoAttendees($scope.booking.numberOfAttendees, $scope.booking.ExternalNames.length);
         $scope.newBooking.NumberOfAttendees = $scope.booking.numberOfAttendees;
 
-        //Validate Subject
-        //var Subject = ValidateSubject($scope.newBooking.Subject);
-
         //Validate Times
         var timeValidation = ValidateStartEndTime($scope.booking.startTime, $scope.booking.endTime);
         if (timeValidation !== "") {
@@ -93,67 +90,88 @@ function MyBookingsController($scope, $http, $resource) {
             return;
         }
 
-        //Create Date String
-        $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true);
-        $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm');
+        //Change the "accept booking" button to stop multiple bookings
+        $("#acceptBookingConfirmButton").prop('disabled', 'disabled');
+        $("#acceptBookingConfirmButton").html('Editing Booking. Please wait..');
 
-        if ($scope.booking.ExternalNames.length > 0) {
-            $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
-        }
+        try {
+            //Create Date String
+            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true);
+            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true);
 
-        //Validate if Date/Time/Attendees has changed
-        if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
-            ($scope.booking.startTime === $scope.existingBooking.startTime) && ($scope.booking.endTime === $scope.existingBooking.endTime)) {
-            SaveEditBooking($scope.bookingId, $scope.newBooking);
-        }
-        else {
-            $scope.availableRooms = Available.query({
-                location: $scope.editBooking.location.name,
-                startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true),
-                endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true),
-                smartRoom: false,
-                numberOfAttendees: $scope.booking.numberOfAttendees,
-                existingBookingId: $scope.bookingId
-            },
-            function (success) {
-                if ($scope.availableRooms.length === 0) {
-                    SetModalErrorMessage('No Rooms Avaliable using the below Date/Time/Attendees.');
-                }
-                else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
-                    SaveEditBooking($scope.bookingId, $scope.newBooking);
-                }
-                else {
-                    SetEditActiveTab('confirmEditBooking');
-                    $scope.currentRoom = $scope.availableRooms[0];
-                }
-            },
-            function (error) {
-                //TODO:Log Error
-                alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
-            });
+            if ($scope.booking.ExternalNames.length > 0) {
+                $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
+            }
+
+            //Validate if Date/Time/Attendees has changed
+            if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
+                ($scope.booking.startTime === $scope.existingBooking.startTime) && ($scope.booking.endTime === $scope.existingBooking.endTime)) {
+                SaveEditBooking($scope.bookingId, $scope.newBooking);
+            }
+            else {
+                $scope.availableRooms = Available.query({
+                    location: $scope.editBooking.location.name,
+                    startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true),
+                    endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true),
+                    smartRoom: false,
+                    numberOfAttendees: $scope.booking.numberOfAttendees,
+                    existingBookingId: $scope.bookingId
+                },
+                function (success) {
+                    if ($scope.availableRooms.length === 0) {
+                        EnableAcceptBookingButton();
+                        SetModalErrorMessage('No Rooms Avaliable using the below Date/Time/Attendees.');
+                    }
+                    else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
+                        SaveEditBooking($scope.bookingId, $scope.newBooking);
+                    }
+                    else {
+                        EnableAcceptBookingButton();
+                        SetEditActiveTab('confirmEditBooking');
+                        $scope.currentRoom = $scope.availableRooms[0];
+                    }
+                },
+                function (error) {
+                    EnableAcceptBookingButton();
+                    alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
+                });
+            }
+        } catch (e) {
+            EnableAcceptBookingButton();
         }
     }
 
     $scope.EditBooking = function () {
+        //Change the "accept booking" button to stop multiple bookings
+        $("#confirmBookingConfirmButton").prop('disabled', 'disabled');
+        $("#confirmBookingConfirmButton").html('Editing Booking. Please wait..');
+
         $scope.newBooking.RoomID = $scope.currentRoom.id;
         SaveEditBooking($scope.bookingId, $scope.newBooking);
+
+        EnableConfirmBookingButton();
     }
 
     $scope.DeleteBooking = function () {
-        Booking.remove(
+        //Change the "delete booking" button to stop multiple bookings
+        $("#deleteBookingConfirmButton").prop('disabled', 'disabled');
+        $("#deleteBookingConfirmButton").html('Deleteing Booking. Please wait..');
+
+        try {
+            Booking.remove(
             {
                 bookingId: $scope.bookingId
             },
             function (success) {
-                //TODO: Change ?
                 location.reload();
             },
             function (error) {
-                //TODO:Log Error
-                alert('Unable to Delete Booking. Please Try Again or Contact ITSD.');
-                location.reload();
-            }
-        );
+                EnableDeleteBookingButton();
+                alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.message);
+            });
+        } catch (e) {
+            EnableDeleteBookingButton();
+        }
     }
 
     $scope.SearchBooking = function () {
