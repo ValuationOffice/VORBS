@@ -20,7 +20,7 @@ function AddExternalName(attendeeArray) {
     var lName = $('#externalLastNameTextBox').val();
 
     if (fName.trim() === "" || lName.trim() === "") {
-        SetModalErrorMessage("Invalid External Attendee !");
+        SetModalErrorMessage("Invalid external attendee.");
     }
     else {
         var fullName = fName + ' ' + lName;
@@ -44,18 +44,18 @@ function RemoveExternalName(fullName, attendeeArray) {
 
 function ValidateNoAttendees(filterAttendees, externalNamesLength) {
     if (filterAttendees === null) {
-        SetModalErrorMessage('Invalid Number Of Attendees.');
+        SetModalErrorMessage('Invalid number of attendees.');
         throw new Error();
     }
     if (externalNamesLength > filterAttendees) {
-        SetModalErrorMessage('The Number of Attendees for this Meeting Exceeds the Room Capacity.');
+        SetModalErrorMessage('The number of attendees for this meeting exceeds the room capacity. Please search for a suitable meeting room and book again.');
         throw new Error();
     }
 }
 
 function ValidateSubject(subject) {
     if (subject.trim() === "") {
-        SetModalErrorMessage('Invalid Subject Detected');
+        SetModalErrorMessage('Invalid subject detected.');
         throw new Error();
     }
     return subject;
@@ -72,11 +72,11 @@ function SaveEditBooking(existingId, editBooking) {
         url: "api/bookings/" + existingId,
         contentType: "application/json",
         success: function (data, status) {
-            alert('Edit Booking Confimed. Confirmation Email has beeen sent.');
+            alert('Edit booking confimed. Confirmation email has beeen sent.');
             location.reload();
         },
         error: function (error) {
-            alert('Unable to edit Meeting Room. Please Contact ITSD. ' + error.message);
+            alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
         }
     });
 }
@@ -88,7 +88,7 @@ function SaveEditBooking(existingId, editBooking) {
 function ValidateStartEndTime(start, end) {
 
     if (start === "" || end === "") {
-        return "Invalid Start/End Time";
+        return "Invalid start/end time.";
     }
 
     var timeSplit = start.split(':');
@@ -100,16 +100,16 @@ function ValidateStartEndTime(start, end) {
     var timeDiff = endDate.diff(startDate, 'm');
 
     if (startDate.hours() < 9 || startDate.hours() >= 18) {
-        return "Start time has to be between 9:00 & 17:30";
+        return "Start time has to be between 9:00 & 17:30.";
     }
     else if (endDate.hours() < 9 || endDate.hours() >= 18) {
-        return "End time has to be between 9:00 & 17:30";
+        return "End time has to be between 9:00 & 17:30.";
     }
     else if (timeDiff < 0) {
-        return "Start time can't be ahead of end time";
+        return "Start time can't be ahead of end time.";
     }
     else if (timeDiff === 0) {
-        return "Identical times can't be used as a valid search";
+        return "Identical times can't be used as a valid search.";
     }
 
     return "";
