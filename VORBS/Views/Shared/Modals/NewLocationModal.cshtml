@@ -1,0 +1,102 @@
+﻿<div class="modal fade" id="newLocationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add New Location</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" id="LocationModalErrorMessage" style="display: none;"></div>
+                <div class="form-group newLocationInputs">
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <label class="control-label">Name:</label>
+                            <input class="form-control" ng-model="newLocation.Name" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Active: <input type="checkbox" ng-model="newLocation.Active"/></label>                            
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="bs-example">
+                    <div class="panel-group" id="accordion">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" data-toggle="collapse" href="#collapseOne">
+                                <h4 class="panel-title">
+                                    <a>Facilities</a>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse in">
+                                <div class="panel-body">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label class="control-label">Email:</label>
+                                            <input class="form-control" ng-model="newLocation.LocationCredentials[0].Email" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label">Phone Number:</label>
+                                            <input maxlength="11" class="form-control phoneNoControl" ng-model="newLocation.LocationCredentials[0].Phone" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" data-toggle="collapse" href="#collapseTwo">
+                                <h4 class="panel-title">
+                                    <a>Security</a>
+                                </h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label class="control-label">Email:</label>
+                                            <input class="form-control" ng-model="newLocation.LocationCredentials[1].Email" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label">Phone Number:</label>
+                                            <input maxlength="11" class="form-control phoneNoControl" ng-model="newLocation.LocationCredentials[1].Phone" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" data-toggle="collapse" href="#collapseThree">
+                                <h4 class="panel-title">
+                                    <a>DSS</a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            <label class="control-label">Email:</label>
+                                            <input class="form-control" ng-model="newLocation.LocationCredentials[2].Email" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="control-label">Phone Number:</label>
+                                            <input maxlength="11" class="form-control phoneNoControl" ng-model="newLocation.LocationCredentials[2].Phone" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="confirmLocationBtn" type="button" class="btn btn-primary" ng-click="AddNewLocation()">
+                    Confirm Location
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

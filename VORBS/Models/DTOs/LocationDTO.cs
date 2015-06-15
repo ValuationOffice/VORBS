@@ -11,5 +11,7 @@ namespace VORBS.Models.DTOs
         public string Name { get; set; }
 
         public IEnumerable<RoomDTO> Rooms { get; set; }
+
+        public bool Active { get; set; }
     }
 }

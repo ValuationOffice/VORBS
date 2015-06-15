@@ -7,6 +7,8 @@
 
 <div id="content" ng-app="administration">
 
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
     <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
         <li class="active" id="bookingTab"><a href="#bookings" data-toggle="tab">Bookings</a></li>
         @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 2))
@@ -33,7 +35,7 @@
             </div>
 
             <div class="tab-pane" id="locations">
-                <p>Manage locations.</p>
+            @Html.Partial("LocationsTab")
             </div>
 
             <div class="tab-pane" id="rooms">
@@ -53,18 +55,17 @@
     <script src="~/Scripts/moment.js"></script>
     <script src="~/Scripts/angular.min.js"></script>
     <script src="~/Scripts/angular-resource.min.js"></script>
-
     <script src="~/Scripts/Administration/moduleManager.js"></script>
 
     <script src="~/Scripts/Administration/usersController.js"></script>
     <script src="~/Scripts/Administration/roomsController.js"></script>
     <script src="~/Scripts/Administration/bookingsController.js"></script>
+    <script src="~/Scripts/Administration/locationsController.js"></script>
 
     <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
 
     <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
     <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
-
     <script src="~/Scripts/bloodhound.min.js"></script>
     <script src="~/Scripts/typeahead.jquery.min.js"></script>
     <script src="~/Scripts/typeahead.bundle.min.js"></script>
@@ -78,6 +79,7 @@
                 autoClose: true,
                 todayBtn: true,
                 todayHighlight: true,
+                todayBtn: 'linked',
                 weekStart: 1,
                 daysOfWeekDisabled: [0, 6]
             });
@@ -91,6 +93,38 @@
 
         jQuery(document).ready(function ($) {
             $('#tabs').tab();
+
+            if ($('#newLocationModal .panel-collapse').hasClass('collapse in')) {
+                $(this).children('a').addClass('pull-right glyphicon glyphicon-plus');
+            } else {
+                $(this).children('a').addClass('pull-right glyphicon glyphicon-minus');
+            }
         });
+
+        $("#roomsControl").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#newLocationModal input").on("blur", function () {
+            $(this).val($(this).val().trim())
+        });
+
+        //$(document).on('click', 'a.accordion-toggle', function (e) {
+        //    $(e.target).parent().siblings('.accordion-body').on('hidden', function (e) {
+        //        e.stopPropagation();
+        //    });
+        //});
     </script>
 }

@@ -2,7 +2,7 @@
 
 function UsersController($scope, $http, $resource) {
 
-    CreateAdminServices($resource);
+    CreateUserAdminServices($resource);
 
     $scope.Locations = Locations.query({});
     $scope.admins = Admins.getAll({});
@@ -117,7 +117,7 @@ function UsersController($scope, $http, $resource) {
     };
 }
 
-function CreateAdminServices($resource) {
+function CreateUserAdminServices($resource) {
     Admins = $resource('/api/admin/:adminId', { adminId: 'adminId' },
     {
         getAll: { method: 'GET', isArray: true },

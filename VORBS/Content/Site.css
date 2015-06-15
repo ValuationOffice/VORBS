@@ -66,6 +66,10 @@ textarea {
     width: 800px;
 }
 
+.locationIcons {
+    margin:5px;
+}
+
 #bookingTable{
     width: 1051px;
     height:550px;
@@ -141,8 +145,21 @@ textarea {
     margin-top: 40px;
 }
 
+#adminLocationsTable td {
+    vertical-align:middle;
+}
+
+#adminLocationsTable td span {
+    padding:0px;
+    margin-top:-3px;
+}
+
 #locationFilterOptions {
     margin-left:5px;
+}
+
+#locationFilterOptions button {
+    margin-left: 30px;
 }
 
 #locationFilterOptions select {
@@ -231,6 +248,7 @@ textarea {
     z-index: 99999;
 }
 
+
 /* TYPEAHEAD DROPDOWN ACTIVE */
 
 .tt-query, /* UPDATE: newer versions use tt-input instead of tt-query */
@@ -275,12 +293,52 @@ textarea {
     width: auto;
 }
 
-.tt-suggestion.tt-is-under-cursor { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
+.tt-suggestion.tt-cursor { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
     color: #fff;
     background-color: #0097cf;
+}
 
+.tt-suggestion.tt-cursor a {
+    color: #fff;
 }
 
 .tt-suggestion p {
     margin: 0;
 }
+
+.newLocationInputs label {
+    margin-right:2px;
+}
+
+.newLocationInputs .form-inline div:nth-child(2) {
+    margin-left:35px;
+}
+
+#accordion .panel.panel-default {
+    margin:5px;
+}
+
+/*#accordion .panel-body input{
+    width:180px;
+}*/
+
+#accordion .form-inline div:nth-child(even) {
+    margin-left:5px;    
+}
+
+#newLocationModal input[type=checkbox]
+{
+    margin-left:5px;
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+
+
+
+
+

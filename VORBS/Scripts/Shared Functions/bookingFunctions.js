@@ -121,6 +121,7 @@ function ValidateEmail(email) {
     return regex.test(email);
 }
 
+
 ////////////////
 
 //Formating (Date/Time)
@@ -166,6 +167,7 @@ function FormatTimeDate(dateTime, returnDate) {
         return new moment(dateTime).format('H:mm');
     }
 }
+
 ////////////////
 
 //Attendees Control Functions
@@ -177,7 +179,7 @@ $(document).ready(function () {
         initval: 1
     });
 
-    $("#attendeesControl").keydown(function (e) {
+    $("#attendeesControl,.phoneNoControl").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
             // Allow: Ctrl+A, Command+A
@@ -190,9 +192,10 @@ $(document).ready(function () {
         // Ensure that it is a number and stop the keypress
         if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
             e.preventDefault();
-        }
+}
     });
 })
 
 
 ////////////////
+
