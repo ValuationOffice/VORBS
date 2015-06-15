@@ -8,11 +8,11 @@
             </div>
             <div class="modal-body">
                 <label>Surname:</label>
-                <input ng-model="emailVal" ng-change="GetAdNames()" class="form-control" />
+                <input id="surnameTextBox" ng-model="emailVal" ng-change="GetAdNames()" class="form-control" />
                 <!--TODO-->
                 <hr />
                 <div class="userInfo">
-                    <table class="table table-striped table-hover userInfoTable">
+                    <table id="activeDirectoryTable" class="table table-striped table-hover userInfoTable">
                         <thead>
                             <tr>
                                 <th>First Name</th>
@@ -35,3 +35,9 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('#activeDirecotryModal').on('shown.bs.modal', function () {
+        $('#surnameTextBox').focus();
+    })
+</script>

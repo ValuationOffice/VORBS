@@ -341,5 +341,11 @@ textarea {
     cursor: pointer;
 }
 
+#activeDirectoryTable tbody{
+    cursor: pointer;
+}
 
+#onBehlafOfTextBox{
+    cursor: pointer;
+}
 
