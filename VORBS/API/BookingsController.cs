@@ -186,6 +186,9 @@ namespace VORBS.API
                 {
                     var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
+                    if (user == null)
+                        return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
+
                     newBooking.Owner = user.Name;
                     newBooking.PID = user.SamAccountName;
                 }
@@ -225,7 +228,6 @@ namespace VORBS.API
                         {
                         }    
                     }
-                    
                 }
 
                 if (newBooking.ExternalNames != null)
@@ -286,26 +288,38 @@ namespace VORBS.API
                 editBooking.Owner = existingBooking.Owner;
                 editBooking.PID = existingBooking.PID;
 
+                string body = "";
+                string facilitiesEmail = "";
+                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
+
+                ////Create DSO Email but do not send until db.savechanges
+                Location bookingsLocation = db.Rooms.Where(x => x.ID == editBooking.RoomID).FirstOrDefault().Location;
+                if ((existingBooking.Flipchart != editBooking.Flipchart) || (editBooking.Projector != existingBooking.Projector))
+                {
+                    facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
+                    if (facilitiesEmail != null)
+                    {
+                        try
+                        {
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEditeddBooking.cshtml", editBooking);
+                        }
+                        catch (Exception exn)
+                        {
+                        }
+                    }
+                }
+
                 db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
                 db.SaveChanges();
 
-                //Send DSO Email
-                //SendDSOEmail(dsoEmailMessage);
-                //TODO: Refactor
-                if ((existingBooking.Flipchart != editBooking.Flipchart) || (editBooking.Projector != existingBooking.Projector))
-                {
-                    //Create DSO Email but do not send until db.savechanges
-                    //dsoEmailMessage = CreateDSOEmail(editBooking, editBooking.Flipchart, editBooking.Projector);
-                }
+                //Send Dso Email
+                if (!string.IsNullOrEmpty(body))
+                    Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Edited booking requires facilities assistance", body);
 
                 //Send Owner Email
-                //SendOwnerEmail(editBooking, adminId);
-                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
                 string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-
                 string toEmail = AdQueries.GetUserByPid(editBooking.PID).EmailAddress;
 
-                string body = "";
                 if (editBooking.PID.ToUpper() != currentUserPid.ToUpper())
                     body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBooking);
                 else
@@ -347,11 +361,21 @@ namespace VORBS.API
 
                 Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking cancellation confirmation", body);
 
-                //TODO: Refactor
-                if ((booking.Flipchart || booking.Projector))
+                if (booking.Flipchart || booking.Projector)
                 {
-                    //Send DSO Email
-                    //SendDSOEmail(editBooking, editBooking.Flipchart, editBooking.Projector);
+                    Location bookingsLocation = db.Rooms.Where(x => x.ID == booking.RoomID).FirstOrDefault().Location;
+                    string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
+                    if (facilitiesEmail != null)
+                    {
+                        try
+                        {
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", booking);
+                            Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Deleted booking requires facilities assistance", body);
+                        }
+                        catch (Exception exn)
+                        {
+                        }
+                    }
                 }
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
