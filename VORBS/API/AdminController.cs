@@ -13,7 +13,13 @@ namespace VORBS.API
     [RoutePrefix("api/admin")]
     public class AdminController : ApiController
     {
+        private NLog.Logger _logger;
         private VORBSContext db = new VORBSContext();
+
+        public AdminController()
+        {
+            _logger = NLog.LogManager.GetCurrentClassLogger();
+        }
 
         [HttpGet]
         [Route("{allAdmins}")]
@@ -43,7 +49,7 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.ErrorException("Unable to get list of admins", ex);
                 return new List<AdminDTO>();
             }
         }
@@ -69,7 +75,7 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.ErrorException("Unable to get admin", ex);
                 return null;
             }
         }
@@ -85,11 +91,13 @@ namespace VORBS.API
                 db.Admins.Add(admin);
                 db.SaveChanges();
 
+                _logger.Info("Admin sucessfully added: " + admin.PID);
+
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.ErrorException("Unable to add new admin: " + admin.PID, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -103,11 +111,13 @@ namespace VORBS.API
                 db.Admins.Remove(db.Admins.Single(a => a.ID == adminId));
                 db.SaveChanges();
 
+                _logger.Info("Admin sucessfully deleted: " + adminId);
+
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.ErrorException("Unable to delete admin: " + adminId, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -119,8 +129,9 @@ namespace VORBS.API
             {
                 return db.Bookings.Select(b => b.Owner).Distinct().ToList();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.ErrorException("Unable to get list of booking owners", ex);
                 return new List<string>();
             }
         }

@@ -20,7 +20,13 @@ namespace VORBS.API
     [RoutePrefix("api/bookings")]
     public class BookingsController : ApiController
     {
+        private NLog.Logger _logger;
         private VORBSContext db = new VORBSContext();
+
+        public BookingsController()
+        {
+            _logger = NLog.LogManager.GetCurrentClassLogger();
+        }
 
         [Route("{location}/{start:DateTime}/{end:DateTime}/")]
         [HttpGet]
@@ -29,22 +35,29 @@ namespace VORBS.API
             if (location == null)
                 return new List<BookingDTO>();
 
-            List<Booking> bookings = db.Bookings
-                .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location)
-                .ToList();
-
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-            bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+
+            try
             {
-                ID = x.ID,
-                EndDate = x.EndDate,
-                StartDate = x.StartDate,
-                Owner = x.Owner,
-                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-            }));
+                List<Booking> bookings = db.Bookings
+                    .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location)
+                    .ToList();
 
 
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Owner = x.Owner,
+                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get bookings for location: " + location, ex);
+            }
             return bookingsDTO;
         }
 
@@ -55,22 +68,28 @@ namespace VORBS.API
             if (location == null || room == null)
                 return new List<BookingDTO>();
 
-            List<Booking> bookings = db.Bookings
-                .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location && x.Room.RoomName == room)
-                .ToList();
-
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-            bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+
+            try
             {
-                ID = x.ID,
-                EndDate = x.EndDate,
-                StartDate = x.StartDate,
-                Owner = x.Owner,
-                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-            }));
+                List<Booking> bookings = db.Bookings
+                    .Where(x => x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location && x.Room.RoomName == room)
+                    .ToList();
 
-
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Owner = x.Owner,
+                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get bookings for room: " + location + "/" + room, ex);
+            }
             return bookingsDTO;
         }
 
@@ -81,22 +100,29 @@ namespace VORBS.API
             if (location == null || room == null || person == null)
                 return new List<BookingDTO>();
 
-            List<Booking> bookings = db.Bookings
-                .Where(x => x.Owner == person && x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location && x.Room.RoomName == room)
-                .ToList();
-
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-            bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+
+            try
             {
-                ID = x.ID,
-                EndDate = x.EndDate,
-                StartDate = x.StartDate,
-                Owner = x.Owner,
-                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-            }));
+                List<Booking> bookings = db.Bookings
+                    .Where(x => x.Owner == person && x.StartDate >= start && x.EndDate <= end && x.Room.Location.Name == location && x.Room.RoomName == room)
+                    .ToList();
 
 
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Owner = x.Owner,
+                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get bookings for room and person: " + location + "/" + room + "/" + person, ex);
+            }
             return bookingsDTO;
         }
 
@@ -104,12 +130,13 @@ namespace VORBS.API
         [HttpGet]
         public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start, string person)
         {
+            if (User.Identity.Name == null)
+                return new List<BookingDTO>();
+
+            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
 
             try
             {
-                if (User.Identity.Name == null)
-                    return new List<BookingDTO>();
-
                 string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1); //TODO: Change?
 
                 List<Booking> bookings = db.Bookings
@@ -117,7 +144,6 @@ namespace VORBS.API
                     .OrderBy(x => x.StartDate)
                     .ToList();
 
-                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
                 {
                     ID = x.ID,
@@ -128,27 +154,25 @@ namespace VORBS.API
                     Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
                 }));
-
-
-                return bookingsDTO;
             }
             catch (Exception ex)
             {
-                //TODO: Log Error
-                return null;
+                _logger.ErrorException("Unable to get bookings for current user", ex);
             }
-
+            return bookingsDTO;
         }
 
         [Route("{bookingId:int}")]
         [HttpGet]
         public BookingDTO GetRoomBookingsForBookingId(int bookingId)
         {
+            BookingDTO bookingsDTO = new BookingDTO();
+
             try
             {
                 Booking booking = db.Bookings.Single(b => b.ID == bookingId);
 
-                BookingDTO bookingsDTO = new BookingDTO()
+                bookingsDTO = new BookingDTO()
                 {
                     ID = booking.ID,
                     EndDate = booking.EndDate,
@@ -168,10 +192,9 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-                //TODO: Log Error
-                return null;
+                _logger.ErrorException("Unable to get booking by id :" + bookingId, ex);
             }
-
+            return bookingsDTO;
         }
 
         [HttpPost]
@@ -199,19 +222,30 @@ namespace VORBS.API
                 db.Bookings.Add(newBooking);
                 db.SaveChanges();
 
+                _logger.Info("Booking sucessfully created: " + newBooking.ID);
+
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
-                string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
-                string toEmail = AdQueries.GetUserByPid(newBooking.PID).EmailAddress;
+                try
+                {
+                    string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
-                string body = "";
-                if (newBooking.PID.ToUpper() != currentUserPid.ToUpper())
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewBooking.cshtml", newBooking);
-                else
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
+                    string toEmail = AdQueries.GetUserByPid(newBooking.PID).EmailAddress;
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "New booking confirmation", body);
-                
+                    string body = "";
+                    if (newBooking.PID.ToUpper() != currentUserPid.ToUpper())
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewBooking.cshtml", newBooking);
+                    else
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
+
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "New booking confirmation", body);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send personal email for new booking: " + newBooking.ID, ex);
+                }
+
+
                 //need location to get DSO, security specific emails etc..
                 Location bookingsLocation = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault().Location;
                 if (newBooking.Flipchart || newBooking.Projector)
@@ -221,12 +255,14 @@ namespace VORBS.API
                     {
                         try
                         {
+                            string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesNewBooking.cshtml", newBooking);
                             Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "New booking requires facilities assistance", body);
                         }
-                        catch (Exception exn)
+                        catch (Exception ex)
                         {
-                        }    
+                            _logger.ErrorException("Unable to send E-Mail to facilities for new booking: " + newBooking.ID, ex);
+                        }
                     }
                 }
 
@@ -237,14 +273,15 @@ namespace VORBS.API
                     {
                         try
                         {
+                            string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBooking.cshtml", newBooking);
                             Utils.EmailHelper.SendEmail(fromEmail, securityEmail, "New booking has external attendees", body);
                         }
-                        catch (Exception exn)
+                        catch (Exception ex)
                         {
+                            _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
                         }
                     }
-
                 }
 
                 if (newBooking.DssAssist)
@@ -254,22 +291,22 @@ namespace VORBS.API
                     {
                         try
                         {
+                            string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", newBooking);
                             Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "New booking needs DSS assistnace", body);
                         }
-                        catch (Exception exn)
+                        catch (Exception ex)
                         {
+                            _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + newBooking.ID, ex);
                         }
-
                     }
-
                 }
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.FatalException("Unable to save new booking: " + newBooking.Owner + "/" + newBooking.StartDate, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -292,6 +329,11 @@ namespace VORBS.API
                 string facilitiesEmail = "";
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
+                _logger.Info("Booking sucessfully editted: " + editBooking.ID);
+
+                //Send DSO Email
+                //SendDSOEmail(dsoEmailMessage);
+                //TODO: Refactor
                 ////Create DSO Email but do not send until db.savechanges
                 Location bookingsLocation = db.Rooms.Where(x => x.ID == editBooking.RoomID).FirstOrDefault().Location;
                 if ((existingBooking.Flipchart != editBooking.Flipchart) || (editBooking.Projector != existingBooking.Projector))
@@ -299,39 +341,48 @@ namespace VORBS.API
                     facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
                     if (facilitiesEmail != null)
                     {
-                        try
-                        {
-                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEditeddBooking.cshtml", editBooking);
-                        }
-                        catch (Exception exn)
-                        {
-                        }
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEditeddBooking.cshtml", editBooking);
                     }
                 }
 
                 db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
                 db.SaveChanges();
 
-                //Send Dso Email
-                if (!string.IsNullOrEmpty(body))
-                    Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Edited booking requires facilities assistance", body);
+                try
+                {
+                    //Send Dso Email
+                    if (!string.IsNullOrEmpty(body))
+                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Edited booking requires facilities assistance", body);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send E-Mail to facilities for editting booking: " + editBooking.ID, ex);
+                }
 
                 //Send Owner Email
-                string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-                string toEmail = AdQueries.GetUserByPid(editBooking.PID).EmailAddress;
+                try
+                {
+                    
+                    string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+                    string toEmail = AdQueries.GetUserByPid(editBooking.PID).EmailAddress;
 
-                if (editBooking.PID.ToUpper() != currentUserPid.ToUpper())
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBooking);
-                else
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBooking);
+                    if (editBooking.PID.ToUpper() != currentUserPid.ToUpper())
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBooking);
+                    else
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBooking);
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking edit confirmation", body);
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking edit confirmation", body);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send personal email for editting booking: " + editBooking.ID, ex);
+                }
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.FatalException("Unable to edit booking: " + editBooking.ID, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -346,20 +397,32 @@ namespace VORBS.API
 
                 db.Bookings.Remove(booking);
                 db.SaveChanges();
-
-                //Once Booking has been removed; Send Cancealtion Emails
-                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
-                string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-
-                string toEmail = AdQueries.GetUserByPid(booking.PID).EmailAddress;
+                _logger.Info("Booking sucessfully cancelled: " + bookingId);
 
                 string body = "";
-                if (booking.PID.ToUpper() != currentUserPid.ToUpper())
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", booking);
-                else
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", booking);
+                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking cancellation confirmation", body);
+                try
+                {
+                    //Once Booking has been removed; Send Cancealtion Emails
+                    
+                    string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+
+                    string toEmail = AdQueries.GetUserByPid(booking.PID).EmailAddress;
+
+                    
+                    if (booking.PID.ToUpper() != currentUserPid.ToUpper())
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", booking);
+                    else
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", booking);
+
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking cancellation confirmation", body);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send personal email for deleting booking: " + bookingId, ex);
+                }
+
 
                 if (booking.Flipchart || booking.Projector)
                 {
@@ -372,8 +435,9 @@ namespace VORBS.API
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", booking);
                             Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Deleted booking requires facilities assistance", body);
                         }
-                        catch (Exception exn)
+                        catch (Exception ex)
                         {
+                            _logger.ErrorException("Unable to send email to facilities for deleting booking: " + bookingId, ex);
                         }
                     }
                 }
@@ -382,7 +446,7 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
+                _logger.FatalException("Unable to delete booking: " + bookingId, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
@@ -391,6 +455,7 @@ namespace VORBS.API
         [HttpGet]
         public List<BookingDTO> GetBookingByOwner(string owner, DateTime start)
         {
+            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
             try
             {
                 List<Booking> bookings = db.Bookings
@@ -398,7 +463,6 @@ namespace VORBS.API
                     .OrderBy(x => x.StartDate)
                     .ToList();
 
-                List<BookingDTO> bookingsDTO = new List<BookingDTO>();
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
                 {
                     ID = x.ID,
@@ -414,10 +478,9 @@ namespace VORBS.API
             }
             catch (Exception ex)
             {
-                //TODO: Log Exception
-                return new List<BookingDTO>();
+                _logger.ErrorException("Unable to get list of bookings for owner: " + owner, ex);
             }
+            return bookingsDTO;
         }
-
     }
 }

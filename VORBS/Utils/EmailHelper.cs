@@ -49,14 +49,7 @@ namespace VORBS.Utils
             message.Body = body;
             message.IsBodyHtml = true;
 
-            try
-            {
-                mailClient.Send(message);
-            }
-            catch (Exception ex)
-            {
-
-            }
+            mailClient.Send(message);
         }
 
         /// <summary>
