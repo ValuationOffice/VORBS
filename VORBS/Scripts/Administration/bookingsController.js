@@ -21,7 +21,7 @@ function MyBookingsController($scope, $http, $resource) {
     }
 
     $('#fullNameTextBox').typeahead({
-        hint: true,
+        hint: false,
         highlight: true,
         minLength: 1
     },
