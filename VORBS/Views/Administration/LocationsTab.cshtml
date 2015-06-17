@@ -1,12 +1,11 @@
 ﻿<div id="controllerDiv" ng-controller="LocationsController">
 
     <h3>Location Management</h3>
-    <hr />    
+    <hr />
 
     <div class="form-inline" id="locationFilterOptions">
         <label class="control-label">Filter By:</label>
-        <select class="form-control" ng-model="selectedItem.type" ng-change="GetLocationsByStatus()" ng-options="status.value as status.name for status in locationStatuses">
-        </select>
+        <select class="form-control" ng-model="selectedItem.type" ng-change="GetLocationsByStatus()" ng-options="status.value as status.name for status in locationStatuses"></select>
         <button data-toggle="modal" data-target="#newLocationModal" class="btn btn-default">Add Location</button>
     </div>
 
@@ -25,10 +24,10 @@
                 <tr ng-repeat="location in Locations">
                     <td>{{ location.name }}</td>
                     <td>{{ location.rooms.length }}</td>
-                    <td ng-show="{{location.active}}"><span class="glyphicon glyphicon-ok-circle locationIcons"></span></td>
-                    <td ng-show="{{ location.active != true }}"><span class="glyphicon glyphicon-remove-circle locationIcons"></span></td>
-                    <td><span data-toggle="modal" data-target="#editLocationModal" class="btn glyphicon glyphicon-edit locationIcons"></span></td>
-                    <td><span data-toggle="modal" data-target="#deleteLocationModal" class="btn glyphicon glyphicon-trash locationIcons"></span></td>
+                    <td ng-show="{{location.active}}"><span class="glyphicon glyphicon-ok-circle locationIcons" title="Active Location"></span></td>
+                    <td ng-show="{{ location.active != true }}"><span class="glyphicon glyphicon-remove-circle locationIcons" title="Inactive Location"></span></td>
+                    <td><span data-toggle="modal" data-target="#editLocationModal" class="btn glyphicon glyphicon-edit locationIcons" title="Edit Location"></span></td>
+                    <td><span data-toggle="modal" data-target="#deleteLocationModal" class="btn glyphicon glyphicon-trash locationIcons" title="Disable Location"></span></td>
                 </tr>
             </tbody>
         </table>

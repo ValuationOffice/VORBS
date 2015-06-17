@@ -57,23 +57,23 @@
     <hr />
 
     <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Full Name</th>
-            <th>Location</th>
-            <th>Email</th>
-            <th>Permission</th>
-            <th></th>
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Location</th>
+                <th>Email</th>
+                <th>Permission</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tr ng-repeat="admin in admins">
+            <td>{{ admin.firstName + ' ' + admin.lastName }}</td>
+            <td>{{ admin.location }}</td>
+            <td>{{ admin.email }}</td>
+            <td>{{ admin.permissionLevelText() }}</td>
+            @*<td><span data-toggle="modal" data-target="#editAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-edit"></span></td>*@
+            <td><span data-toggle="modal" data-target="#deleteAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-trash" title="Delete User"></span></td>
         </tr>
-    </thead>
-    <tr ng-repeat="admin in admins">
-        <td>{{ admin.firstName + ' ' + admin.lastName }}</td>
-        <td>{{ admin.location }}</td>
-        <td>{{ admin.email }}</td>
-        <td>{{ admin.permissionLevelText() }}</td>
-        @*<td><span data-toggle="modal" data-target="#editAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-edit"></span></td>*@
-        <td><span data-toggle="modal" data-target="#deleteAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-trash"></span></td>
-    </tr>
     </table>
 
     <div class="modal fade" id="deleteAdminModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

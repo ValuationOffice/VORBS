@@ -7,23 +7,23 @@
     <p>Below you will find a list of all available bookings in the system, you can amend or cancel existing bookings or you can create new bookings.</p>
 
 
-        <div class="form-inline">
+    <div class="form-inline">
 
-            <div class="input-group">
-                <label class="control-label">Full Name</label>
-                <div>
-                    <input id="fullNameTextBox" class="typeahead form-control" type="text" placeholder="Full Name" ng-model="bookingFilter.fullName">
-                </div>
+        <div class="input-group">
+            <label class="control-label">Full Name</label>
+            <div>
+                <input id="fullNameTextBox" class="typeahead form-control" type="text" placeholder="Full Name" ng-model="bookingFilter.fullName">
             </div>
-
-            <div class="input-group">
-                <label class="control-label">Date</label>
-                <input id="startDatePicker" class="form-control datepicker" placeholder="Booking Date" ng-model="bookingFilter.startDate" />
-            </div>
-
-            <input id="searchButton" type="button" class="form-control" ng-click="SearchBooking()" value="Search" />
-
         </div>
+
+        <div class="input-group">
+            <label class="control-label">Date</label>
+            <input id="startDatePicker" class="form-control datepicker" placeholder="Booking Date" ng-model="bookingFilter.startDate" />
+        </div>
+
+        <input id="searchButton" type="button" class="form-control" ng-click="SearchBooking()" value="Search" />
+
+    </div>
     <hr />
 
     <table class="table table-condensed">
@@ -43,11 +43,11 @@
             <td>{{ booking.DateFormatted() }}</td>
             <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
             <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
-            <td><span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
-            <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
+            <td><span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon glyphicon-edit" title="Edit Booking"></span></td>
+            <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash" title="Delete Booking"></span></td>
         </tr>
     </table>
-   
+
     <div id="adminErrorMessage" style="display: none;" class="alert alert-danger"></div>
 
     @Html.Partial("Modals/EditBookingModal", null)

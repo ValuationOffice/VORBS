@@ -339,6 +339,7 @@ textarea {
 
 .dailyCalendar tbody{
     cursor: pointer;
+    content: 'ss'
 }
 
 #activeDirectoryTable tbody{
@@ -349,3 +350,8 @@ textarea {
     cursor: pointer;
 }
 
+.loadingContainer{
+    margin-left: auto;
+    margin-right: auto;
+    width: 30px;
+}
