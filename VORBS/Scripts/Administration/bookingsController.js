@@ -13,10 +13,12 @@ function MyBookingsController($scope, $http, $resource) {
     }
 
     $scope.AddExternalAttendee = function () {
+        SetModalErrorMessage('');
         $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
     }
 
     $scope.RemoveExternalAttendee = function (fullName) {
+        SetModalErrorMessage('');
         $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
     }
 
