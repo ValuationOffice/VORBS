@@ -21,9 +21,12 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.SearchBookings = function (viewAll) {
 
+        $("#bookingTable").html('');
+        $("#bookingTable").html('<div class="loadingContainer"><img src="/Content/images/loading.gif" /></div>');
+
         var roomResults;
 
-        var isValid = validateSearchFilters();
+        var isValid = ValidateSearchFilters();
         if (isValid) {
             if (viewAll === true) {
                 $scope.roomBookings = AllRooms.query({
@@ -46,6 +49,8 @@ function NewBookingController($scope, $http, $resource) {
                     $scope.RenderBookings(roomResults);
                 });
             }
+        } else {
+            $("#bookingTable").html('');
         }
         
     }
@@ -431,7 +436,7 @@ function AdEmailExist(email, currentEmails) {
     }
 }
 
-function validateSearchFilters() {
+function ValidateSearchFilters() {
     var valid = true;
 
     $("#searchFilterErrorList").html('');
