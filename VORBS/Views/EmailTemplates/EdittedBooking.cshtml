@@ -1,9 +1,45 @@
-﻿@{
+﻿@model VORBS.Models.Booking
+@{
     Layout = null;
 }
 
 <html>
 <body>
-    <h1>I editted this</h1>
+    <h2>You have made the following booking:</h2>
+    <table cellspacing="0" cellpadding="10" border="1" width="600">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Equipment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Room.Location.Name</td>
+                <td>@Model.Room.RoomName</td>
+                <td>@Model.StartDate.ToShortDateString()</td>
+                <td>@Model.StartDate.ToShortTimeString()</td>
+                <td>@Model.Subject</td>
+                <td>
+                    <ul>
+                        @if (Model.Projector)
+                        {
+                            <li>Projector</li>
+                        }
+                        @if (Model.Flipchart)
+                        {
+                            <li>Flipchart</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>To edit or delete your booking visit <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/MyBookings"))">My Bookings</a> page </p>
+    <p>If you have any special requests or requirements visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/Help"))"> Help</a></p>
 </body>
 </html>

@@ -1,9 +1,19 @@
-﻿@{
+﻿@model VORBS.Models.Booking
+@{
     Layout = null;
 }
 
 <html>
-    <body>
-        <h1>Booking has external attendees</h1>
-    </body>
+<body>
+    <h2>@Model.Owner has scheduled a meeting with the following external guests on @Model.StartDate.ToShortDateString() at @Model.StartDate.ToShortTimeString():</h2>
+    <p>
+        <ul>
+            @foreach (var attendee in Model.ExternalNames.Split(';'))
+            {
+                <li>@attendee</li>
+            }
+        </ul>
+
+    </p>
+</body>
 </html>

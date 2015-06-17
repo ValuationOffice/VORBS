@@ -203,6 +203,7 @@ namespace VORBS.API
             try
             {
                 newBooking.RoomID = newBooking.Room.ID;
+                Room bookingRoom = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault();
 
                 //Get the current user
                 if (string.IsNullOrWhiteSpace(newBooking.PID))
@@ -222,6 +223,8 @@ namespace VORBS.API
                 db.Bookings.Add(newBooking);
                 db.SaveChanges();
 
+                newBooking.Room = bookingRoom;
+
                 _logger.Info("Booking sucessfully created: " + newBooking.ID);
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
@@ -238,7 +241,7 @@ namespace VORBS.API
                     else
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
 
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "New booking confirmation", body);
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
                 }
                 catch (Exception ex)
                 {
@@ -257,7 +260,7 @@ namespace VORBS.API
                         {
                             string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesNewBooking.cshtml", newBooking);
-                            Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "New booking requires facilities assistance", body);
+                            Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, string.Format("Meeting room equipment booking on {0}", newBooking.StartDate.ToShortDateString()), body);
                         }
                         catch (Exception ex)
                         {
@@ -275,7 +278,7 @@ namespace VORBS.API
                         {
                             string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBooking.cshtml", newBooking);
-                            Utils.EmailHelper.SendEmail(fromEmail, securityEmail, "New booking has external attendees", body);
+                            Utils.EmailHelper.SendEmail(fromEmail, securityEmail, string.Format("External guests notifcation for {0}", newBooking.StartDate.ToShortDateString()), body);
                         }
                         catch (Exception ex)
                         {
@@ -293,7 +296,7 @@ namespace VORBS.API
                         {
                             string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", newBooking);
-                            Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "New booking needs DSS assistnace", body);
+                            Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("SMART room set up support on {0}", newBooking.StartDate.ToShortDateString()) , body);
                         }
                         catch (Exception ex)
                         {
@@ -352,12 +355,14 @@ namespace VORBS.API
                 {
                     //Send Dso Email
                     if (!string.IsNullOrEmpty(body))
-                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Edited booking requires facilities assistance", body);
+                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Editted booking requires facilities assistance", body);
                 }
                 catch (Exception ex)
                 {
                     _logger.ErrorException("Unable to send E-Mail to facilities for editting booking: " + editBooking.ID, ex);
                 }
+
+                Booking edittedBooking = db.Bookings.Single(b => b.ID == existingBooking.ID);
 
                 //Send Owner Email
                 try
@@ -367,11 +372,17 @@ namespace VORBS.API
                     string toEmail = AdQueries.GetUserByPid(editBooking.PID).EmailAddress;
 
                     if (editBooking.PID.ToUpper() != currentUserPid.ToUpper())
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBooking);
+                    {
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", edittedBooking);
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room edit confirmation", body);
+                    }
                     else
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBooking);
+                    {
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", edittedBooking);
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
+                    }
 
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking edit confirmation", body);
+                    
                 }
                 catch (Exception ex)
                 {
@@ -399,12 +410,15 @@ namespace VORBS.API
                 db.SaveChanges();
                 _logger.Info("Booking sucessfully cancelled: " + bookingId);
 
+                Room locationRoom = db.Rooms.First(b => b.ID == booking.RoomID);
+                booking.Room = locationRoom;
+
                 string body = "";
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
                 try
                 {
-                    //Once Booking has been removed; Send Cancealtion Emails
+                    //Once Booking has been removed; Send Cancelltion Emails
                     
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
@@ -416,7 +430,7 @@ namespace VORBS.API
                     else
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", booking);
 
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Booking cancellation confirmation", body);
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation", body);
                 }
                 catch (Exception ex)
                 {

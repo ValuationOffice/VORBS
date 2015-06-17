@@ -1,9 +1,43 @@
-﻿@{
+﻿@model VORBS.Models.Booking
+@{
     Layout = null;
 }
 
 <html>
-    <body>
-        <h1>Booking needs facilities help</h1>
-    </body>
+<body>
+    <h2>The following request for equipment has been made:</h2>
+    <table cellspacing="0" cellpadding="10" border="1" width="600">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Equipment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Room.Location.Name</td>
+                <td>@Model.Room.RoomName</td>
+                <td>@Model.StartDate.ToShortDateString()</td>
+                <td>@Model.StartDate.ToShortTimeString()</td>
+                <td>@Model.Subject</td>
+                <td>
+                    <ul>
+                        @if (Model.Projector)
+                        {
+                            <li>Projector</li>
+                        }
+                        @if (Model.Flipchart)
+                        {
+                            <li>Flipchart</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
 </html>
