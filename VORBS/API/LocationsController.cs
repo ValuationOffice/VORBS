@@ -46,7 +46,8 @@ namespace VORBS.API
                                 RoomName = r.RoomName,
                                 ComputerCount = r.ComputerCount,
                                 PhoneCount = r.PhoneCount,
-                                SmartRoom = r.SmartRoom
+                                SmartRoom = r.SmartRoom,
+                                SeatCount = r.SeatCount
                             }; return rDto;
                     }).ToList()
                 }));
@@ -76,13 +77,13 @@ namespace VORBS.API
                     Rooms = x.Rooms.Select(r =>
                     {
                         RoomDTO rDto = new RoomDTO()
-                            {
-                                ID = r.ID,
-                                RoomName = r.RoomName,
-                                ComputerCount = r.ComputerCount,
-                                PhoneCount = r.PhoneCount,
-                                SmartRoom = r.SmartRoom
-                            }; return rDto;
+                        {
+                            ID = r.ID,
+                            RoomName = r.RoomName,
+                            ComputerCount = r.ComputerCount,
+                            PhoneCount = r.PhoneCount,
+                            SmartRoom = r.SmartRoom
+                        }; return rDto;
                     }).ToList()
                 }));
             }

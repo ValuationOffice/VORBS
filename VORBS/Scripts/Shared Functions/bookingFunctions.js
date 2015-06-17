@@ -122,7 +122,13 @@ function ValidateStartEndTime(start, end) {
 
     var timeDiff = endDate.diff(startDate, 'm');
 
-    if (startDate.hours() < 9 || startDate.hours() >= 18) {
+    if (startDate.minutes() !== 0 && startDate.minutes() !== 30) {
+        return "Start time must be 30 minute interval."
+    }
+    else if (endDate.minutes() !== 0 && endDate.minutes() !== 30) {
+        return "End time must be 30 minute interval."
+    }
+    else if (startDate.hours() < 9 || startDate.hours() >= 18) {
         return "Start time has to be between 9:00 & 17:30.";
     }
     else if (endDate.hours() < 9 || endDate.hours() >= 18) {
@@ -142,6 +148,13 @@ function ValidateStartEndTime(start, end) {
 function ValidateEmail(email) {
     var regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return regex.test(email);
+}
+
+function ValidateUnSavedAttendee() {
+    if ($('#externalFirstNameTextBox').val().trim() !== "" || $('#externalLastNameTextBox').val().trim() !== "") {
+        return "Unsaved external attendee. Please press add to save external attendee.";
+    }
+    return "";
 }
 
 

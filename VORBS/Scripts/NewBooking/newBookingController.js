@@ -178,10 +178,17 @@ function NewBookingController($scope, $http, $resource) {
 
         try {
             //Validate Number of External Names is not graether than attendees
-            ValidateNoAttendees($scope.bookingFilter.numberOfAttendees, $scope.booking.ExternalNames.length);
+            ValidateNoAttendees($scope.newBooking.Room.seatCount, $scope.booking.ExternalNames.length);
 
             //Validate Subject
             //ValidateSubject($scope.newBooking.Subject);
+
+            var unsavedAttendee = ValidateUnSavedAttendee();
+            if (unsavedAttendee !== "") {
+                SetModalErrorMessage(unsavedAttendee);
+                EnableNewBookingButton();
+                return;
+            }
 
             //Validate Time
             var timeValidation = ValidateStartEndTime($scope.booking.StartTime, $scope.booking.EndTime);

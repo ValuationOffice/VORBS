@@ -83,6 +83,12 @@ function MyBookingsController($scope, $http, $resource) {
         ValidateNoAttendees($scope.booking.numberOfAttendees, $scope.booking.ExternalNames.length);
         $scope.newBooking.NumberOfAttendees = $scope.booking.numberOfAttendees;
 
+        var unsavedAttendee = ValidateUnSavedAttendee();
+        if (unsavedAttendee !== "") {
+            SetModalErrorMessage(unsavedAttendee);
+            return;
+        }
+
         //Validate Times
         var timeValidation = ValidateStartEndTime($scope.booking.startTime, $scope.booking.endTime);
         if (timeValidation !== "") {
