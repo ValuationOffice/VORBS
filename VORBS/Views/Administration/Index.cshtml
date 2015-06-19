@@ -75,11 +75,12 @@
     <script>
         $(function () {
             $('.datepicker').datepicker({
+                startDate: '-0m',
                 format: 'dd-mm-yyyy',
                 autoClose: true,
                 todayBtn: true,
-                todayHighlight: true,
                 todayBtn: 'linked',
+                todayHighlight: true,
                 weekStart: 1,
                 daysOfWeekDisabled: [0, 6]
             });
