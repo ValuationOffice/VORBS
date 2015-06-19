@@ -36,17 +36,17 @@
 
             <div class="input-group">
                 <label class="control-label">First Name</label>
-                <input id="firstNameTextBox" class="form-control" ng-model="adminUser.FirstName" />
+                <input id="firstNameTextBox" class="form-control" ng-model="adminUser.FirstName" readonly="readonly"/>
             </div>
 
             <div class="input-group">
                 <label class="control-label">Surname</label>
-                <input id="lastNameTextBox" class="form-control" ng-model="adminUser.LastName" />
+                <input id="lastNameTextBox" class="form-control" ng-model="adminUser.LastName" readonly="readonly" />
             </div>
 
             <div class="input-group">
                 <label class="control-label">Email</label>
-                <input id="emailTextBox" class="form-control" ng-model="adminUser.Email" />
+                <input id="emailTextBox" class="form-control" ng-model="adminUser.Email" readonly="readonly" />
             </div>
 
             <input id="searchButton" type="button" class="form-control" ng-click="AddAdmin()" value="Add" />
