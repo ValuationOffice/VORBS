@@ -40,4 +40,8 @@
     $('#activeDirecotryModal').on('shown.bs.modal', function () {
         $('#surnameTextBox').focus();
     })
+
+    $('#activeDirecotryModal').on('hidden.bs.modal', function () {
+        $('#surnameTextBox').val('');
+    })
 </script>
