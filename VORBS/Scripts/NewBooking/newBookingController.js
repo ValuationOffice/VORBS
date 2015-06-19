@@ -74,10 +74,10 @@ function NewBookingController($scope, $http, $resource) {
             }
 
             if (roomResults[i].smartRoom === true) {
-                var roomDetails = '<h3 style="text-align: center;">' +roomResults[i].roomName.replace('_', '.') + '<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span></h3>';  
+                var roomDetails = '<h3 style="text-align: center;">' +roomResults[i].roomName + '<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span></h3>';  
                 }
             else {
-                var roomDetails = '<h3 style="text-align: center;">' + roomResults[i].roomName.replace('_', '.') + '</h3>';
+                var roomDetails = '<h3 style="text-align: center;">' + roomResults[i].roomName + '</h3>';
             }
                 
             //debugger;
@@ -86,9 +86,9 @@ function NewBookingController($scope, $http, $resource) {
             roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + roomResults[i].computerCount + ' PC\'s"> ' + roomResults[i].computerCount + '</span></span>';
             roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + roomResults[i].phoneCount + ' Phones"> ' + roomResults[i].phoneCount + '</span></span>';
 
-            $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + roomResults[i].roomName + '_calendar" class="dailyCalendar" title="Click and drag"></div></div>');
+            $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + roomResults[i].roomName.replace('.','_') + '_calendar" class="dailyCalendar" title="Click and drag"></div></div>');
             var roomName = '[' + roomResults[i].roomName + ']';
-            $("#" + roomResults[i].roomName + "_calendar").fullCalendar({
+            $("#" + roomResults[i].roomName.replace('.', '_') + "_calendar").fullCalendar({
                 weekends: false,
                 header: {
                     left: '',
@@ -126,7 +126,7 @@ function NewBookingController($scope, $http, $resource) {
                     }
 
                     $scope.newBooking.Room = room;
-                    $scope.newBooking.Room.RoomName = room.roomName.replace('_', '.');
+                    $scope.newBooking.Room.RoomName = room.roomName;
 
                     $scope.booking.StartTime = start.utc().format('H:mm');
                     $scope.booking.EndTime = end.utc().format('H:mm');
