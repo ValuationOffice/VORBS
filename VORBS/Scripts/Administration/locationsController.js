@@ -51,19 +51,19 @@ function LocationsController($scope, $http, $resource) {
         Active: false,
         LocationCredentials: [
        {
-           Department: 'Facilities',
+           Department: 'facilities',
            Phone: '',
            Email: '',
            Person: ''
        },
        {
-           Department: 'Security',
+           Department: 'security',
            Phone: '',
            Email: '',
            Person: ''
        },
         {
-            Department: 'DSS',
+            Department: 'dss',
             Phone: '',
             Email: '',
             Person: ''
@@ -101,7 +101,9 @@ function LocationsController($scope, $http, $resource) {
                     contentType: "application/json",
                     success: function (data, status) {
                         alert('New Location Added.');
-                        window.location.href = "/Administration/Locations";
+                        $('#newLocationModal').modal('hide');
+                        $scope.Locations = Locations.query({});
+                       
                     },
                     error: function (error) {
                         alert('Unable to create new Location.');
