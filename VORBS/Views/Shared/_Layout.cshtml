@@ -49,6 +49,10 @@
                     @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Administration", "Index", "Administration")</li>
+                    }
+                    else
+                    {
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Help" ? "active" : "")">@Html.ActionLink("Help", "Index", "Help")</li>
                     }                    
                 </ul>
             </div>
@@ -57,9 +61,6 @@
     <div class="container body-content">
         @RenderBody()
         <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Valuation Office Agency</p>
-        </footer>
     </div>
 
 

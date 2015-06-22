@@ -1,0 +1,1 @@
+﻿var support = angular.module('supportPage', ['ngResource']);

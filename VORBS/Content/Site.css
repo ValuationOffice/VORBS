@@ -23,15 +23,15 @@ textarea {
     max-width: 280px;
 }
 
-#logo_text{
+#logo_text {
     width: 400px;
 }
 
 #timepicker2 {
-    z-index:2050 !important;
+    z-index: 2050 !important;
 }
 
-#logo_text #logoBanner{
+#logo_text #logoBanner {
     background-color: #008770;
     width: 5px;
     height: 55px;
@@ -46,46 +46,46 @@ textarea {
     font-size: 25px;
 }
 
-.navbar-nav{  
+.navbar-nav {
     margin-top: 15px;
 }
 
-.navbar-nav li{
-    text-align: center;
-    width: 170px;
-    border: 1px;
-    border-style: solid;
-    border-color:  #008770;
-}
+    .navbar-nav li {
+        text-align: center;
+        width: 170px;
+        border: 1px;
+        border-style: solid;
+        border-color: #008770;
+    }
 
-#calendarContainer{
+#calendarContainer {
     margin-top: 20px;
 }
 
-#calendar{
+#calendar {
     width: 800px;
 }
 
 .locationIcons {
-    margin:5px;
+    margin: 5px;
 }
 
-#bookingTable{
+#bookingTable {
     width: 1051px;
-    height:550px;
+    height: 550px;
     overflow-x: auto;
-    overflow-y:hidden;
-    white-space:nowrap;
+    overflow-y: hidden;
+    white-space: nowrap;
 }
 
 #myBookingsTable {
-    margin-top:25px;
+    margin-top: 25px;
 }
 
 .dailyCalendarContainer {
-    height:590px;
+    height: 590px;
     width: 150px;
-    display:inline-block;
+    display: inline-block;
 }
 
 /*#attendeesInputFilter {
@@ -93,30 +93,30 @@ textarea {
 }*/
 
 #searchButton {
-    margin-left:30px;
-    margin-top:10px;
+    margin-left: 30px;
+    margin-top: 10px;
 }
 
 /*ADDED 15/05/2015 CL*/
 .navbar-inverse .navbar-nav > li > a {
-  color: #ffffff !important;
-  font-weight:bold !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
 }
 
-/*ADDED 15/05/2015 CL*/
-.navbar-inverse .navbar-nav > li > a:hover,
-.navbar-inverse .navbar-nav > li > a:focus {
-  text-decoration: underline !important;
-  background-color: transparent !important;
-}
+    /*ADDED 15/05/2015 CL*/
+    .navbar-inverse .navbar-nav > li > a:hover,
+    .navbar-inverse .navbar-nav > li > a:focus {
+        text-decoration: underline !important;
+        background-color: transparent !important;
+    }
 
 /*ADDED 15/05/2015 CL*/
 .navbar-inverse .navbar-nav > .active > a,
 .navbar-inverse .navbar-nav > .active > a:hover,
 .navbar-inverse .navbar-nav > .active > a:focus {
-  color: #1d8feb !important;
-  font-weight: bold !important;
-  background-color: #080808 !important;
+    color: #1d8feb !important;
+    font-weight: bold !important;
+    background-color: #080808 !important;
 }
 
 #attendeesBadgeIcon {
@@ -124,109 +124,109 @@ textarea {
 }
 
 #smartroomBadgeIcon {
-    vertical-align:middle;
-    margin-bottom:3px;
+    vertical-align: middle;
+    margin-bottom: 3px;
 }
 
-#pcBadgeIcon { 
-    float:left;
-    margin-left:34px;
+#pcBadgeIcon {
+    float: left;
+    margin-left: 34px;
 }
 
 #phoneBadgeIcon {
-    float:left;
+    float: left;
 }
 
 #roomDetailsBox {
-    height:45px;
+    height: 45px;
 }
 
 #adminLocationsTable {
     margin-top: 40px;
 }
 
-#adminLocationsTable td {
-    vertical-align:middle;
-}
+    #adminLocationsTable td {
+        vertical-align: middle;
+    }
 
-#adminLocationsTable td span {
-    padding:0px;
-    margin-top:-3px;
-}
+        #adminLocationsTable td span {
+            padding: 0px;
+            margin-top: -3px;
+        }
 
 #locationFilterOptions {
-    margin-left:5px;
+    margin-left: 5px;
 }
 
-#locationFilterOptions button {
-    margin-left: 30px;
-}
+    #locationFilterOptions button {
+        margin-left: 30px;
+    }
 
-#locationFilterOptions select {
-    margin-left: 10px;
-    width:200px;
-}
+    #locationFilterOptions select {
+        margin-left: 10px;
+        width: 200px;
+    }
 
 .userInfoTable {
-    margin-top:-15px;    
-    width:100%;
-    border-spacing:0;
+    margin-top: -15px;
+    width: 100%;
+    border-spacing: 0;
 }
 
-.userInfoTable tbody, .userInfoTable thead, .userInfoTable tr, 
-.userInfoTable th, .userInfoTable td { 
-    display: block; 
-}
+    .userInfoTable tbody, .userInfoTable thead, .userInfoTable tr,
+    .userInfoTable th, .userInfoTable td {
+        display: block;
+    }
 
-.userInfoTable thead tr {
-    /* fallback */
-    width: 97%;
-    /* minus scroll bar width */
-    width: -webkit-calc(100% - 16px);
-    width:    -moz-calc(100% - 16px);
-    width:         calc(100% - 16px);
-}
+        .userInfoTable thead tr {
+            /* fallback */
+            width: 97%;
+            /* minus scroll bar width */
+            width: -webkit-calc(100% - 16px);
+            width: -moz-calc(100% - 16px);
+            width: calc(100% - 16px);
+        }
 
-.userInfoTable tr:after {  /* clearing float */
-    content: ' ';
-    display: block;
-    visibility: hidden;
-    clear: both;
-}
+        .userInfoTable tr:after { /* clearing float */
+            content: ' ';
+            display: block;
+            visibility: hidden;
+            clear: both;
+        }
 
-.userInfoTable tbody {
-    overflow-y:auto;
-    height:500px;    
-}
+    .userInfoTable tbody {
+        overflow-y: auto;
+        height: 500px;
+    }
 
-.userInfoTable th, .userInfoTable tbody td { 
-    width:49%;
-    float:left;
-}
+        .userInfoTable th, .userInfoTable tbody td {
+            width: 49%;
+            float: left;
+        }
 
-#myBookingsTable .userInfoTable th, #myBookingsTable .userInfoTable tbody td { 
-    width:14%;
-    float:left;
+#myBookingsTable .userInfoTable th, #myBookingsTable .userInfoTable tbody td {
+    width: 14%;
+    float: left;
 }
 
 #adminLocationsTable .userInfoTable th, #adminLocationsTable .userInfoTable tbody td {
-    width:20%;
-    float:left;
+    width: 20%;
+    float: left;
 }
 
 .userInfoTable tbody tr:first-child td {
-    border:none;
+    border: none;
 }
 
 #subjectInfo {
-    max-width:120px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #myTab .tab-content {
-    margin-top:20px;
+    margin-top: 20px;
 }
 
 #viewAllButton {
@@ -234,17 +234,17 @@ textarea {
 }
 
 .input-group.bootstrap-touchspin {
-    width:250px;
-    float:left;
-    margin-top:40px;
+    width: 250px;
+    float: left;
+    margin-top: 40px;
 }
 
 #attendeesInputFilter label {
     margin-top: 10px;
-    margin-left:-235px;
+    margin-left: -235px;
 }
 
-.bootstrap-timepicker-widget{
+.bootstrap-timepicker-widget {
     z-index: 99999;
 }
 
@@ -282,9 +282,9 @@ textarea {
     box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
-.tt-menu a:hover {
-    background-color:#FF77FF;
-}
+    .tt-menu a:hover {
+        background-color: #FF77FF;
+    }
 
 .tt-suggestion {
     padding: 3px 20px;
@@ -293,29 +293,29 @@ textarea {
     width: auto;
 }
 
-.tt-suggestion.tt-cursor { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
-    color: #fff;
-    background-color: #0097cf;
-}
+    .tt-suggestion.tt-cursor { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
+        color: #fff;
+        background-color: #0097cf;
+    }
 
-.tt-suggestion.tt-cursor a {
-    color: #fff;
-}
+        .tt-suggestion.tt-cursor a {
+            color: #fff;
+        }
 
-.tt-suggestion p {
-    margin: 0;
-}
+    .tt-suggestion p {
+        margin: 0;
+    }
 
 .newLocationInputs label {
-    margin-right:2px;
+    margin-right: 2px;
 }
 
 .newLocationInputs .form-inline div:nth-child(2) {
-    margin-left:35px;
+    margin-left: 35px;
 }
 
 #accordion .panel.panel-default {
-    margin:5px;
+    margin: 5px;
 }
 
 /*#accordion .panel-body input{
@@ -323,35 +323,86 @@ textarea {
 }*/
 
 #accordion .form-inline div:nth-child(even) {
-    margin-left:5px;    
+    margin-left: 5px;
 }
 
-#newLocationModal input[type=checkbox]
-{
-    margin-left:5px;
-  /* Double-sized Checkboxes */
-  -ms-transform: scale(2); /* IE */
-  -moz-transform: scale(2); /* FF */
-  -webkit-transform: scale(2); /* Safari and Chrome */
-  -o-transform: scale(2); /* Opera */
-  padding: 10px;
+#newLocationModal input[type=checkbox] {
+    margin-left: 5px;
+    /* Double-sized Checkboxes */
+    -ms-transform: scale(2); /* IE */
+    -moz-transform: scale(2); /* FF */
+    -webkit-transform: scale(2); /* Safari and Chrome */
+    -o-transform: scale(2); /* Opera */
+    padding: 10px;
 }
 
-.dailyCalendar tbody{
+.dailyCalendar tbody {
     cursor: pointer;
-    content: 'ss'
+    content: 'ss';
 }
 
-#activeDirectoryTable tbody{
-    cursor: pointer;
-}
-
-#onBehlafOfTextBox{
+#activeDirectoryTable tbody {
     cursor: pointer;
 }
 
-.loadingContainer{
+#onBehlafOfTextBox {
+    cursor: pointer;
+}
+
+.loadingContainer {
     margin-left: auto;
     margin-right: auto;
     width: 30px;
+}
+
+.panel, .panel-group .panel-heading + .panel-collapse > .panel-body {
+    border: none;
+    box-shadow: none;
+}
+
+.questionAccordionTitle {
+    color: rgb(46,117,182);
+}
+
+#supportPage section {
+    margin: auto;
+}
+
+#supportPage .helpQuestions {
+    width: 65%;
+    float: left;
+}
+
+#supportPage #helpTable {
+    margin-left: 20px;
+    float:right;
+    width: 30%;
+    background-color: #222;
+    color: white;
+    padding: 10px;
+    font-weight:bold;
+}
+
+/*#helpTable{
+    background-color:aqua;
+    width: 300px;
+    float: right;
+}
+
+#questionAccordion{
+    background-color:pink;
+    width: 50%;
+}*/
+
+.panel-heading .accordion-toggle:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\e082";    /* adjust as needed, taken from bootstrap.css */
+    float: left;        /* adjust as needed */
+    color: grey;         /* adjust as needed */
+    padding-right: 10px;  /*Change from left - right based on float*/
+}
+.panel-heading .accordion-toggle.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\e081";    /* adjust as needed, taken from bootstrap.css */
 }

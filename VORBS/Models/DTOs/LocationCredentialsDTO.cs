@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace VORBS.Models
+namespace VORBS.Models.DTOs
 {
-    public class LocationCredentials
+    public class LocationCredentialsDTO
     {
         public int ID { get; set; }
         public int LocationID { get; set; }
@@ -14,7 +14,7 @@ namespace VORBS.Models
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
 
-        public virtual Location Location { get; set; }
+        public LocationDTO Location { get; set; }
 
         public enum DepartmentNames { dss, facilities, security }
     }

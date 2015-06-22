@@ -1,0 +1,119 @@
+﻿@{
+    ViewBag.Title = "Help";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Help & Contact Details</h2>
+<p>Use the filters below to see contact details for a selected office.</p>
+
+<hr />
+
+<div ng-app="supportPage" id="supportPage">
+    <div id="controllerDiv" ng-controller="HelpController">
+        <section>
+            @*<ul class="nav nav-pills nav-stacked">*@
+            <div class="helpQuestions">
+                <div class="panel-group" id="questionAccordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title questionAccordionTitle">
+                                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Something is broken/not working properly when I try to book a room. How can I get it fixed?</a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                Please email our technical team on <a href="mailto:itservicedesk@voa.gsi.gov.uk" target="_top">itservicedesk@voa.gsi.gov.uk</a> describing the problem you are having, preferably with screen shots, and we will look into it
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title questionAccordionTitle">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">How can I make a request or find out more about the room I’ve booked</a>
+                            </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Contact your facilities rep on {{ currentLocation.GetContactDetail('facilities').phoneNumber }} or {{ currentLocation.GetContactDetail('facilities').email }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title questionAccordionTitle">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">I need a room but none are available, what should I do?</a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Try contacting the people who have booked rooms you could use. They might be flexible or no longer need them. Failing that you will have to hold your meeting on a different day.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title questionAccordionTitle">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">Why was my booking edited or deleted by an admin?</a>
+                            </h4>
+                        </div>
+                        <div id="collapseFour" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Admin’s are responsible for managing the facilities in the VOA. This means occasionally rooms have to be refurbished, repurposed or booked out for other reasons and existing bookings have to be amended. Contact your facilities rep if you want to know more or need help making a new booking.
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title questionAccordionTitle">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">I have an idea on how to make this booking tool better. How can I give a suggestion?</a>
+                                </h4>
+                            </div>
+                            <div id="collapseFive" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    Great! As this is a pilot we are looking for ways to improve this room booking process. Please email our project team [PROJET EMAIL] and someone will be in touch.
+                                </div>
+                            </div>
+                        </div>*@
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title questionAccordionTitle">
+                                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">How can I get help setting up a SMART Room meeting?</a>
+                            </h4>
+                        </div>
+                        <div id="collapseSix" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                If you require help setting up a SMART Room booking, please contact DSS Team on {{ currentLocation.GetContactDetail('dss').phoneNumber }} or {{ currentLocation.GetContactDetail('dss').email }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="helpTable">
+                <p>
+                    Support<br />
+                    Can't find the answer to your question, contact your relevant facilities representative:
+                </p>
+                <div class="input-group" id="searchLocation">
+                    <label class="col-sm-2 control-label">Location</label>
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="currentLocation" ng-change="GetHelpData()">
+                        <option value="" selected disabled>Select a location...</option>
+                    </select>
+                </div>
+                <div>
+                    <h4>Facilities:</h4>
+                    Phone: {{ currentLocation.GetContactDetail('facilities').phoneNumber }}
+                    <br />
+                    Email: {{ currentLocation.GetContactDetail('facilities').email }}
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/angular-resource.min.js"></script>
+
+    <script src="~/Scripts/Help Page/moduleManager.js"></script>
+    <script src="~/Scripts/Help Page/helpController.js"></script>
+}

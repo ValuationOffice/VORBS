@@ -12,6 +12,8 @@ namespace VORBS.Models.DTOs
 
         public IEnumerable<RoomDTO> Rooms { get; set; }
 
+        public IEnumerable<LocationCredentialsDTO> LocationCredentials { get; set; }
+
         public bool Active { get; set; }
     }
 }

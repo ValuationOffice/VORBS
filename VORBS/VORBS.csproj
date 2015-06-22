@@ -145,7 +145,9 @@
     <Compile Include="API\UsersController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
     <Compile Include="Controllers\ErrorsController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Models\DTOs\AdminDTO.cs" />
+    <Compile Include="Models\DTOs\LocationCredentialsDTO.cs" />
     <Compile Include="Models\DTOs\UserDTO.cs" />
     <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\LocationCredentials.cs" />
@@ -229,6 +231,8 @@
     <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\bloodhound.js" />
     <Content Include="Scripts\bloodhound.min.js" />
+    <Content Include="Scripts\Help Page\helpController.js" />
+    <Content Include="Scripts\Help Page\moduleManager.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.min.js" />
     <Content Include="Scripts\Shared Functions\bookingFunctions.js" />
@@ -1084,12 +1088,11 @@
     <Content Include="Views\EmailTemplates\FacilitiesDeletedBooking.cshtml" />
     <Content Include="Views\Administration\LocationsTab.cshtml" />
     <Content Include="Views\Shared\Modals\NewLocationModal.cshtml" />
+    <Content Include="Views\Help\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\BootStrapDateTimePicker\" />
-    <Folder Include="Scripts\BootstrapDateTimePicker\" />
-    <Folder Include="Scripts\FullCalendarResourceView\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
