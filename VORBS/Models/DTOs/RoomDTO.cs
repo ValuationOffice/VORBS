@@ -15,6 +15,10 @@ namespace VORBS.Models.DTOs
         public int SeatCount { get; set; }
         public bool SmartRoom { get; set; }
 
+        public bool Active { get; set; }
+
+        public virtual LocationDTO location { get; set; }
+
         public virtual IEnumerable<RoomDTO> Rooms { get; set; }
         public virtual IEnumerable<BookingDTO> Bookings { get; set; }
     }

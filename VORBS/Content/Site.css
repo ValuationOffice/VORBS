@@ -70,6 +70,14 @@ textarea {
     margin: 5px;
 }
 
+.activeIcons {
+    color: green;
+}
+
+.inactiveIcons {
+    color: red;
+}
+
 #bookingTable {
     width: 1051px;
     height: 550px;
@@ -91,11 +99,6 @@ textarea {
 /*#attendeesInputFilter {
     margin-right:-30px;
 }*/
-
-#searchButton {
-    margin-left: 30px;
-    margin-top: 10px;
-}
 
 /*ADDED 15/05/2015 CL*/
 .navbar-inverse .navbar-nav > li > a {
@@ -375,12 +378,12 @@ textarea {
 
 #supportPage #helpTable {
     margin-left: 20px;
-    float:right;
+    float: right;
     width: 30%;
     background-color: #222;
     color: white;
     padding: 10px;
-    font-weight:bold;
+    font-weight: bold;
 }
 
 /*#helpTable{
@@ -396,13 +399,62 @@ textarea {
 
 .panel-heading .accordion-toggle:after {
     /* symbol for "opening" panels */
-    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
-    content: "\e082";    /* adjust as needed, taken from bootstrap.css */
-    float: left;        /* adjust as needed */
-    color: grey;         /* adjust as needed */
-    padding-right: 10px;  /*Change from left - right based on float*/
+    font-family: 'Glyphicons Halflings'; /* essential for enabling glyphicon */
+    content: "\e082"; /* adjust as needed, taken from bootstrap.css */
+    float: left; /* adjust as needed */
+    color: grey; /* adjust as needed */
+    padding-right: 10px; /*Change from left - right based on float*/
 }
+
 .panel-heading .accordion-toggle.collapsed:after {
     /* symbol for "collapsed" panels */
-    content: "\e081";    /* adjust as needed, taken from bootstrap.css */
+    content: "\e081"; /* adjust as needed, taken from bootstrap.css */
+}
+
+#searchButton {
+    margin-left: 30px;
+    margin-top: 10px;
+}
+
+/*Admin Room Tab*/
+
+#seatCountControl, #computerCountControl, #phoneCountControl {
+    width: 150px;
+}
+
+#newRoomComputer label {
+    margin-left: -750px;
+    margin-top: 12px;
+}
+
+#newRoomPhone label {
+    margin-left: 165px;
+    margin-top: 12px;
+}
+
+#newRoomSeatCount label {
+    margin-left: 185px;
+    margin-top: 12px;
+}
+
+#newRoomAddButton {
+    width: 75px;
+    margin-top: -10px;
+}
+
+/*Admin User Tab*/
+
+#userSearchButton {
+    margin-bottom: -21px;
+    width: 75px;
+    margin-left: 14px;
+}
+
+#bookingSearchButton {
+    margin-bottom: -16px;
+    margin-left: 10px;
+}
+
+#adminBookingDatePicker{
+    margin-top: -6px;
 }

@@ -65,6 +65,11 @@ function SetEditActiveTab(tabId) {
     $('#editBookingTabs a[href="#' + tabId + '"]').tab('show');
 }
 
+function SetAdminActiveTab(tabId) {
+    $('#adminTabs a[href="#' + tabId + '"]').tab('show');
+}
+
+
 function SaveEditBooking(existingId, editBooking) {
     try {
         $.ajax({
@@ -209,13 +214,19 @@ function FormatTimeDate(dateTime, returnDate) {
 //Attendees Control Functions
 
 $(document).ready(function () {
-    $('#attendeesControl').TouchSpin({
+    $('.touchSpinControl').TouchSpin({
         verticalbuttons: true,
         min: 1,
         initval: 1
     });
 
-    $("#attendeesControl,.phoneNoControl,#attendees").keydown(function (e) {
+    $('.touchSpinControlZero').TouchSpin({
+        verticalbuttons: true,
+        min: 0,
+        initval: 0
+    });
+
+    $(".phoneNoControl,.numberControl").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
             // Allow: Ctrl+A, Command+A
@@ -227,6 +238,23 @@ $(document).ready(function () {
         }
         // Ensure that it is a number and stop the keypress
         if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#roomName").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+        // Ensure that only numbers and letters are allowed
+        if (!((e.keyCode >= 48 && e.keyCode <= 105) || e.keyCode === 190)) {
             e.preventDefault();
         }
     });

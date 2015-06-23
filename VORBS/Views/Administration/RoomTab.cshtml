@@ -5,81 +5,132 @@
     <h4>Room Management</h4>
     <p>Add, Edit or Delete Rooms below.</p>
 
-    <div class="form-inline">
+    <div class="form-group" id="newRoom">
+        <div class="form-inline">
 
-        <div class="form-group">
             <div class="input-group">
                 <label class="control-label ">Location</label>
-                <select class="form-control" ng-options="location.name for location in Locations" ng-model="adminUser.Location">
-                    <option value="" selected disabled>Select a location...</option>
-                </select>
+                <select class="form-control" ng-options="location.name for location in Locations" ng-model="currentLocation"></select>
             </div>
 
-            <div class="input-group">
+            <div class="input-group" id="newRoomName">
                 <label class="control-label">Room Name</label>
-                <input id="roomName" class="form-control" placeholder="Room Name" ng-model="bookingFilter.startDate" />
+                <input id="roomName" class="form-control" placeholder="Room Name" ng-model="newRoom.RoomName" />
             </div>
 
-            <div class="input-group ">
-                <label class="control-label">Computer(s)</label>
-                <select class="form-control" ng-model="adminUser.PermissionLevel">
-                    <option value="0">Yes</option>
-                    <option value="1">No</option>
-                </select>
-            </div>
-
-            <div class="input-group ">
-                <label class="control-label">Phone(s)</label>
-                <select class="form-control" ng-model="adminUser.PermissionLevel">
-                    <option value="0">Yes</option>
-                    <option value="1">No</option>
-                </select>
-            </div>
-            
-            <div class="input-group ">
-                <label class="control-label">Seat(s)</label>
-                <select class="form-control" ng-model="adminUser.PermissionLevel">
-                    <option value="0">Yes</option>
-                    <option value="1">No</option>
-                </select>
-            </div>
-
-            <div class="input-group ">
+            <div class="input-group" id="newRoomSmart">
                 <label class="control-label">Smart Room</label>
-                <select class="form-control" ng-model="adminUser.PermissionLevel">
-                    <option value="0">Yes</option>
-                    <option value="1">No</option>
+                <select id="smartRoomControl" class="form-control" ng-model="newRoom.SmartRoom">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
                 </select>
             </div>
 
-            <br />
-            <br />
-            <input id="addButton" type="button" class="form-control" value="Add" />
+        </div>
 
-            <br />
-            <br />
+        <span id="newRoomComputer">
+            <label class="control-label">Computer(s)</label>
+            <input type="number" class="touchSpinControlZero numberControl" id="computerCountControl" ng-model="newRoom.ComputerCount" ng-pattern="/^[0-9]+$/" />
+        </span>
 
-            <table class="table table-condensed">
-                <thead>
-                    <tr>
-                        <th>Room Name</th>
-                        <th>No. of Computers</th>
-                        <th>Phone Installed</th>
-                        <th>No. of Seat</th>
-                        <th>Smart Room</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tr ng-repeat="booking in bookings">
-                    <td>{{ booking.room.roomName }}</td>
-                    <td>{{ booking.DateFormatted() }}</td>
-                    <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
-                    <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
-                    <td><span data-toggle="modal" data-target="#editModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-edit"></span></td>
-                    <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash"></span></td>
-                </tr>
-            </table>
+        <span id="newRoomPhone">
+            <label class="control-label">Phone(s)</label>
+            <input type="number" class="touchSpinControlZero numberControl" id="phoneCountControl" ng-model="newRoom.PhoneCount" ng-pattern="/^[0-9]+$/" />
+        </span>
 
+        <span id="newRoomSeatCount">
+            <label class="control-label">Seat(s)</label>
+            <input type="number" class="touchSpinControl numberControl" id="seatCountControl" ng-model="newRoom.SeatCount" ng-pattern="/^[0-9]+$/" />
+        </span>
+    </div>
+
+        <input id="newRoomAddButton" type="button" class="form-control" value="Add" ng-click="NewRoom()" />
+
+    <p>
+        <div class="alert alert-danger" id="addRoomErrorCont" style="display: none;">
+            <ul id="addRoomErrorList"></ul>
+        </div>
+    </p>
+
+    <hr />
+
+    <div class="form-inline" id="roomFilterOptions">
+        <label class="control-label">Filter Rooms By:</label>
+        <select class="form-control" ng-model="roomFilter.location" ng-change="GetRoomsByFilter()" ng-options="location.name for location in Locations">
+            <option value="" selected>All Locations</option>
+        </select>
+        <select class="form-control" ng-model="roomFilter.status" ng-change="GetRoomsByFilter()">
+            <option value="-1" selected>All Rooms</option>
+            <option value="1">Active</option>
+            <option value="0">Inactive</option>
+        </select>
+    </div>
+
+    <br />
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Room Name</th>
+                <th>Active</th>
+                <th>No. of Computers</th>
+                <th>No. of Phones</th>
+                <th>No. of Seat</th>
+                <th>Smart Room</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tr ng-repeat="room in Rooms">
+            <td>{{ room.location.name }}</td>
+            <td>{{ room.roomName }}</td>
+            <td ng-show="{{ room.active }}"><span style="color:green" class="glyphicon glyphicon-ok-circle locationIcons activeIcons" title="Active Room"></span></td>
+            <td ng-show="{{ room.active != true }}"><span class="glyphicon glyphicon-remove-circle locationIcons inactiveIcons" title="Inactive Room"></span></td>
+            <td>{{ room.computerCount }}</td>
+            <td>{{ room.phoneCount }}</td>
+            <td>{{ room.seatCount}}</td>
+            <td>{{ room.smartRoomFormatted()}}</td>
+            <td><span data-toggle="modal" data-target="#editRoomModal" ng-click="SetRoomId(room.id)" class="btn glyphicon glyphicon-edit" title="Edit Room"></span></td>
+            <td ng-show="{{ room.active }}"><span data-toggle="modal" data-target="#disableRoomModal" ng-click="SetRoomId(room.id)" class="btn glyphicon glyphicon-trash" title="Disable Room"></span></td>
+            <td ng-show="{{ room.active != true }}"><span data-toggle="modal" data-target="#enableRoomModal" ng-click="SetRoomId(room.id)" class="btn glyphicon glyphicon-ok-sign" title="Enable Room"></span></td>
+        </tr>
+    </table>
+
+
+    <div class="modal fade" id="disableRoomModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Disable Room</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to disable this meeting room?</p>
+                    <p><b>All bookings for this room will be deleted. Email notifications will be sent to affected users.</b></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="disableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="DisableRoom()">Disable</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="enableRoomModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Enable Room</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to enable this meeting room?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="enableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="EnableRoom()">Enable</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

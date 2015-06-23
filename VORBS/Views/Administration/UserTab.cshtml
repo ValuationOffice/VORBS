@@ -1,7 +1,7 @@
 ﻿<div id="controllerDiv" ng-controller="UsersController">
 
     <h4>User Management</h4>
-    <p>Add, Edit or Delete Admin Users below.</p>
+    <p>Below you will find a list of administrator users, you can also create a new administrator or delete an existing one.</p>
 
     <div class="form-inline">
         <div class="form-group">
@@ -49,7 +49,7 @@
                 <input id="emailTextBox" class="form-control" ng-model="adminUser.Email" readonly="readonly" />
             </div>
 
-            <input id="searchButton" type="button" class="form-control" ng-click="AddAdmin()" value="Add" />
+            <input id="userSearchButton" type="button" class="form-control" ng-click="AddAdmin()" value="Add" />
         </div>
 
     </div>

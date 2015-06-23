@@ -9,7 +9,7 @@
 
     <link href="~/Content/Site.css" rel="stylesheet" />
 
-    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+    <ul id="adminTabs" class="nav nav-tabs" data-tabs="tabs">
         <li class="active" id="bookingTab"><a href="#bookings" data-toggle="tab">Bookings</a></li>
         @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 2))
         {
@@ -35,7 +35,7 @@
             </div>
 
             <div class="tab-pane" id="locations">
-            @Html.Partial("LocationsTab")
+                @Html.Partial("LocationsTab")
             </div>
 
             <div class="tab-pane" id="rooms">

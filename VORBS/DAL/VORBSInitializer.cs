@@ -37,39 +37,39 @@ namespace VORBS.DAL
 
             var rooms = new List<Room>()
             {
-                new Room(){ LocationID =  1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 1, SeatCount = 16, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 16, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 7, PhoneCount = 1, SeatCount = 16, SmartRoom = false }
+                new Room(){ LocationID =  1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false,Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 1, SeatCount = 16, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 16, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 7, PhoneCount = 1, SeatCount = 16, SmartRoom = false, Active = true }
                 
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 4, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 4, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 10, SmartRoom = false }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 4, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 4, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 10, SmartRoom = false, Active = true }
 
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 4, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 10, SmartRoom = false }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 4, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 10, SmartRoom = false, Active = true }
 
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 6, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 10, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 1, SeatCount = 9, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 6, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 10, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 1, SeatCount = 9, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false, Active = true }
 
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 8, SmartRoom = false, Active = true }
 
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 12, SmartRoom = false }
-                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 1, SeatCount = 12, SmartRoom = false }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 1, PhoneCount = 1, SeatCount = 12, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 1, RoomName = "room-name", ComputerCount = 0, PhoneCount = 1, SeatCount = 12, SmartRoom = false, Active = true }
 
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 6, SmartRoom = false }
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false }
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 6, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false, Active = true }
 
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 6, SmartRoom = false }
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false }
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false }
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 24, SmartRoom = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 6, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 3, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 24, SmartRoom = true, Active = true  }
 
-                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 24, SmartRoom = true }
+                ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 24, SmartRoom = true, Active = true  }
             };
 
             rooms.ForEach(r => context.Rooms.Add(r));

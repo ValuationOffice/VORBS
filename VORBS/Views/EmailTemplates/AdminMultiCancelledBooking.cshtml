@@ -1,0 +1,49 @@
+﻿@model IEnumerable<VORBS.Models.Booking>
+
+@{
+    Layout = null;
+}
+
+<html>
+<body>
+    <h2>Unfortunately an admin has had to cancel the following booking(s):</h2>
+    <table cellspacing="0" cellpadding="10" border="1" width="600">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Equipment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Room.Location.Name</td>
+                    <td>@item.Room.RoomName</td>
+                    <td>@item.StartDate.ToShortDateString()</td>
+                    <td>@item.StartDate.ToShortTimeString()</td>
+                    <td>@item.Subject</td>
+                    <td>
+                        <ul>
+                            @if (item.Projector)
+                            {
+                                <li>Projector</li>
+                            }
+                            @if (item.Flipchart)
+                            {
+                                <li>Flipchart</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p>To make a new booking, visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/NewBooking"))">New Booking</a> page </p>
+    <p>If you have any special requests or requirements visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/Help"))"> Help</a> page</p>
+</body>
+</html>

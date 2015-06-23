@@ -4,7 +4,7 @@ function NewBookingController($scope, $http, $resource) {
     CreateServices($resource);
 
     $scope.locations = Locations.query({ status: true });
-    $scope.currentLocation = $scope.locations[0]
+    //$scope.currentLocation = $scope.locations[0]
 
 
     //$scope.$watch('currentLocation', function () { $('#calendar').fullCalendar('refetchEvents') });
@@ -230,7 +230,6 @@ function NewBookingController($scope, $http, $resource) {
                 data: JSON.stringify($scope.newBooking),
                 url: "api/bookings",
                 contentType: "application/json",
-
                 success: function (data, status) {
                     alert('Booking Confirmed. Meeting Requests Have Been Sent.');
                     window.location.href = "/MyBookings"; //Redirect to my bookings

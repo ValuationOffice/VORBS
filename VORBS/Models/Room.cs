@@ -16,6 +16,8 @@ namespace VORBS.Models
         public int SeatCount { get; set; }
         public bool SmartRoom { get; set; }
 
+        public bool Active { get; set; }
+
         public virtual Location Location { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; }
     }

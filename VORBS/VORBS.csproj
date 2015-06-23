@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\AdminController.cs" />
+    <Compile Include="API\RoomsController.cs" />
     <Compile Include="API\UsersController.cs" />
     <Compile Include="Controllers\AdministrationController.cs" />
     <Compile Include="Controllers\ErrorsController.cs" />
@@ -1089,6 +1090,7 @@
     <Content Include="Views\Administration\LocationsTab.cshtml" />
     <Content Include="Views\Shared\Modals\NewLocationModal.cshtml" />
     <Content Include="Views\Help\Index.cshtml" />
+    <Content Include="Views\EmailTemplates\AdminMultiCancelledBooking.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
