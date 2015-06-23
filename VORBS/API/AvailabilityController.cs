@@ -35,7 +35,7 @@ namespace VORBS.API
 
             try
             {
-                var availableRooms = db.Rooms.Where(x => x.Location.Name == location)
+                var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.Active == true)
                     .OrderBy(r => r.SeatCount)
                     .ToList();
 
@@ -185,7 +185,7 @@ namespace VORBS.API
 
             try
             {
-                var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople &&
+                var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople && x.Active == true &&
                                                (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate).Count() == 0)) //Do any bookings overlap
                                 .OrderBy(r => r.SeatCount).ThenBy(r => r.SmartRoom)
                                 .ToList();
@@ -234,7 +234,7 @@ namespace VORBS.API
 
             try
             {
-                var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople &&
+                var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople && x.Active == true &&
                                                (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate && b.ID != existingBookignId).Count() == 0)) //Do any bookings overlap
                                 .OrderBy(r => r.SeatCount).ThenBy(r => r.SmartRoom)
                                 .ToList();
