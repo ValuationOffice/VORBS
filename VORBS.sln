@@ -20,25 +20,25 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Development|Any CPU = Development|Any CPU
-		Dev-Test|Any CPU = Dev-Test|Any CPU
+		Dev-Demo|Any CPU = Dev-Demo|Any CPU
+		Dev-Dev|Any CPU = Dev-Dev|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Development|Any CPU.ActiveCfg = Dev-Test|Any CPU
-		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Development|Any CPU.Build.0 = Dev-Test|Any CPU
-		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Test|Any CPU.ActiveCfg = Dev-Test|Any CPU
-		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Test|Any CPU.Build.0 = Dev-Test|Any CPU
+		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Demo|Any CPU.ActiveCfg = Dev-Demo|Any CPU
+		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Demo|Any CPU.Build.0 = Dev-Demo|Any CPU
+		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Dev|Any CPU.ActiveCfg = Dev-Dev|Any CPU
+		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Dev-Dev|Any CPU.Build.0 = Dev-Dev|Any CPU
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39C06688-9D12-4C37-9BED-ABF73DFC3F79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Debug|Any CPU.ActiveCfg = Development
 		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Debug|Any CPU.Build.0 = Development
-		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Development|Any CPU.ActiveCfg = Development
-		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Development|Any CPU.Build.0 = Development
-		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Dev-Test|Any CPU.ActiveCfg = Development
-		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Dev-Test|Any CPU.Build.0 = Development
+		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Dev-Demo|Any CPU.ActiveCfg = Dev-Demo
+		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Dev-Demo|Any CPU.Build.0 = Dev-Demo
+		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Dev-Dev|Any CPU.ActiveCfg = Dev-Dev
+		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Dev-Dev|Any CPU.Build.0 = Dev-Dev
 		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Release|Any CPU.ActiveCfg = Development
 		{2563AD92-59F5-49A5-AADA-6BE425ED3C0E}.Release|Any CPU.Build.0 = Development
 	EndGlobalSection
