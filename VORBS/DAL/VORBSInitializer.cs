@@ -14,9 +14,9 @@ namespace VORBS.DAL
         {
             var locations = new List<Location>()
             {
-                new Location(){Name="Location1"},
-                new Location(){Name="Location2"},
-                new Location(){Name="Location3"},
+                new Location(){Name="Location1", Active= true },
+                new Location(){Name="Location2", Active= true },
+                new Location(){Name="Location3", Active= true },
             };
 
             locations.ForEach(l => context.Locations.Add(l));

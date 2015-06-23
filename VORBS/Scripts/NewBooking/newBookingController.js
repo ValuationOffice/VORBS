@@ -3,7 +3,7 @@
 function NewBookingController($scope, $http, $resource) {
     CreateServices($resource);
 
-    $scope.locations = Locations.query({});
+    $scope.locations = Locations.query({ status: true });
     $scope.currentLocation = $scope.locations[0]
 
 
@@ -294,7 +294,8 @@ function NewBookingController($scope, $http, $resource) {
 
 
 function CreateServices($resource) {
-    Locations = $resource('/api/locations', {
+    Locations = $resource('/api/locations/:status', {
+        status: 'active'
     }, {
         query: {
             method: 'GET', isArray: true
