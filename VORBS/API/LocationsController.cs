@@ -38,6 +38,17 @@ namespace VORBS.API
                     ID = x.ID,
                     Name = x.Name,
                     Active = x.Active,
+                    LocationCredentials = x.LocationCredentials.Select(lc =>
+                    {
+                        LocationCredentialsDTO lcDto = new LocationCredentialsDTO()
+                        {
+                            ID = lc.ID,
+                            Department = lc.Department,
+                            LocationID = lc.ID,
+                            Email = lc.Email,
+                            PhoneNumber = lc.PhoneNumber
+                        }; return lcDto;
+                    }).ToList(),
                     Rooms = x.Rooms.Select(r =>
                     {
                         RoomDTO rDto = new RoomDTO()
