@@ -28,8 +28,7 @@ namespace VORBS.DAL
                 new Admin(){ ID = 2, FirstName = "Admin2", LastName = "Admin2", Location = "Location1", Email = "fakeemail2@mail.com", PermissionLevel = 2, PID = "0000002" },
                 new Admin(){ ID = 3, FirstName = "Admin3", LastName = "Admin3", Location = "Location1", Email = "fakeemail3@mail.com", PermissionLevel = 2, PID = "0000003" },
                 new Admin(){ ID = 4, FirstName = "Admin4", LastName = "Admin4", Location = "Location1", Email = "fakeemail4@mail.com", PermissionLevel = 2, PID = "0000004" },
-                new Admin(){ ID = 5, FirstName = "Sam", LastName = "Kort", Location = "Location1", Email = "sam.kort@voa.gsi.gov.uk", PermissionLevel = 2, PID = "9993708" },
-                new Admin(){ ID = 6, FirstName = "Admin5", LastName = "Admin5", Location = "Location1", Email = "fakeemail5@mail.com", PermissionLevel = 2, PID = "0000005" }
+                new Admin(){ ID = 5, FirstName = "Admin5", LastName = "Admin5", Location = "Location1", Email = "fakeemail5@mail.com", PermissionLevel = 2, PID = "0000005" }
             };
 
             admins.ForEach(a => context.Admins.Add(a));

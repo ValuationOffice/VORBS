@@ -36,7 +36,7 @@
 
             <div class="input-group">
                 <label class="control-label">First Name</label>
-                <input id="firstNameTextBox" class="form-control" ng-model="adminUser.FirstName" readonly="readonly"/>
+                <input id="firstNameTextBox" class="form-control" ng-model="adminUser.FirstName" readonly="readonly" />
             </div>
 
             <div class="input-group">
@@ -71,10 +71,48 @@
             <td>{{ admin.location }}</td>
             <td>{{ admin.email }}</td>
             <td>{{ admin.permissionLevelText() }}</td>
-            @*<td><span data-toggle="modal" data-target="#editAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-edit"></span></td>*@
+            <td><span data-toggle="modal" data-target="#editAdminModal" ng-click="GetAdmin(admin.id)" class="btn glyphicon glyphicon-edit" title="Edit User"></span></td>
             <td><span data-toggle="modal" data-target="#deleteAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-trash" title="Delete User"></span></td>
         </tr>
     </table>
+
+    <div class="modal fade" id="editAdminModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Admin User: <b>{{editAdmin.firstName + ' ' + editAdmin.lastName }}</b></h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-inline">
+                        <div class="form-group">
+
+                            <div class="input-group">
+                                <label class="control-label">Location</label>
+                                <select class="form-control" ng-options="location.name for location in Locations" ng-model="editAdminUser.location">
+                                </select>
+                            </div>
+
+                            <div class="input-group ">
+                                <label class="control-label">Permission</label>
+                                <select class="form-control" ng-model="editAdminUser.permissionLevel">
+                                    <option value="1">Admin</option>
+                                    <option value="2">Super Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="editAdminEditButton" type="button" class="btn btn-primary" ng-click="EditAdmin()">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="modal fade" id="deleteAdminModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">

@@ -58,8 +58,64 @@ function UsersController($scope, $http, $resource) {
         SetAdminErrorMessage('');
     }
 
+    $scope.GetAdmin = function (id) {
+        $scope.SetAdminId(id);
+
+        var indexAdmin = GetIndexFromAdmins($scope.admins, $scope.adminId);
+        if (indexAdmin >= 0) {
+            $scope.editAdmin = $scope.admins[indexAdmin];
+            $scope.editAdminUser.permissionLevel = $scope.editAdmin.permissionLevel
+            var indexLocation = GetIndexFromLocations($scope.Locations, $scope.editAdmin.location)
+            if (indexLocation >= 0) {
+                $scope.editAdminUser.location = $scope.Locations[indexLocation];
+            }
+        }
+        else {
+            alert('Unable to retrieve admin. Admin may have already been deleted.');
+            $('#editAdminModal').modal('hide');
+        }
+    }
+
     $scope.EditAdmin = function (id) {
-        
+        var dateChanged = false;
+        //Change the "edit booking" button to stop multiple edits
+        $("#editAdminEditButton").prop('disabled', 'disabled');
+        $("#editAdminEditButton").html('Editing Admin. Please wait..');
+
+        if ($scope.editAdminUser.location.name !== $scope.editAdmin.location) {
+            $scope.editAdmin.location = $scope.editAdminUser.location.name
+            dateChanged = true;
+        }
+
+        if ($scope.editAdminUser.permissionLevel !== $scope.editAdmin.permissionLevel) {
+            $scope.editAdmin.permissionLevel = $scope.editAdminUser.permissionLevel;
+            dateChanged = true;
+        }
+
+        if (!dateChanged) {
+            alert('Admin data has not changed.');
+            EnableEditAdminButton();
+            return;
+        }
+
+        try {
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify($scope.editAdmin),
+                url: "api/admin/" + $scope.adminId,
+                contentType: "application/json",
+                success: function (data, status) {
+                    alert('Admin Edited Successfully!');
+                    location.reload();
+                },
+                error: function (error) {
+                    EnableEditAdminButton();
+                    alert('Unable to Edit Admin. Please Try Again or Contact ITSD. ' + error.message);
+                }
+            });
+        } catch (e) {
+            EnableEditAdminButton();
+        }
     }
 
     $scope.DeleteAdmin = function () {
@@ -100,13 +156,9 @@ function UsersController($scope, $http, $resource) {
         $('#activeDirecotryModal').modal('hide');
     }
 
-    $scope.adminUser = {
-        PID: '',
-        FirstName: '',
-        LastName: '',
-        Location: '',
-        Email: '',
-        PermissionLevel: 1
+    $scope.editAdminUser = {
+        location: '',
+        permissionLevel: 1
     }
 
     $scope.adAdminUser = {
@@ -121,7 +173,7 @@ function CreateUserAdminServices($resource) {
     Admins = $resource('/api/admin/:adminId', { adminId: 'adminId' },
     {
         getAll: { method: 'GET', isArray: true },
-        getAdminById: { method: 'GET', isArray: true },
+        getAdminById: { method: 'GET' },
         removeAdminById: { method: 'DELETE' }
     });
 
@@ -138,6 +190,12 @@ function CreateUserAdminServices($resource) {
         queryAll: { method: 'GET', isArray: true },
         querySurname: { method: 'GET', isArray: true }
     });
+}
+
+function EnableEditAdminButton() {
+    //Change the "new booking" button to stop multiple bookings
+    $("#editAdminEditButton").prop('disabled', '');
+    $("#editAdminEditButton").html('Edit');
 }
 
 function SetAdminErrorMessage(message) {
@@ -157,8 +215,24 @@ function GetPermissionText(permission) {
     }
 }
 
+function GetIndexFromAdmins(admins, searchAdminId) {
+    for (var i = 0; i < admins.length; i++) {
+        if (admins[i].id === searchAdminId) {
+            return i;
+        }
+    }
+}
+
+function GetIndexFromLocations(locations, searchLocation) {
+    for (var i = 0; i < locations.length; i++) {
+        if (locations[i].name === searchLocation) {
+            return i;
+        }
+    }
+}
+
 $(document).ready(function () {
     $("#pidTextBox").keydown(function (e) {
-            e.preventDefault();
+        e.preventDefault();
     });
 });

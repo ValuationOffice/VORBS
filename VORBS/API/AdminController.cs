@@ -102,6 +102,35 @@ namespace VORBS.API
             }
         }
 
+        [HttpPost]
+        [Route("{existingAdminId:int}")]
+        public HttpResponseMessage EditAdmin(int existingAdminId, Admin editAdmin)
+        {
+            try
+            {
+                //Find Existing Booking
+                Admin existingAdmin = db.Admins.Single(a => a.ID == existingAdminId);
+
+                //No edits found
+                if (existingAdmin.PermissionLevel == editAdmin.PermissionLevel && existingAdmin.Location == editAdmin.Location)
+                    return new HttpResponseMessage(HttpStatusCode.NotModified);
+
+                existingAdmin.PermissionLevel = editAdmin.PermissionLevel;
+                existingAdmin.Location = editAdmin.Location;
+
+                db.SaveChanges();
+
+                _logger.Info("Admin sucessfully Edited: " + editAdmin.PID);
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to edit new admin: " + editAdmin.PID, ex);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpDelete]
         [Route("{adminId:int}")]
         public HttpResponseMessage DeleteAdminUserById(int adminId)
