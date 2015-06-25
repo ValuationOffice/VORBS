@@ -43,7 +43,7 @@ function UsersController($scope, $http, $resource) {
             contentType: "application/json",
             success: function () {
                 alert('User Added Successfully!');
-                location.reload();
+                ReloadThisPage("users");
             },
             error: function (error) {
                 if (error.status == 409) {
@@ -87,7 +87,7 @@ function UsersController($scope, $http, $resource) {
             dateChanged = true;
         }
 
-        if ($scope.editAdminUser.permissionLevel !== $scope.editAdmin.permissionLevel) {
+        if ($scope.editAdminUser.permissionLevel != $scope.editAdmin.permissionLevel) {
             $scope.editAdmin.permissionLevel = $scope.editAdminUser.permissionLevel;
             dateChanged = true;
         }
@@ -106,7 +106,7 @@ function UsersController($scope, $http, $resource) {
                 contentType: "application/json",
                 success: function (data, status) {
                     alert('Admin Edited Successfully!');
-                    location.reload();
+                    ReloadThisPage("users");
                 },
                 error: function (error) {
                     EnableEditAdminButton();
@@ -123,7 +123,7 @@ function UsersController($scope, $http, $resource) {
             adminId: $scope.adminId
         },
         function (success) {
-            location.reload();
+            ReloadThisPage("users");
         },
         function (error) {
             alert('Unable to Delete Admin. Please Try Again or Contact ITSD. ' + error.message); //TODO:Log Error
@@ -154,6 +154,15 @@ function UsersController($scope, $http, $resource) {
         $scope.adminUser.Email = user.email;
 
         $('#activeDirecotryModal').modal('hide');
+    }
+
+    $scope.adminUser = {
+        PID: '',
+        FirstName: '',
+        LastName: '',
+        Location: '',
+        Email: '',
+        PermissionLevel: 1
     }
 
     $scope.editAdminUser = {
@@ -230,9 +239,3 @@ function GetIndexFromLocations(locations, searchLocation) {
         }
     }
 }
-
-$(document).ready(function () {
-    $("#pidTextBox").keydown(function (e) {
-        e.preventDefault();
-    });
-});

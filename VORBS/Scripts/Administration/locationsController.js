@@ -101,9 +101,7 @@ function LocationsController($scope, $http, $resource) {
                     contentType: "application/json",
                     success: function (data, status) {
                         alert('New Location Added.');
-                        $('#newLocationModal').modal('hide');
-                        $scope.Locations = Locations.query({});
-                       
+                        ReloadThisPage("locations");
                     },
                     error: function (error) {
                         alert('Unable to create new Location.');

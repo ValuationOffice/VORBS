@@ -171,7 +171,7 @@ function MyBookingsController($scope, $http, $resource) {
                 bookingId: $scope.bookingId
             },
             function (success) {
-                location.reload();
+                ReloadThisPage("bookings");
             },
             function (error) {
                 EnableDeleteBookingButton();

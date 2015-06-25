@@ -102,7 +102,7 @@ function CreateNewRoom(newRoom) {
         contentType: "application/json",
         success: function (data, status) {
             alert('New room has been created.');
-            location.reload();
+            ReloadThisPage("rooms");
         },
         error: function (error) {
             alert('Unable to create new room. Please contact ITSD. ' + error.responseJSON.message);
@@ -126,7 +126,7 @@ function EnableDisableRoom(roomId, active) {
             contentType: "application/json",
             success: function (data, status) {
                 alert('Room status has been updated.');
-                location.reload();
+                ReloadThisPage("rooms");
             },
             error: function (error) {
                 if (active) {

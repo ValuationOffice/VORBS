@@ -79,7 +79,7 @@ function SaveEditBooking(existingId, editBooking) {
             contentType: "application/json",
             success: function (data, status) {
                 alert('Edit booking confimed. Confirmation email has beeen sent.');
-                location.reload();
+                ReloadThisPage("bookings");
             },
             error: function (error) {
                 EnableEditBookingButton();
@@ -263,3 +263,18 @@ $(document).ready(function () {
 
 ////////////////
 
+//Admin Functions
+
+function ReloadThisPage(tabId) {
+    var hashIndex = window.location.href.indexOf("#");
+    if (hashIndex > 0) {
+        window.location.href = window.location.href.substring(0, hashIndex) + "#" + tabId;
+    }
+    else {
+        window.location.href = window.location.href + "#" + tabId;
+    }
+
+    location.reload();
+}
+
+////////////////
