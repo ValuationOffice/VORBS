@@ -42,7 +42,7 @@ function UsersController($scope, $http, $resource) {
             url: "api/admin",
             contentType: "application/json",
             success: function () {
-                alert('User Added Sucesfully!');
+                alert('User Added Successfully!');
                 location.reload();
             },
             error: function (error) {
