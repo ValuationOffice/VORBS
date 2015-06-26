@@ -167,6 +167,8 @@ function ValidateUnSavedAttendee() {
 
 //Formating (Date/Time)
 function FormatDateTimeForURL(date, formatString, toUtc) {
+
+    date = date.trim();
     if (date === "") {
         alert('Please Enter a Valid Date');
         throw new Error();

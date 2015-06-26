@@ -18,18 +18,20 @@
             <span aria-hidden="true">&times;</span>
         </button>
         <h4 style="text-align: center;">Debug</h4>
-        <strong>User:</strong> @User.Identity.Name<br/>
+        <strong>User:</strong> @User.Identity.Name<br />
         <strong>Version:</strong> @ViewBag.CurrentVersion <br />
     </div>
-
+    <div class="navbar-bottom-bar navbar-fixed-top">
+        &nbsp
+    </div>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-
             <div class="navbar-header">
-                <div id="logo_text" align="center">
-                    <div id="logoBanner">&nbsp</div>
-                    <!-- class="logo_colour", allows you to change the colour of the text -->
-                    <h1 color="#008770">Valuation Office Room Booking System<span class="logo_colour"></span></h1>
+                <div id="logo_text">
+                    <div id="logoBanner">
+                        <img id="bannerImage" src="~/Content/images/voaLogo.jpg" />
+                        <h1>Valuation Office Agency</h1>
+                    </div>
                 </div>
 
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -39,7 +41,7 @@
                 </button>
                 @*@Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
                 <!-- logo -->
-                
+
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -48,12 +50,12 @@
 
                     @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
                     {
-                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Administration", "Index", "Administration")</li>
+                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Admin", "Index", "Administration")</li>
                     }
                     else
                     {
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Help" ? "active" : "")">@Html.ActionLink("Help", "Index", "Help")</li>
-                    }                    
+                    }
                 </ul>
             </div>
         </div>

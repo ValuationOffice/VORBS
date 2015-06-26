@@ -7,6 +7,8 @@
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    margin-top: -40px;
+    font-family: "nta", Arial, sans-serif;
 }
 
 /* Override the default bootstrap behavior where horizontal description lists 
@@ -24,7 +26,8 @@ textarea {
 }
 
 #logo_text {
-    width: 400px;
+    width: 450px;
+    background-color: rebeccapurple;
 }
 
 #timepicker2 {
@@ -32,11 +35,23 @@ textarea {
 }
 
 #logo_text #logoBanner {
-    background-color: #008770;
-    width: 5px;
-    height: 55px;
     float: left;
+    margin-left: 30px;
 }
+
+    #logo_text #logoBanner h1 {
+        padding-left: 60px;
+        margin-top: 12px;
+        font-family: "nta", Arial, sans-serif;
+        color: white;
+    }
+
+    #logo_text #logoBanner #bannerImage {
+        width: 40px;
+        top: 5px;
+        float: left;
+        position: fixed;
+    }
 
 #logo_text h1, #logo_text h1 a, #logo_text h1 a:hover {
     padding: 0 0 0 0;
@@ -46,17 +61,29 @@ textarea {
     font-size: 25px;
 }
 
-.navbar-nav {
-    margin-top: 15px;
+.navbar-inverse {
+    background-color: black;
+    height: 10px;
 }
 
+.navbar-bottom-bar {
+    background-color: #1E5595;
+    height: 60px;
+    width: 65%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.navbar-nav {    
+    margin-right: 20px;
+    margin-top: 10px;
+    float:right;
+}
     .navbar-nav li {
         text-align: center;
-        width: 170px;
-        border: 1px;
-        border-style: solid;
-        border-color: #008770;
     }
+
+/********** CALENDAR STYLES **********/
 
 #calendarContainer {
     margin-top: 20px;
@@ -64,6 +91,17 @@ textarea {
 
 #calendar {
     width: 800px;
+}
+
+.fc-event{
+    border-radius: 0;
+}
+
+.form-control-date{
+} 
+
+.fc-widget-content table{
+    background-color: white;
 }
 
 .locationIcons {
@@ -80,10 +118,38 @@ textarea {
 
 #bookingTable {
     width: 1051px;
-    height: 550px;
+    height: 438px;
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
+}
+
+#bookingTable .calendarRoomName{
+    background-color: black;
+    text-align: center;
+    width: 104px;  
+    float: right;  
+    font-size: large;
+    color: white;
+}
+
+#bookingTable .calendarRoomDetails{
+    background-color: white;
+    width: 104px;
+    float: right;
+    text-align: center;
+    border-left:solid 1px;
+    border-right:solid 1px;   
+    border-color: lightgray; 
+}
+
+#bookingTable .calendarIcons{    
+    margin-left: 3px;
+    margin-right: 3px;    
+}
+
+#bookingTable .fc-toolbar{
+    margin-bottom: 0;
 }
 
 #myBookingsTable {
@@ -95,6 +161,8 @@ textarea {
     width: 150px;
     display: inline-block;
 }
+
+
 
 /*#attendeesInputFilter {
     margin-right:-30px;
@@ -119,11 +187,11 @@ textarea {
 .navbar-inverse .navbar-nav > .active > a:focus {
     color: #1d8feb !important;
     font-weight: bold !important;
-    background-color: #080808 !important;
+    background-color: transparent !important;   
 }
 
 #attendeesBadgeIcon {
-    margin: 0px 10px 5px 19px;
+    margin: 0 10px 5px 19px;
 }
 
 #smartroomBadgeIcon {
@@ -138,10 +206,6 @@ textarea {
 
 #phoneBadgeIcon {
     float: left;
-}
-
-#roomDetailsBox {
-    height: 45px;
 }
 
 #adminLocationsTable {
@@ -237,20 +301,42 @@ textarea {
 }
 
 .input-group.bootstrap-touchspin {
-    width: 250px;
-    float: left;
-    margin-top: 40px;
+    /*width: 250px;*/
+    /*float: left;*/
+    /*margin-top: 40px;*/
 }
 
 #attendeesInputFilter label {
-    margin-top: 10px;
-    margin-left: -235px;
+    /*margin-top: 10px;
+    margin-left: -235px;*/
 }
 
 .bootstrap-timepicker-widget {
     z-index: 99999;
 }
 
+.datepicker{
+    border-radius: 0;
+}
+
+#searchFilter{
+    margin-top:40px;
+}
+
+#searchFilter #searchButton{
+    background-color: #21846E;
+    color: white;
+    font-weight: bold;
+    border-bottom: solid;
+    border-bottom-width: 2px;
+    border-bottom-color: black;
+    width: 75%;
+}
+
+#viewAllRoomsLink{
+    float: right;
+    display: none;
+}
 
 /* TYPEAHEAD DROPDOWN ACTIVE */
 
@@ -411,11 +497,6 @@ textarea {
     content: "\e081"; /* adjust as needed, taken from bootstrap.css */
 }
 
-#searchButton {
-    margin-left: 30px;
-    margin-top: 10px;
-}
-
 /*Admin Room Tab*/
 
 #seatCountControl, #computerCountControl, #phoneCountControl {
@@ -455,6 +536,6 @@ textarea {
     margin-left: 10px;
 }
 
-#adminBookingDatePicker{
+#adminBookingDatePicker {
     margin-top: -6px;
 }

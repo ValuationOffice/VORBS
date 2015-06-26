@@ -20,14 +20,23 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.SearchBookings = function (viewAll) {
-
+       
         $("#bookingTable").html('');
         $("#bookingTable").html('<div class="loadingContainer"><img src="/Content/images/loading.gif" /></div>');
 
+        $("#newSearchResults").css('display', 'block');
         var roomResults;
 
-        var isValid = ValidateSearchFilters();
+        var advancedFilterVal = false;
+        if (!viewAll) {
+            advancedFilterVal = advancedSearchActive;
+        }
+
+        var isValid = ValidateSearchFilters(advancedFilterVal);
         if (isValid) {
+            $("#searchedLocation").text($scope.bookingFilter.location.name);
+            var formattedDate = new moment($scope.bookingFilter.startDate, ['DD-MM-YYYY']).format('dddd Do MMMM');
+            $("#searchedDate").text(formattedDate);
             if (viewAll === true) {
                 $scope.roomBookings = AllRooms.query({
                     location: $scope.bookingFilter.location.name,
@@ -36,23 +45,37 @@ function NewBookingController($scope, $http, $resource) {
                     roomResults = success;
                     $scope.RenderBookings(roomResults);
                 });
+                
             }
             else {
-                $scope.roomBookings = Available.query({
-                    location: $scope.bookingFilter.location.name,
-                    startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true),
-                    endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true),
-                    smartRoom: $scope.bookingFilter.smartRoom,
-                    numberOfAttendees: $scope.bookingFilter.numberOfAttendees
-                }, function (success) {
+
+                var queryParams = {};
+                if (advancedSearchActive) {
+                    queryParams = {
+                        location: $scope.bookingFilter.location.name,
+                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true),
+                        endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true),
+                        smartRoom: $scope.bookingFilter.smartRoom,
+                        numberOfAttendees: $scope.bookingFilter.numberOfAttendees
+                    };
+                } else {
+                    queryParams = {
+                        location: $scope.bookingFilter.location.name,
+                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true)
+                    };
+                }
+
+                $scope.roomBookings = Available.query(queryParams, function (success) {
                     roomResults = success;
                     $scope.RenderBookings(roomResults);
                 });
+                $("#newSearchResults").css('display', 'block');
             }
         } else {
             $("#bookingTable").html('');
+            $("#newSearchResults").css('display', 'none');
         }
-        
+
     }
 
     $scope.RenderBookings = function (roomResults) {
@@ -73,20 +96,30 @@ function NewBookingController($scope, $http, $resource) {
                 });
             }
 
-            if (roomResults[i].smartRoom === true) {
-                var roomDetails = '<h3 style="text-align: center;">' +roomResults[i].roomName + '<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span></h3>';  
-                }
-            else {
-                var roomDetails = '<h3 style="text-align: center;">' + roomResults[i].roomName + '</h3>';
-            }
+            //<span title="Smart Room" id="smartroomBadgeIcon" class="badge"><span class="glyphicon glyphicon-facetime-video"></span></span>
+
+            var roomDetails = '<div class="calendarRoomName">' + roomResults[i].roomName + '</div>';
+
+            //if (roomResults[i].smartRoom === true) {
                 
-            //debugger;
+            //}
+            //else {
+            //    var roomDetails = '<div class="calendarRoomName">' + roomResults[i].roomName + '</div>';
+            //}
 
-            roomDetails = roomDetails + '<span id="attendeesBadgeIcon" class="badge"><span class="glyphicon glyphicon-user" title="' + roomResults[i].seatCount + ' Attendees"> ' + roomResults[i].seatCount + '</span></span>';
-            roomDetails = roomDetails + '<span id="pcBadgeIcon" class="badge"><span class="glyphicon glyphicon-hdd" title="' + roomResults[i].computerCount + ' PC\'s"> ' + roomResults[i].computerCount + '</span></span>';
-            roomDetails = roomDetails + '<span id="phoneBadgeIcon" class="badge"><span class="glyphicon glyphicon-earphone" title="' + roomResults[i].phoneCount + ' Phones"> ' + roomResults[i].phoneCount + '</span></span>';
+            roomDetails = roomDetails + '<div class="calendarRoomDetails">';
 
-            $('#bookingTable').append('<div class="dailyCalendarContainer"><div id="roomDetailsBox" style="text-align: center;">' + roomDetails + '</div><div id="' + roomResults[i].roomName.replace('.','_') + '_calendar" class="dailyCalendar" title="Click and drag"></div></div>');
+            roomDetails = roomDetails + '<span  class="glyphicon glyphicon-user calendarIcons" title="' + roomResults[i].seatCount + ' Attendees"></span>' + roomResults[i].seatCount;
+            roomDetails = roomDetails + '<span  class="glyphicon glyphicon-hdd calendarIcons" title="' + roomResults[i].computerCount + ' PC\'s"></span>';
+            roomDetails = roomDetails + '<span  class="glyphicon glyphicon-earphone calendarIcons" title="' + roomResults[i].phoneCount + ' Phones"></span>';
+
+            if (roomResults[i].smartRoom === true) {
+                roomDetails = roomDetails + '<span title="Smart Room" class="glyphicon glyphicon-facetime-video calendarIcons"></span>';
+            }
+
+            roomDetails = roomDetails + '</div>';
+
+            $('#bookingTable').append('<div class="dailyCalendarContainer">' + roomDetails + '<div id="' + roomResults[i].roomName.replace('.', '_') + '_calendar" class="dailyCalendar" title="Click and drag"></div></div>');
             var roomName = '[' + roomResults[i].roomName + ']';
             $("#" + roomResults[i].roomName.replace('.', '_') + "_calendar").fullCalendar({
                 weekends: false,
@@ -104,8 +137,11 @@ function NewBookingController($scope, $http, $resource) {
                 allDaySlot: false,
                 selectable: true,
                 selectHelper: true,
-                height: 452,
+                eventBackgroundColor: 'rgba(33,132,110, 0.7)',
+                eventTextColor: 'black',
+                height: 425,
                 titleFormat: '' + roomName + '',
+                dayNames: ['', '', '', '', '', ''],
                 select: function (start, end, allDay) {
 
                     var newEvent = {
@@ -136,9 +172,15 @@ function NewBookingController($scope, $http, $resource) {
                     $("#confirmModal #bookingModalStartTime").timepicker('setTime', start.utc().format('H:mm'));
                     $("#confirmModal #bookingModalEndTime").timepicker('setTime', end.utc().format('H:mm'));
 
-                    $("#confirmModal").modal('show');                    
+                    $("#confirmModal").modal('show');
                 },
-                events: eventData
+                eventSources: [
+                    {
+                        events: eventData,
+                        color: 'rgba(158, 158, 158, 0.7)',
+                        textColor: 'black'
+                    }
+                ]
             });
         }
     }
@@ -217,7 +259,7 @@ function NewBookingController($scope, $http, $resource) {
                 return;
             };
 
-            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm',true);
+            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm', true);
             $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm', true);
             $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
@@ -242,7 +284,7 @@ function NewBookingController($scope, $http, $resource) {
         } catch (e) {
             EnableNewBookingButton();
         }
-        
+
     }
 
     $('#confirmModal').on('show.bs.modal', function () {
@@ -301,18 +343,14 @@ function CreateServices($resource) {
         }
     });
 
-    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', {
-        location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom'
-    },
+    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
     {
         query: {
             method: 'GET', isArray: true
         }
     });
 
-    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom', {
-        location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom'
-    },
+    Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
     {
         query: {
             method: 'GET', isArray: true
@@ -438,7 +476,7 @@ function AdEmailExist(email, currentEmails) {
     }
 }
 
-function ValidateSearchFilters() {
+function ValidateSearchFilters(advancedSearch) {
     var valid = true;
 
     $("#searchFilterErrorList").html('');
@@ -453,25 +491,36 @@ function ValidateSearchFilters() {
         $("#searchFilter #searchLocation").removeClass('has-error');
     }
 
-    if ($("#searchFilter #attendeesInputFilter input").val().trim() == "") {
-        $("#searchFilter #attendeesInputFilter").addClass('has-error');
-        errors.push('Please enter number of attendees');
+    if ($("#searchFilter #date input").val().trim() == "") {
+        $("#searchFilter #date").addClass('has-error');
+        errors.push('Please enter a date');
         valid = false;
     } else {
-        $("#searchFilter #attendeesInputFilter").removeClass('has-error');
+        $("#searchFilter #date").removeClass('has-error');
     }
 
-    timeValidationMessage = ValidateStartEndTime($('#startTimePicker').val(), $('#endTimePicker').val())
+    if (advancedSearch) {
 
-    if (timeValidationMessage !== "") {
-        $("#searchFilter #endTime").addClass('has-error');
-        $("#searchFilter #startTime").addClass('has-error');
-        errors.push(timeValidationMessage);
-        valid = false;
-    }
-    else {
-        $("#searchFilter #startTime").removeClass('has-error');
-        $("#searchFilter #endTime").removeClass('has-error');
+        timeValidationMessage = ValidateStartEndTime($('#startTimePicker').val(), $('#endTimePicker').val())
+
+        if (timeValidationMessage !== "") {
+            $("#searchFilter #endTime").addClass('has-error');
+            $("#searchFilter #startTime").addClass('has-error');
+            errors.push(timeValidationMessage);
+            valid = false;
+        }
+        else {
+            $("#searchFilter #startTime").removeClass('has-error');
+            $("#searchFilter #endTime").removeClass('has-error');
+        }
+
+        if ($("#searchFilter #attendeesInputFilter input").val().trim() == "") {
+            $("#searchFilter #attendeesInputFilter").addClass('has-error');
+            errors.push('Please enter number of attendees');
+            valid = false;
+        } else {
+            $("#searchFilter #attendeesInputFilter").removeClass('has-error');
+        }
     }
 
     if (!valid) {
@@ -494,7 +543,21 @@ function IncrementCurrentTime(addMins) {
         start.add(60 - start.minute(), 'm');
     }
 
-   return moment(start).add("minutes", addMins).format("H:mm");
+    return moment(start).add("minutes", addMins).format("H:mm");
+}
+
+var advancedSearchActive = false;
+function ToggleAdvancedSearch() {    
+    if (advancedSearchActive) {
+        $("#advancedSearch").hide();
+        $("#toggleAdvancedSearchLink").text('Advanced Search');
+        $("#viewAllRoomsLink").hide();
+    } else {
+        $("#advancedSearch").show();
+        $("#toggleAdvancedSearchLink").text('Hide Advanced Search');
+        $("#viewAllRoomsLink").show();
+    }
+    advancedSearchActive = !advancedSearchActive;
 }
 
 $(document).ready(function () {
