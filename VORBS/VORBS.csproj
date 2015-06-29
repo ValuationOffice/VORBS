@@ -194,7 +194,7 @@
     <Content Include="Content\fullcalendar\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar\fullcalendar.print.css" />
     <Content Include="Content\images\loading.gif" />
-    <Content Include="Content\images\voaLogo.jpg" />
+    <Content Include="Content\images\voaLogo.png" />
     <Content Include="Content\jquery-uiBootstrap\jquery.bootstrap-touchspin.css" />
     <Content Include="Content\jquery-uiBootstrap\jquery.bootstrap-touchspin.min.css" />
     <Content Include="favicon.ico" />
