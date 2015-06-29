@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 100px;
     padding-bottom: 20px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -48,7 +49,7 @@ textarea {
 
     #logo_text #logoBanner #bannerImage {
         width: 40px;
-        top: 5px;
+        top: 8px;
         float: left;
         position: fixed;
     }
@@ -74,11 +75,12 @@ textarea {
     margin-right: auto;
 }
 
-.navbar-nav {    
+.navbar-nav {
     margin-right: 20px;
     margin-top: 10px;
-    float:right;
+    float: right;
 }
+
     .navbar-nav li {
         text-align: center;
     }
@@ -93,14 +95,14 @@ textarea {
     width: 800px;
 }
 
-.fc-event{
+.fc-event {
     border-radius: 0;
 }
 
-.form-control-date{
-} 
+.form-control-date {
+}
 
-.fc-widget-content table{
+.fc-widget-content table {
     background-color: white;
 }
 
@@ -117,43 +119,56 @@ textarea {
 }
 
 #bookingTable {
-    width: 1051px;
+    width: 100%;
     height: 438px;
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
 }
 
-#bookingTable .calendarRoomName{
-    background-color: black;
-    text-align: center;
-    width: 104px;  
-    float: right;  
-    font-size: large;
-    color: white;
-}
+    #bookingTable .calendarRoomName {
+        background-color: black;
+        text-align: center;
+        width: 104px;
+        float: right;
+        font-size: large;
+        color: white;
+    }
 
-#bookingTable .calendarRoomDetails{
-    background-color: white;
-    width: 104px;
-    float: right;
-    text-align: center;
-    border-left:solid 1px;
-    border-right:solid 1px;   
-    border-color: lightgray; 
-}
+    #bookingTable .calendarRoomDetails {
+        background-color: white;
+        width: 104px;
+        float: right;
+        text-align: center;
+        border-left: solid 1px;
+        border-right: solid 1px;
+        border-color: lightgray;
+    }
 
-#bookingTable .calendarIcons{    
-    margin-left: 3px;
-    margin-right: 3px;    
-}
+    #bookingTable .calendarIcons {
+        margin-left: 3px;
+        margin-right: 3px;
+    }
 
-#bookingTable .fc-toolbar{
-    margin-bottom: 0;
-}
+    #bookingTable .fc-toolbar {
+        margin-bottom: 0;
+    }
 
 #myBookingsTable {
     margin-top: 25px;
+}
+
+#myBookingsControllerDiv h2 {
+    font-weight: bold;
+}
+
+#myBookingsControllerDiv th {
+    font-size: medium;
+}
+
+#myBookingsControllerDiv tr {
+    border-bottom: solid;
+    border-bottom-width: .1em;
 }
 
 .dailyCalendarContainer {
@@ -187,7 +202,7 @@ textarea {
 .navbar-inverse .navbar-nav > .active > a:focus {
     color: #1d8feb !important;
     font-weight: bold !important;
-    background-color: transparent !important;   
+    background-color: transparent !important;
 }
 
 #attendeesBadgeIcon {
@@ -286,9 +301,9 @@ textarea {
 }
 
 #subjectInfo {
-    max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 200px;
     white-space: nowrap;
 }
 
@@ -315,25 +330,25 @@ textarea {
     z-index: 99999;
 }
 
-.datepicker{
+.datepicker {
     border-radius: 0;
 }
 
-#searchFilter{
-    margin-top:40px;
+#searchFilter {
+    margin-top: 40px;
 }
 
-#searchFilter #searchButton{
-    background-color: #21846E;
-    color: white;
-    font-weight: bold;
-    border-bottom: solid;
-    border-bottom-width: 2px;
-    border-bottom-color: black;
-    width: 75%;
-}
+    #searchFilter #searchButton {
+        background-color: #21846E;
+        color: white;
+        font-weight: bold;
+        border-bottom: solid;
+        border-bottom-width: 2px;
+        border-bottom-color: black;
+        width: 75%;
+    }
 
-#viewAllRoomsLink{
+#viewAllRoomsLink {
     float: right;
     display: none;
 }
@@ -538,4 +553,16 @@ textarea {
 
 #adminBookingDatePicker {
     margin-top: -6px;
+}
+
+/*#editModal .bootstrap-touchspin{
+    width: 100px;
+}
+
+#editModal #editBookingAttendees{
+    margin-left: 10px;
+}*/
+
+.btn {
+    border-radius: 0;
 }

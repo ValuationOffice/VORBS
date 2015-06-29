@@ -344,13 +344,13 @@ namespace VORBS.API
                     facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
                     if (facilitiesEmail != null)
                     {
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEditeddBooking.cshtml", editBooking);
+                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", editBooking);
                     }
                 }
 
                 db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
                 db.SaveChanges();
-
+                _logger.Info("Booking sucessfully editted: " + editBooking.ID);
                 try
                 {
                     //Send Dso Email

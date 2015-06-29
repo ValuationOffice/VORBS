@@ -1,6 +1,6 @@
 ﻿<!--Edit Booking Confirmation Screen-->
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
             <ul id="editBookingTabs" class="nav nav-tabs" hidden="hidden">
@@ -9,75 +9,59 @@
             </ul>
 
             <div id="my-edittab-content" class="tab-content">
-
                 <div class="tab-pane active" id="editBooking">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Edit Booking for {{ booking.date }}</h4>
+                        <h4 class="modal-title" id="myModalLabel">Edit Booking</h4>
+                        <h4>Room {{newBooking.Room.RoomName}}, {{ editBooking.location.name }} on {{ editBooking.startDate | date:'dd/MM/yyyy' }}</h4>
                     </div>
-
                     <div class="modal-body">
-                        <div class="form">
+                        <form role="form">
                             <div class="alert alert-danger" id="bookingModalErrorMessage" style="display: none;"></div>
-                            <div class="form-inline">
-                                <div class="form-group">
-                                    <label class="control-label">Location</label>
-                                    <span style="padding-left:20px;">
-                                        <input class="form-control" readonly="readonly" ng-model="editBooking.location.name">
-                                    </span>
-                                </div>
-                                <div class="form-group">
-                                    <label style="margin-left:9px;" class="control-label">Room Name</label>
-                                    <input class="form-control" style="margin-left:16px;" readonly="readonly" ng-model="newBooking.Room.RoomName">
-                                </div>
-                            </div>
-                            <br />
-                            <div class="form-inline">
-                                <div class="form-group">
+                            <div class="form-group row">
+                                <div class="col-xs-3">
                                     <label class="control-label">Date</label>
-                                    <span style="padding-left:48px;">
-                                        <input style="width:180px;" id="bookingDate" class="form-control datepicker" ng-model="booking.date" />
-                                    </span>
+                                    <input id="bookingDate" class="form-control datepicker" ng-model="booking.date" />
                                 </div>
-                                <div class="form-group">
-                                    <label style="padding-left:10px;" class="control-label">Attendees</label>
-                                    <input id="attendees" class="numberControl form-control" type="number" min="1" style="margin-left:28px;" class="form-control" ng-model="booking.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                                <div class="col-xs-3">
+                                    <label class="control-label">Start</label>
+                                    <input id="bookingStartTime" class="form-control timepicker" ng-model="booking.startTime" />
                                 </div>
-                            </div>
-                            <br />
-                            <div class="form-inline">
-                                <div class="form-group">
-                                    <label class="control-label">Start Time</label>
-                                    <span style="padding-left:12px;">
-                                        <input id="bookingStartTime" style="margin-left:-2px;" class="form-control timepicker" ng-model="booking.startTime" />
-                                    </span>
+                                <div class="col-xs-3">
+                                    <label class="control-label">End</label>
+                                    <input id="bookingEndTime" class="form-control timepicker" ng-model="booking.endTime" />
                                 </div>
-                                <div class="form-group" style="padding-left:17px;">
-                                    <label style="margin-left:-5px;" class="control-label">End Time</label>
-                                    <input id="bookingEndTime" style="margin-left:30px;" class="form-control timepicker" ng-model="booking.endTime" />
+                                <div class="col-xs-3">
+                                    <label class="control-label">Attendees</label>
+                                    <input type="number" id="attendees" class="form-control numberControl touchSpinControl" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
                                 </div>
-                            </div>
-                            <br />
-                            <div class="form-inline">
-                                <div class="form-group">
+                                <div class="col-xs-6">
                                     <label class="control-label">Subject</label>
-                                    <span style="padding-left:30px;">
-                                        <input maxlength="140" style="width:inherit" class="form-control" ng-model="newBooking.Subject">
-                                    </span>
+                                    <input maxlength="140" class="form-control" ng-model="newBooking.Subject">
                                 </div>
                             </div>
                             <hr />
-                            <div class="form-group">
+                            <p><label class="control-label">External Attendees</label></p>
+                            <div class="form-group row">
 
-                                <label class="control-label">External Attendees</label>
-                                <div class="form-group">
-                                    <div class="form-inline">
-                                        <label style="font-weight: normal !important;">First Name</label>
-                                        <input class="form-control" id="externalFirstNameTextBox" />
-                                        <label style="font-weight: normal !important;">Last Name</label>
-                                        <input class="form-control" id="externalLastNameTextBox" />
-                                        <button type="button" class="btn btn-primary" ng-click="AddExternalAttendee()">Add</button>
-                                    </div>
+                                <div class="col-xs-5">
+                                    <label>First Name</label>
+                                    <input class="form-control" id="externalFirstNameTextBox" />
+                                </div>
+                                <div class="col-xs-5">
+                                    <label>Last Name</label>
+                                    <input class="form-control" id="externalLastNameTextBox" />
+                                </div>
+                                <div class="col-xs-2">
+                                    <label>&nbsp;</label>
+                                    <input id="addExternal" type="button" class="form-control btn-primary btn-sm" ng-click="AddExternalAttendee()" value="Add" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-xs-5">
+                                    <label>
+                                        Attendees
+                                    </label>
                                     <table>
                                         <tr ng-repeat="externalName in booking.ExternalNames">
                                             <td>{{ externalName }}</td>
@@ -85,29 +69,25 @@
                                         </tr>
                                     </table>
                                 </div>
-                                <hr />
-                                <div class="form-group">
-                                    <div class="input-group ">
-                                        <label class="control-label">Additional Equipment</label><br />
-                                        <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
-                                        <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
-                                    </div>
+                            </div>
+                            <hr />
+                            <div class="form-group row">
+                                <div class="col-xs-5">
+                                    <label class="control-label">Additional Equipment</label><br />
+                                    <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
+                                    <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
-
                     <div class="modal-footer">
+                        <button id="acceptBookingConfirmButton" type="button" ng-click="CheckEditBooking()" class="btn btn-primary">Accept Changes</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button id="acceptBookingConfirmButton" type="button" ng-click="CheckEditBooking()" class="btn btn-primary">Accept</button>
                     </div>
-
                 </div>
-
                 <div class="tab-pane" id="confirmEditBooking">
                     @Html.Partial("Modals/ConfirmEditBookingModal")
                 </div>
-
             </div>
         </div>
     </div>

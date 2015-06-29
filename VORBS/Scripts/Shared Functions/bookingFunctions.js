@@ -104,10 +104,17 @@ function EnableConfirmBookingButton() {
 }
 
 function EnableDeleteBookingButton() {
-    //Change the "new booking" button to stop multiple bookings
+    //Change the "delete booking" button to stop multiple bookings
     $("#deleteBookingConfirmButton").prop('disabled', '');
     $("#deleteBookingConfirmButton").html('Delete');
 }
+
+function EnableEditBookingButton() {
+    //Change the "edit booking" button to stop multiple bookings
+    $("#acceptBookingConfirmButton").prop('disabled', '');
+    $("#acceptBookingConfirmButton").html('Accept');
+}
+
 
 
 ////////////////
@@ -216,18 +223,6 @@ function FormatTimeDate(dateTime, returnDate) {
 //Attendees Control Functions
 
 $(document).ready(function () {
-    $('.touchSpinControl').TouchSpin({
-        verticalbuttons: true,
-        min: 1,
-        initval: 1
-    });
-
-    $('.touchSpinControlZero').TouchSpin({
-        verticalbuttons: true,
-        min: 0,
-        initval: 0
-    });
-
     $(".phoneNoControl,.numberControl").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110]) !== -1 ||

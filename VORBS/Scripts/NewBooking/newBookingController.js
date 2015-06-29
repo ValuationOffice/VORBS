@@ -564,5 +564,11 @@ $(document).ready(function () {
     $("#onBehlafOfTextBox").keydown(function (e) {
         e.preventDefault();
     });
+
+    $('.touchSpinControl').TouchSpin({
+        verticalbuttons: true,
+        min: 1,
+        initval: 1
+    });
 });
 ///////////////////////////////////////////////////////////////////

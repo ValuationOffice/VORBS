@@ -3,15 +3,17 @@
 }
 
 <div ng-app="myBookings">
-    <div id="controllerDiv" ng-controller="MyBookingsController">
+    <div id="myBookingsControllerDiv" ng-controller="MyBookingsController">
 
         <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
         <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
         <link href="~/Content/Site.css" rel="stylesheet" />
+        <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
 
-        <h2>My Bookings</h2>
+        <h2>My bookings</h2>
+        
         <div id="myBookingsTable">
-            <table class="table table-striped userInfoTable">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Location</th>
@@ -19,7 +21,6 @@
                         <th>Date</th>
                         <th>Time</th>
                         <th>Subject</th>
-                        <th>&nbsp;</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -30,13 +31,14 @@
                         <td>{{ booking.DateFormatted() }}</td>
                         <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                         <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
-                        <td><span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon glyphicon-edit" title="Edit Booking"></span></td>
-                        <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash" title="Delete Booking"></span></td>
+                        <td>
+                            <span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon" title="Edit Booking"><a>Edit</a></span>
+                            <span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon" title="Delete Booking"><a>Delete</a></span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-
         @Html.Partial("Modals/EditBookingModal", null)
 
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
