@@ -235,11 +235,3 @@ function CreateServices($resource) {
         remove: { method: 'DELETE' }
     });
 }
-
-$(function () {
-    $('.touchSpinControl').TouchSpin({
-        verticalbuttons: true,
-        min: 1,
-        initval: 1
-    });
-})

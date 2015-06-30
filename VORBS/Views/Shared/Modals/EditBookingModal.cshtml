@@ -33,7 +33,7 @@
                                 </div>
                                 <div class="col-xs-3">
                                     <label class="control-label">Attendees</label>
-                                    <input type="number" id="attendees" class="form-control numberControl touchSpinControl" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                                    <input type="number" id="attendees" class="form-control numberControl touchSpinControl" ng-model="booking.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
                                 </div>
                                 <div class="col-xs-6">
                                     <label class="control-label">Subject</label>
@@ -92,3 +92,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(function () {
+        $('.touchSpinControl').TouchSpin({
+            verticalbuttons: true,
+            min: 1,
+            initval: 1
+        });
+    })
+</script>
