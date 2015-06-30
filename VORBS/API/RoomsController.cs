@@ -60,6 +60,41 @@ namespace VORBS.API
         }
 
         [HttpGet]
+        [Route("{roomId:int}")]
+        public RoomDTO GetRoomById(int roomId)
+        {
+            try
+            {
+                RoomDTO roomDTO = new RoomDTO();
+
+                Room room = db.Rooms.Single(r => r.ID == roomId);
+
+                roomDTO = new RoomDTO()
+                {
+                    ID = room.ID,
+                    location = new LocationDTO()
+                    {
+                        ID = room.Location.ID,
+                        Name = room.Location.Name
+                    },
+                    RoomName = room.RoomName,
+                    ComputerCount = room.ComputerCount,
+                    SeatCount = room.SeatCount,
+                    PhoneCount = room.PhoneCount,
+                    SmartRoom = room.SmartRoom,
+                    Active = room.Active
+                };
+
+                return roomDTO;
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get room using roomid: " + roomId, ex);
+                return new RoomDTO();
+            }
+        }
+
+        [HttpGet]
         [Route("{locationName}/{status:int}")]
         public List<RoomDTO> GetRoomsByLocationAndStatus(string locationName, int status)
         {
@@ -131,6 +166,40 @@ namespace VORBS.API
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
+
+        [HttpPost]
+        [Route("{existingRoomId:int}")]
+        public HttpResponseMessage EditRoom(int existingRoomId, Room editRoom)
+        {
+            try
+            {
+                //Find Existing Booking
+                Room existingRoom = db.Rooms.Single(r => r.ID == existingRoomId);
+
+                if (existingRoom.RoomName != editRoom.RoomName)
+                {
+                    var duplicateRoomCheck = db.Rooms.Where(r => r.RoomName == editRoom.RoomName && r.LocationID == existingRoom.LocationID).Count();
+
+                    if (duplicateRoomCheck > 0)
+                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", editRoom.RoomName, editRoom.Location.Name));
+                }
+
+                editRoom.LocationID = existingRoom.LocationID;
+
+                db.Entry(existingRoom).CurrentValues.SetValues(editRoom);
+                db.SaveChanges();
+
+                _logger.Info("Room sucessfully Edited: " + editRoom.ID);
+
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to edit room: " + editRoom.ID, ex);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
 
         [HttpPost]
         [Route("{roomId:Int}/{active:bool}")]

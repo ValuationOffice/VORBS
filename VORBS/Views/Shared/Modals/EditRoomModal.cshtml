@@ -1,0 +1,49 @@
+﻿<!--Address Book Modal (Internal Attendees)-->
+<div class="modal fade" id="editRoomModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Room</h4>
+                <h5>{{ editRoom.location.name }} - {{ currentEditRoom}}</h5>
+            </div>
+            <div class="modal-body">
+
+                <p>
+                    <div class="alert alert-danger" id="editRoomErrorCont" style="display: none;">
+                        <ul id="editRoomErrorList"></ul>
+                    </div>
+                </p>
+
+                <form role="form" id="editRoom">
+                    <div class="form-group row">
+                        <div class="col-xs-4" id="roomName">
+                            <label class="control-label">Room Name</label>
+                            <input id="roomName" class="form-control" ng-model="editRoom.roomName" />
+                        </div>
+                        <div class="col-xs-3" id="roomComputer">
+                            <label class="control-label">Computer(s)</label>
+                            <input type="number" class="touchSpinControlZero numberControl" id="editComputerCountControl" ng-model="editRoom.computerCount" ng-pattern="/^[0-9]+$/" />
+                        </div>
+                        <div class="col-xs-3" id="roomPhone">
+                            <label class="control-label">Phone(s)</label>
+                            <input type="number" class="touchSpinControlZero numberControl" id="editPhoneCountControl" ng-model="editRoom.phoneCount" ng-pattern="/^[0-9]+$/" />
+                        </div>
+                        <div class="col-xs-3" id="roomSeatCount">
+                            <label class="control-label">Seat(s)</label>
+                            <input type="number" class="touchSpinControl numberControl" id="editSeatCountControl" ng-model="editRoom.seatCount" ng-pattern="/^[0-9]+$/" />
+                        </div>
+                        <div class="col-xs-3" id="roomSmart">
+                            <label class="control-label">Smart Room</label>
+                            <input type="checkbox" id="smartRoomControl" class="form-control" ng-model="editRoom.smartRoom">
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" ng-click="EditRoom()">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

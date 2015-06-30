@@ -26,6 +26,12 @@ textarea {
     max-width: 280px;
 }
 
+/* THIS IS A TEMPORARY ADDITION AS BOOTSTRAP APPEARS TO BE PRODUCING CHECKBOX/RADIO MARGINS INCORRECTLY   */
+input[type='radio'], input[type='checkbox']{
+    margin-top:0;
+}
+
+
 #logo_text {
     width: 450px;
     background-color: rebeccapurple;
@@ -513,29 +519,8 @@ textarea {
 }
 
 /*Admin Room Tab*/
-
-#seatCountControl, #computerCountControl, #phoneCountControl {
-    width: 150px;
-}
-
-#newRoomComputer label {
-    margin-left: -750px;
-    margin-top: 12px;
-}
-
-#newRoomPhone label {
-    margin-left: 165px;
-    margin-top: 12px;
-}
-
-#newRoomSeatCount label {
-    margin-left: 185px;
-    margin-top: 12px;
-}
-
-#newRoomAddButton {
-    width: 75px;
-    margin-top: -10px;
+#newRoomAddButton{
+    margin-top: 25px;
 }
 
 /*Admin User Tab*/

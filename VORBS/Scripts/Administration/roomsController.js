@@ -16,8 +16,27 @@ function RoomsController($scope, $http, $resource) {
         $scope.roomId = id;
     }
 
+    $scope.GetRoom = function (id) {
+        $scope.SetRoomId(id);
+        $scope.editRoom = GetRoomById.query({
+            roomId: $scope.roomId
+        }, function (success) {
+            var roomName = $scope.editRoom.roomName;
+            $scope.currentEditRoom = roomName;
+        });
+        
+    }
+
+    $scope.EditRoom = function () {
+        var isValid = ValidateRoom(true, $scope.Rooms, $scope.editRoom.roomName, $scope.editRoom.location.name);
+
+        if (isValid) {
+            EditRoom($scope.editRoom, $scope.roomId);
+        }
+    }
+
     $scope.NewRoom = function () {
-        var isValid = ValidateNewRoom($scope.Rooms, $scope.newRoom.RoomName, $scope.currentLocation);
+        var isValid = ValidateRoom(false, $scope.Rooms, $scope.newRoom.RoomName, $scope.currentLocation);
 
         if (isValid) {
             $scope.newRoom.LocationID = $scope.currentLocation.id;
@@ -67,6 +86,10 @@ function CreateRoomAdminServices($resource) {
         query: { method: 'GET', isArray: true }
     });
 
+    GetRoomById = $resource('/api/room/:roomId', { roomId: "roomId" }, {
+        query: { method: 'GET' }
+    });
+
     GetAllRooms = $resource('/api/room', {}, {
         query: { method: 'GET', isArray: true }
     });
@@ -102,12 +125,36 @@ function CreateNewRoom(newRoom) {
         contentType: "application/json",
         success: function (data, status) {
             alert('New room has been created.');
-            ReloadThisPage("rooms");
+            ReloadRooms(null);
         },
         error: function (error) {
             alert('Unable to create new room. Please contact ITSD. ' + error.responseJSON.message);
         }
     });
+}
+
+function EditRoom(editRoom, existingId) {
+    $.ajax({
+        type: "POST",
+        data: JSON.stringify(editRoom),
+        url: "api/room" + "/" + existingId,
+        contentType: "application/json",
+        success: function (data, status) {
+            alert('Room updated successfully.');
+            ReloadRooms("editRoomModal");
+        },
+        error: function (error) {
+            alert('Unable to edit room. ' + error.responseJSON.message);
+        }
+    });
+}
+
+function ReloadRooms(isModal) {
+    if (isModal !== null) {
+        $('#' + isModal).modal('hide');
+    }
+    var $scope = angular.element($("#roomControllerDiv")).scope();
+    $scope.Rooms = GetAllRooms.query({});
 }
 
 function EnableDisableRoom(roomId, active) {
@@ -120,97 +167,115 @@ function EnableDisableRoom(roomId, active) {
         $("#disableBookingConfirmButton").html('Disabling Room. Please wait..');
     }
 
-        $.ajax({
-            type: "POST",
-            url: "api/room/" + roomId + "/" + active,
-            contentType: "application/json",
-            success: function (data, status) {
-                alert('Room status has been updated.');
-                ReloadThisPage("rooms");
-            },
-            error: function (error) {
-                if (active) {
-                    alert('Unable to enable room. Please contact ITSD. ' + error.responseJSON.message);
-                    $("#enableBookingConfirmButton").prop('disabled', '');
-                    $("#enableBookingConfirmButton").html('Enable');
-                }
-                else {
-                    alert('Unable to disable room. Please contact ITSD. ' + error.responseJSON.message);
-                    $("#disableBookingConfirmButton").prop('disabled', '');
-                    $("#disableBookingConfirmButton").html('Disable');
-                }
+    $.ajax({
+        type: "POST",
+        url: "api/room/" + roomId + "/" + active,
+        contentType: "application/json",
+        success: function (data, status) {
+            alert('Room status has been updated.');
+            if (active) {
+                ReloadRooms("enableRoomModal");
             }
-        });
-  
+            else {
+                ReloadRooms("disableRoomModal");
+            }
+        },
+        error: function (error) {
+            if (active) {
+                alert('Unable to enable room. Please contact ITSD. ' + error.responseJSON.message);
+                $("#enableBookingConfirmButton").prop('disabled', '');
+                $("#enableBookingConfirmButton").html('Enable');
+            }
+            else {
+                alert('Unable to disable room. Please contact ITSD. ' + error.responseJSON.message);
+                $("#disableBookingConfirmButton").prop('disabled', '');
+                $("#disableBookingConfirmButton").html('Disable');
+            }
+        }
+    });
+
 }
 
-function ValidateNewRoom(existingRooms, newRoom, newLocation) {
+function ValidateRoom(edit, existingRooms, newRoom, newLocation) {
     var valid = true;
+    var divNames;
 
-    $("#addRoomErrorList").html('');
-    $("#addRoomErrorCont").css('display', 'none');
+    if (edit) {
+        divNames = ["#editRoomErrorList", "#editRoomErrorCont", "#editRoom"];
+    }
+    else {
+        divNames = ["#addRoomErrorList", "#addRoomErrorCont", "#newRoom"];
+    }
+
+    $(divNames[0]).html('');
+    $(divNames[1]).css('display', 'none');
     var errors = [];
 
-    if ($("#newRoom #newRoomName input").val().trim() === "") {
-        $("#newRoom #newRoomName").addClass('has-error');
+    if ($(divNames[2] + " #roomName input").val().trim() === "") {
+        $(divNames[2] + " #roomName").addClass('has-error');
         errors.push('Please enter a valid room name.');
         valid = false;
     } else {
         var duplicateRoom = false;
-        //Check to see if room name already exists at location
-        for (var i = 0; i < existingRooms.length; i++) {
-            if (existingRooms[i].roomName.toUpperCase() === newRoom.toUpperCase() && existingRooms[i].location.name === newLocation.name) {
-                duplicateRoom = true;
+
+        //TODO: Need to change this so it allows the same room name if editing
+        if (!edit) {
+            //Check to see if room name already exists at location
+            for (var i = 0; i < existingRooms.length; i++) {
+                if (existingRooms[i].roomName.toUpperCase() === newRoom.toUpperCase() && existingRooms[i].location.name === newLocation.name) {
+                    duplicateRoom = true;
+                }
             }
         }
+
         if (duplicateRoom) {
-            $("#newRoom #newRoomName").addClass('has-error');
+            $(divNames[2] + " #roomName").addClass('has-error');
             errors.push('Room already exists at selected location.');
             valid = false;
         }
         else {
-            $("#newRoom #newRoomName").removeClass('has-error');
+            $(divNames[2] + " #roomName").removeClass('has-error');
         }
     }
 
-    if ($("#newRoom #newRoomComputer input").val().trim() === "") {
-        $("#newRoom #newRoomComputer").addClass('has-error');
+    if ($(divNames[2] + " #roomComputer input").val().trim() === "") {
+        $(divNames[2] + " #roomComputer").addClass('has-error');
         errors.push('Please enter number of computers.');
         valid = false;
     } else {
-        $("#newRoom #newRoomComputer").removeClass('has-error');
+        $(divNames[2] + " #roomComputer").removeClass('has-error');
     }
 
-    if ($("#newRoom #newRoomPhone input").val().trim() === "") {
-        $("#newRoom #newRoomPhone").addClass('has-error');
+    if ($(divNames[2] + " #roomPhone input").val().trim() === "") {
+        $(divNames[2] + " #roomPhone").addClass('has-error');
         errors.push('Please enter number of telephones.');
         valid = false;
     } else {
-        $("#newRoom #newRoomPhone").removeClass('has-error');
+        $(divNames[2] + " #roomPhone").removeClass('has-error');
     }
 
-
-    if ($("#newRoom #newRoomSeatCount input").val().trim() === "") {
-        $("#newRoom #newRoomSeatCount").addClass('has-error');
+    if ($(divNames[2] + " #roomSeatCount input").val().trim() === "") {
+        $(divNames[2] + " #roomSeatCount").addClass('has-error');
         errors.push('Please enter number of seats.');
         valid = false;
     } else {
-        $("#newRoom #newRoomSeatCount").removeClass('has-error');
+        $(divNames[2] + " #roomSeatCount").removeClass('has-error');
     }
 
-    if ($("#newRoom #newRoomSmart select")[0].selectedIndex < 0) {
-        $("#newRoom #newRoomSmart").addClass('has-error');
-        errors.push('Please select if room is a SMART room.');
-        valid = false;
-    } else {
-        $("#newRoom #newRoomSmart").removeClass('has-error');
-    }
+    /* dont need smart room validation anymore, as it is a checkbox. Can only be yes or no */
+    //if ($(divNames[2] + " #roomSmart :selected").text() == "") {
+    //    $(divNames[2] + " #roomSmart").addClass('has-error');
+    //    errors.push('Please select if room is a SMART room.');
+    //    valid = false;
+    //} else {
+    //    $(divNames[2] + " #roomSmart").removeClass('has-error');
+    //}
 
     if (!valid) {
         for (var i = 0; i < errors.length; i++) {
-            $("#addRoomErrorList").append('<li>' + errors[i] + '</li>');
+            $(divNames[0]).append('<li>' + errors[i] + '</li>');
         }
-        $("#addRoomErrorCont").css('display', 'block');
+        $(divNames[1]).css('display', 'block');
     }
     return valid;
 }
