@@ -204,7 +204,7 @@ function LocationsController($scope, $http, $resource) {
 
                 $("#location-success-alert").alert();
                 $("#location-success-alert p").text('Location has been updated');
-                $("#location-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+                $("#location-success-alert").fadeTo(5000, 500).slideUp(500, function () {
                     $("#location-success-alert").hide();
                 });
 
@@ -252,7 +252,7 @@ function LocationsController($scope, $http, $resource) {
                 $scope.Locations = Locations.query({});
                 $("#location-success-alert").alert();
                 $("#location-success-alert p").text('Location Status has been updated.');
-                $("#location-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+                $("#location-success-alert").fadeTo(5000, 500).slideUp(500, function () {
                     $("#location-success-alert").hide();
                 });
 

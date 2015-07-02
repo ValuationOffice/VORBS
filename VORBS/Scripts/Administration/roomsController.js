@@ -143,7 +143,7 @@ function EditRoom(editRoom, existingId) {
             //alert('Room updated successfully.');
             $("#room-success-alert").alert();
             $("#room-success-alert p").text('Room has been updated');
-            $("#room-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $("#room-success-alert").fadeTo(5000, 500).slideUp(500, function () {
                 $("#room-success-alert").hide();
             });
             ReloadRooms("editRoomModal");
@@ -180,7 +180,7 @@ function EnableDisableRoom(roomId, active) {
             //            alert('Room status has been updated.');
             $("#room-success-alert").alert();
             $("#room-success-alert p").text('Room status has been updated');
-            $("#room-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+            $("#room-success-alert").fadeTo(5000, 500).slideUp(500, function () {
                 $("#room-success-alert").hide();
             });
             if (active) {
