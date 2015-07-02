@@ -295,14 +295,15 @@ function ClearEditLocationErrors() {
     $(".has-error").removeClass('has-error');
 }
 
+function ClearEditLocationModalFields() {
+    $("#editLocationModal input").val('');
+}
+
 function AddElementError(elementSelector, errorMessage) {
     $(elementSelector).addClass('has-error');
     AddEditLocationErrorMessage(errorMessage);
 }
 
-function ClearElementError(element) {
-
-}
 
 function AddEditLocationErrorMessage(message) {
     var errorList = $("#editLocationErrorList");
@@ -315,6 +316,7 @@ function AddEditLocationErrorMessage(message) {
 $(function () {
     $("#editLocationModal").on("hidden.bs.modal", function () {
         ClearEditLocationErrors();
+        ClearEditLocationModalFields();
         $("#editLocationModal #accordion").collapse('hide');
     });
 })
