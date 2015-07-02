@@ -1,0 +1,97 @@
+﻿<div class="modal fade" id="editLocationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Location</h4>
+                <h5></h5>
+            </div>
+            <div class="modal-body">
+                <p>
+                    <div class="alert alert-danger" id="editLocationErrorCont" style="display: none;">
+                        <ul id="editLocationErrorList"></ul>
+                    </div>
+                </p>
+
+                <form role="form" id="editLocation">
+                    <div class="form-group row">
+                        <div class="col-xs-4" id="locationNameCont">
+                            <label class="control-label">Location Name</label>
+                            <input id="locationName" class="form-control" ng-model="NewEditLocation.name" />
+                        </div>
+                    </div>
+                    <div class="form-group form-inline">
+                        <div class="panel-group" id="locationCredentials">
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#facilitiesPanel">Facilities Details</a>
+                                    </h4>
+                                </div>
+                                <div class="panel-collapse collapse" id="facilitiesPanel">
+                                    <div class="panel-body" id="facilitiesDetailsCont">
+                                        <div class="form-group" id="facilitiesDetailEmailCont">
+                                            <label class="control-label">Email:</label>
+                                            <input id="facilitiesEmail" class="form-control" value="{{NewEditLocation.GetLocationCredentials('facilities').email}}" />
+                                        </div>
+
+                                        <div class="form-group" id="facilitiesDetailPhoneCont">
+                                            <label class="control-label">Phone Number:</label>
+                                            <input id="facilitiesPhone" class="form-control phoneNoControl" maxlength="11" value="{{NewEditLocation.GetLocationCredentials('facilities').phoneNumber}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#securityPanel">Security Details</a>
+                                    </h4>
+                                </div>
+                                <div class="panel-collapse collapse" id="securityPanel">
+                                    <div class="panel-body" id="securityDetailsCont">
+                                        <div class="form-group" id="securityDetailEmailCont">
+                                            <label class="control-label">Email:</label>
+                                            <input id="securityEmail" class="form-control" value="{{NewEditLocation.GetLocationCredentials('security').email}}" />
+                                        </div>
+                                        <div class="form-group" id="securityDetailPhoneCont">
+                                            <label class="control-label">Phone Number:</label>
+                                            <input id="securityPhone" maxlength="11" class="form-control phoneNoControl" value="{{NewEditLocation.GetLocationCredentials('security').phoneNumber}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#dssPanel">DSS Details</a>
+                                    </h4>
+                                </div>
+                                <div class="panel-collapse collapse" id="dssPanel">
+                                    <div class="panel-body" id="dssDetailsCont">
+                                        <div class="form-group" id="dssDetailEmailCont">
+                                            <label class="control-label">Email:</label>
+                                            <input id="dssEmail" class="form-control" value="{{NewEditLocation.GetLocationCredentials('dss').email}}" />
+                                        </div>
+                                        <div class="form-group" id="dssDetailPhoneCont">
+                                            <label class="control-label">Phone Number:</label>
+                                            <input id="dssPhone" maxlength="11" class="form-control phoneNoControl" value="{{NewEditLocation.GetLocationCredentials('dss').phoneNumber}}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" ng-click="EditLocation();">Edit</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>>>

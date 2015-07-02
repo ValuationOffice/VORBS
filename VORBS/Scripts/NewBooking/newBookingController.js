@@ -273,7 +273,7 @@ function NewBookingController($scope, $http, $resource) {
                 url: "api/bookings",
                 contentType: "application/json",
                 success: function (data, status) {
-                    alert('Booking Confirmed. Meeting Requests Have Been Sent.');
+                    alert('Booking Confirmed.');
                     window.location.href = "/MyBookings"; //Redirect to my bookings
                 },
                 error: function (error) {

@@ -6,15 +6,23 @@ function LocationsController($scope, $http, $resource) {
 
     $scope.Locations = Locations.query({});
 
+    $scope.NewEditLocation = {};
+    $scope.OriginalEditLocation = {};
+
     $scope.GetLocationsByStatus = function () {
         if ($scope.selectedItem.type === "all") {
-            $scope.Locations = Locations.query({});
+            $scope.Locations = Locations.query({
+            });
         }
         if ($scope.selectedItem.type === "enabled") {
-            $scope.Locations = Locations.query({ status: true });
+            $scope.Locations = Locations.query({
+                status: true
+            });
         }
         if ($scope.selectedItem.type === "disabled") {
-            $scope.Locations = Locations.query({ status: false });
+            $scope.Locations = Locations.query({
+                status: false
+            });
         }
 
     }
@@ -38,8 +46,8 @@ function LocationsController($scope, $http, $resource) {
         SetLocationModalErrorMessage("");
     }))
 
-    $('#newLocationModal').on('hidden.bs.modal', function () {             
-        $scope.newLocation.Name = '',        
+    $('#newLocationModal').on('hidden.bs.modal', function () {
+        $scope.newLocation.Name = '',
         $scope.newLocation.Active = false,
         $scope.newLocation.LocationCredentials = [],
         $scope.$digest()
@@ -85,7 +93,7 @@ function LocationsController($scope, $http, $resource) {
                 locations.push($scope.Locations[i].name);
             }
 
-            
+
             var emails = [];
             for (var i = 0; i < $scope.newLocation.LocationCredentials.length; i++) {
                 emails.push($scope.newLocation.LocationCredentials[i].Email);
@@ -109,7 +117,7 @@ function LocationsController($scope, $http, $resource) {
                         $('#confirmLocationBtn').html('Confirm Location');
                     }
                 });
-            }            
+            }
             $('#confirmLocationBtn').prop('disabled', '');
             $('#confirmLocationBtn').html('Confirm Location');
 
@@ -118,18 +126,79 @@ function LocationsController($scope, $http, $resource) {
             $('#confirmLocationBtn').html('Confirm Location');
         }
     }
+
+    $scope.SetNewEditLocation = function (_id) {
+        $scope.NewEditLocation = LocationById.query({ id: _id }, function (success) {
+            $scope.NewEditLocation = success;
+
+            var newLoc = success;
+            $scope.OriginalEditLocation = { name: success.name, id: success.id };
+            $scope.NewEditLocation.GetLocationCredentials = function (department) {
+                for (var i = 0; i < this.locationCredentials.length; i++) {
+                    if (this.locationCredentials[i].department == department) {
+                        return this.locationCredentials[i];
+                    }
+                }
+            }
+        });
+    }
+
+    $scope.EditLocation = function () {
+        if (ValidateEditLocation($scope.NewEditLocation, $scope.OriginalEditLocation, $scope.Locations)) {
+
+            var credentials = [];
+
+            var facilityDetail = { department: 'facilities', email: $("#facilitiesEmail").val().trim(), phoneNumber: $("#facilitiesPhone").val().trim() };
+            if (facilityDetail.email != "" || facilityDetail.phoneNumber != "") {
+                credentials.push(facilityDetail);
+            }
+
+            var securityDetail = { department: 'security', email: $("#securityEmail").val().trim(), phoneNumber: $("#securityPhone").val().trim() };
+            if (securityDetail.email != "" || securityDetail.phoneNumber != "") {
+                credentials.push(securityDetail);
+            }
+
+            var dssDetail = { department: 'dss', email: $("#dssEmail").val().trim(), phoneNumber: $("#dssPhone").val().trim() };
+            if (dssDetail.email != "" || dssDetail.phoneNumber != "") {
+                credentials.push(dssDetail);
+            }
+
+            $scope.NewEditLocation.locationCredentials = credentials;
+
+            LocationById.edit({ id: $scope.OriginalEditLocation.id }, $scope.NewEditLocation, function (success) {
+                alert('Location successfully editted.');
+                $scope.Locations = Locations.query({});
+                $("#editLocationModal").modal('hide');
+            }, function (error) {
+                ClearEditLocationErrors();
+                AddEditLocationErrorMessage('Error occured when editting the location. Please try again or contact ITSD');
+            });
+        }
+    }
 }
 
 function CreateLocationAdminServices($resource) {
 
-    Locations = $resource('/api/locations/:status', {}, {
-        query: { method: 'GET', isArray: true }
+    Locations = $resource('/api/locations/:status', {
+    }, {
+        query: {
+            method: 'GET', isArray: true
+        }
+    });
+
+    LocationById = $resource('/api/locations/:id', {}, {
+        query: {
+            method: 'GET'
+        },
+        edit: {
+            method: 'PUT'
+        }
     });
 
 }
 
 function ValidateNewLocation(newLocationName, locations, emails) {
-
+    ClearEditLocationErrors();
     var valid = true;
 
     // Validate Location Name
@@ -172,3 +241,80 @@ function SetLocationModalErrorMessage(message) {
     }
 }
 
+
+/**************** EDIT LOCATION *******************/
+
+function ValidateEditLocation(newEditLocation, originalLocation, currentLocations) {
+    ClearEditLocationErrors();
+    var valid = true;
+
+    if (newEditLocation.name != originalLocation.name) {
+        if (newEditLocation.name.trim() == "") {
+            valid = false;
+            AddElementError("#locationNameCont", "Must specify a location name");
+        } else {
+            var nameValid = true;
+            for (var i = 0; i < currentLocations.length; i++) {
+                if (newEditLocation.name.toLowerCase() === currentLocations[i].name.toLowerCase()) {
+                    nameValid = false;
+                    break;
+                }
+            }
+            if (!nameValid) {
+                valid = false;
+                AddElementError("#locationNameCont", "Location name already exists");
+            }
+        }
+    }
+
+    if ($("#facilitiesEmail").val().trim() != "") {
+        if (!ValidateEmail($("#facilitiesEmail").val().trim())) {
+            valid = false;
+            AddElementError("#facilitiesDetailEmailCont", "Invalid email address for Facilities");
+        }
+    }
+    if ($("#securityEmail").val().trim() != "") {
+        if (!ValidateEmail($("#securityEmail").val().trim())) {
+            valid = false;
+            AddElementError("#securityDetailEmailCont", "Invalid email address for Security");
+        }
+    }
+    if ($("#dssEmail").val().trim() != "") {
+        if (!ValidateEmail($("#dssEmail").val().trim())) {
+            valid = false;
+            AddElementError("#dssDetailEmailCont", "Invalid email address for DSS");
+        }
+    }
+    return valid;
+}
+
+function ClearEditLocationErrors() {
+    $("#editLocationErrorCont").css('display', 'none');
+    $("#editLocationErrorList").html('');
+
+    $(".has-error").removeClass('has-error');
+}
+
+function AddElementError(elementSelector, errorMessage) {
+    $(elementSelector).addClass('has-error');
+    AddEditLocationErrorMessage(errorMessage);
+}
+
+function ClearElementError(element) {
+
+}
+
+function AddEditLocationErrorMessage(message) {
+    var errorList = $("#editLocationErrorList");
+    if (errorList.children('li').length == 0) {
+        $("#editLocationErrorCont").css('display', 'block');
+    }
+    errorList.append('<li>' + message + '</li>');
+}
+
+$(function () {
+    $("#editLocationModal").on("hidden.bs.modal", function () {
+        ClearEditLocationErrors();
+        $("#editLocationModal #accordion").collapse('hide');
+    });
+})

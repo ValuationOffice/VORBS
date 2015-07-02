@@ -1094,6 +1094,7 @@
     <Content Include="Views\EmailTemplates\AdminMultiCancelledBooking.cshtml" />
     <Content Include="Views\Shared\Modals\EditRoomModal.cshtml" />
     <Content Include="Views\Administration\ReportsTab.cshtml" />
+    <Content Include="Views\Shared\Modals\EditLocationModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

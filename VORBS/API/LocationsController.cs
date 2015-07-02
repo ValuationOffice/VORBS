@@ -105,6 +105,83 @@ namespace VORBS.API
             return locationsDTO;
         }
 
+        [HttpGet]
+        [Route("{id:int}")]
+        public LocationDTO GetLocationById(int id)
+        {
+            try
+            {
+                Location location = db.Locations.Where(x => x.ID == id).SingleOrDefault();
+                LocationDTO locationDto = new LocationDTO()
+                {
+                    Active = location.Active,
+                    ID = location.ID,
+                    Name = location.Name,
+                    Rooms = location.Rooms.Select(r =>
+                    {
+                        RoomDTO rDto = new RoomDTO()
+                        {
+                            ID = r.ID,
+                            RoomName = r.RoomName,
+                            ComputerCount = r.ComputerCount,
+                            PhoneCount = r.PhoneCount,
+                            SmartRoom = r.SmartRoom
+                        }; return rDto;
+                    }).ToList(),
+                    LocationCredentials = location.LocationCredentials.Select(l =>
+                    {
+                        LocationCredentialsDTO lcDto = new LocationCredentialsDTO()
+                        {
+                            Department = l.Department,
+                            Email = l.Email,
+                            ID = l.ID,
+                            LocationID = l.LocationID,
+                            PhoneNumber = l.PhoneNumber
+                        }; return lcDto;
+                    }).ToList()
+                };
+                return locationDto;
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get a location by id: " + id, ex);
+                return new LocationDTO();
+            }
+        }
+
+        [HttpPut]
+        [Route("{id:int}")]
+        public HttpResponseMessage EditLocation(int id, Location editLocation)
+        {
+            try
+            {
+                Location originalLoc = db.Locations.Where(x => x.ID == id).SingleOrDefault();
+                if (editLocation.Name != originalLoc.Name)
+                {
+                    int duplicateLocationCheck = db.Locations.Where(l => l.Name == editLocation.Name).Count();
+                    if (duplicateLocationCheck > 0)
+                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Location {0} already exists.", editLocation.Name));
+                }
+
+                db.Entry(originalLoc).CurrentValues.SetValues(editLocation);
+
+                //TODO: Need to tidy this up, we shouldn't have to delete all locations and re-add them each time. Not sure if there is a virtual update method
+                IEnumerable<LocationCredentials> credentials = db.LocationCredentials.Where(x => x.LocationID == id).ToList();
+                db.LocationCredentials.RemoveRange(credentials);
+                editLocation.LocationCredentials.ToList().ForEach(x => x.LocationID = id);
+                db.LocationCredentials.AddRange(editLocation.LocationCredentials);
+                
+                db.SaveChanges();
+                _logger.Info(string.Format("Location {0} successfully editted", id));
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to edit the location: " + editLocation.Name, ex);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("")]
         public HttpResponseMessage SaveNewLocation(Location newLocation)
