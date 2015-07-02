@@ -95,7 +95,8 @@ namespace VORBS.API
                             RoomName = r.RoomName,
                             ComputerCount = r.ComputerCount,
                             PhoneCount = r.PhoneCount,
-                            SmartRoom = r.SmartRoom
+                            SmartRoom = r.SmartRoom,
+                            SeatCount = r.SeatCount
                         }; return rDto;
                     }).ToList()
                 }));
@@ -127,7 +128,8 @@ namespace VORBS.API
                             RoomName = r.RoomName,
                             ComputerCount = r.ComputerCount,
                             PhoneCount = r.PhoneCount,
-                            SmartRoom = r.SmartRoom
+                            SmartRoom = r.SmartRoom,
+                            SeatCount = r.SeatCount
                         }; return rDto;
                     }).ToList(),
                     LocationCredentials = location.LocationCredentials.Select(l =>
