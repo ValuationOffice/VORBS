@@ -140,7 +140,12 @@ function EditRoom(editRoom, existingId) {
         url: "api/room" + "/" + existingId,
         contentType: "application/json",
         success: function (data, status) {
-            alert('Room updated successfully.');
+            //alert('Room updated successfully.');
+            $("#room-success-alert").alert();
+            $("#room-success-alert p").text('Room has been updated');
+            $("#room-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+                $("#room-success-alert").hide();
+            });
             ReloadRooms("editRoomModal");
         },
         error: function (error) {
@@ -172,7 +177,12 @@ function EnableDisableRoom(roomId, active) {
         url: "api/room/" + roomId + "/" + active,
         contentType: "application/json",
         success: function (data, status) {
-            alert('Room status has been updated.');
+            //            alert('Room status has been updated.');
+            $("#room-success-alert").alert();
+            $("#room-success-alert p").text('Room status has been updated');
+            $("#room-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+                $("#room-success-alert").hide();
+            });
             if (active) {
                 ReloadRooms("enableRoomModal");
             }

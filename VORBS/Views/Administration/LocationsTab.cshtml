@@ -1,8 +1,10 @@
-﻿<div id="controllerDiv" ng-controller="LocationsController">
+﻿<div id="locationsControllerDiv" ng-controller="LocationsController">
 
     <h4>Location Management</h4>
     <hr />
-
+    <div class="alert alert-success" id="location-success-alert">
+        <p></p>
+    </div>
     <div class="form-inline" id="locationFilterOptions">
         <label class="control-label">Filter By:</label>
         <select class="form-control" ng-model="selectedItem.type" ng-change="GetLocationsByStatus()" ng-options="status.value as status.name for status in locationStatuses"></select>
@@ -27,11 +29,50 @@
                     <td ng-show="{{location.active}}"><span class="glyphicon glyphicon-ok-circle locationIcons activeIcons" title="Active Location"></span></td>
                     <td ng-show="{{ location.active != true }}"><span class="glyphicon glyphicon-remove-circle locationIcons inactiveIcons" title="Inactive Location"></span></td>
                     <td><span data-toggle="modal" ng-click="SetNewEditLocation(location.id);" data-target="#editLocationModal" class="btn glyphicon glyphicon-edit locationIcons" title="Edit Location"></span></td>
-                    <td><span data-toggle="modal" data-target="#deleteLocationModal" class="btn glyphicon glyphicon-trash locationIcons" title="Disable Location"></span></td>
+                    <td ng-show="{{ location.active }}"><span data-toggle="modal" data-target="#disableLocationModal" ng-click="SetLocation(location)" title="Disable Location" class="btn glyphicon glyphicon-remove-sign" title="Disable Location"></span></td>
+                    <td ng-show="{{ location.active != true }}"><span data-toggle="modal" data-target="#enableLocationModal" ng-click="SetLocation(location)" title="Enable Location" class="btn glyphicon glyphicon-ok-sign" title="Enable Location"></span></td>
                 </tr>
             </tbody>
         </table>
     </div>
+
+    <div class="modal fade" id="disableLocationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Disable Location</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to disable this location?</p>
+                    <p><b>All bookings for rooms in this location will be deleted. Email notifications will be sent to affected users.</b></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="disableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="DisableLocation()">Disable</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="enableLocationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Enable Location</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to enable this location?</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="enableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="EnableLocation()">Enable</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Html.Partial("Modals/NewLocationModal")
     @Html.Partial("Modals/EditLocationModal")
 </div>

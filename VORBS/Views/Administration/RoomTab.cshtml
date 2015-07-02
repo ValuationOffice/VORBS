@@ -3,6 +3,10 @@
     <h4>Room Management</h4>
     <p>Add, Edit or Delete Rooms below.</p>
 
+    <div class="alert alert-success" id="room-success-alert">
+        <p></p>
+    </div>
+
     <form role="form" id="newRoom">
         <div class="form-group row">
             <div class="col-xs-3">
@@ -97,8 +101,8 @@
                     <p><b>All bookings for this room will be deleted. Email notifications will be sent to affected users.</b></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button id="disableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="DisableRoom()">Disable</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -115,8 +119,8 @@
                     <p>Are you sure you want to enable this meeting room?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button id="enableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="EnableRoom()">Enable</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

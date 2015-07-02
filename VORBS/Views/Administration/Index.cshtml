@@ -110,6 +110,9 @@
             } else {
                 $(this).children('a').addClass('pull-right glyphicon glyphicon-minus');
             }
+
+            $("#location-success-alert").hide();
+            $("#room-success-alert").hide();
         });
 
         $("#newLocationModal input").on("blur", function () {

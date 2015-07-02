@@ -6,6 +6,18 @@ function LocationsController($scope, $http, $resource) {
 
     $scope.Locations = Locations.query({});
 
+    $scope.locationId = 0;
+
+    $scope.SetLocation = function (location) {
+        $scope.pickedLocation =
+        {
+            ID: location.id,
+            Name: location.name,
+            Rooms: location.rooms,
+            Active: location.active
+        };
+    }
+
     $scope.NewEditLocation = {};
     $scope.OriginalEditLocation = {};
 
@@ -41,6 +53,14 @@ function LocationsController($scope, $http, $resource) {
         open: true,
         disabled: false
     };
+
+    $scope.DisableLocation = function () {
+        EnableDisableLocation($scope.pickedLocation.ID, false);
+    }
+
+    $scope.EnableLocation = function () {
+        EnableDisableLocation($scope.pickedLocation.ID, true);
+    }
 
     $($('#newLocationModal').on('show.bs.modal', function () {
         SetLocationModalErrorMessage("");
@@ -102,22 +122,30 @@ function LocationsController($scope, $http, $resource) {
             var isValid = ValidateNewLocation($scope.newLocation.Name, locations, emails);
 
             if (isValid) {
-                $.ajax({
-                    type: "POST",
-                    data: JSON.stringify($scope.newLocation),
-                    url: "api/locations",
-                    contentType: "application/json",
-                    success: function (data, status) {
-                        alert('New Location Added.');
-                        ReloadThisPage("locations");
-                    },
-                    error: function (error) {
-                        alert('Unable to create new Location.');
-                        $('#confirmLocationBtn').prop('disabled', '');
-                        $('#confirmLocationBtn').html('Confirm Location');
-                    }
+                //$scope.Locations.push({ 'name': $scope.newLocation.Name, 'rooms': [], 'active': $scope.newLocation.Active });
+
+                // Writing to the server
+                var res = $http.post('api/locations', $scope.newLocation);
+
+                //$.ajax({
+                //    type: "POST",
+                //    data: JSON.stringify($scope.newLocation),
+                //    url: "api/locations",
+                //    contentType: "application/json",
+
+
+                res.success(function (data, status) {
+                    //alert('New Location Added.');
+                    $('#newLocationModal').modal('hide');
+                    $scope.Locations = Locations.query({});
+
                 });
-            }
+                res.error(function (error) {
+                    alert('Unable to create new Location.');
+                    $('#confirmLocationBtn').prop('disabled', '');
+                    $('#confirmLocationBtn').html('Confirm Location');
+                });
+            };
             $('#confirmLocationBtn').prop('disabled', '');
             $('#confirmLocationBtn').html('Confirm Location');
 
@@ -144,6 +172,8 @@ function LocationsController($scope, $http, $resource) {
     }
 
     $scope.EditLocation = function () {
+        $("#editLocationConfirm").prop('disabled', 'disabled');
+        $("#editLocationConfirm").html('Enabling Location. Please wait..');
         if (ValidateEditLocation($scope.NewEditLocation, $scope.OriginalEditLocation, $scope.Locations)) {
 
             var credentials = [];
@@ -166,15 +196,82 @@ function LocationsController($scope, $http, $resource) {
             $scope.NewEditLocation.locationCredentials = credentials;
 
             LocationById.edit({ id: $scope.OriginalEditLocation.id }, $scope.NewEditLocation, function (success) {
-                alert('Location successfully editted.');
                 $scope.Locations = Locations.query({});
+
+                $("#editLocationConfirm").prop('disabled', '');
+                $("#editLocationConfirm").html('Edit');
                 $("#editLocationModal").modal('hide');
+
+                $("#location-success-alert").alert();
+                $("#location-success-alert p").text('Location has been updated');
+                $("#location-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+                    $("#location-success-alert").hide();
+                });
+
             }, function (error) {
+                $("#editLocationConfirm").prop('disabled', '');
+                $("#editLocationConfirm").html('Edit');
                 ClearEditLocationErrors();
                 AddEditLocationErrorMessage('Error occured when editting the location. Please try again or contact ITSD');
             });
+        } else {
+            $("#editLocationConfirm").prop('disabled', '');
+            $("#editLocationConfirm").html('Edit');
         }
+
     }
+
+    function EnableDisableLocation(locationid, active) {
+        var $scope = angular.element($("#locationsControllerDiv")).scope();
+        if (active) {
+            $("#enableLocationConfirmButton").prop('disabled', 'disabled');
+            $("#enableLocationConfirmButton").html('Enabling Location. Please wait..');
+        } else {
+            $("#disableLocationConfirmButton").prop('disabled', 'disabled');
+            $("#disableLocationConfirmButton").html('Disabling Location. Please wait..');
+        }
+
+        // Writing to the server
+        // var res = $http.post('api/locations/' + locationid + '/' + active, $scope.pickedLocation);
+
+        $.ajax({
+            type: "POST",
+            url: "api/locations/" + locationid + "/" + active,
+            contentType: "application/json",
+            success: function (data, status) {
+                if (active) {
+                    $('#enableLocationModal').modal('hide');
+                    $("#enableLocationConfirmButton").prop('disabled', '');
+                    $("#enableLocationConfirmButton").html('Enable');
+                }
+                else {
+                    $('#disableLocationModal').modal('hide');
+                    $("#disableLocationConfirmButton").prop('disabled', '');
+                    $("#disableLocationConfirmButton").html('Disable');
+                }
+                $scope.Locations = Locations.query({});
+                $("#location-success-alert").alert();
+                $("#location-success-alert p").text('Location Status has been updated.');
+                $("#location-success-alert").fadeTo(2000, 500).slideUp(500, function () {
+                    $("#location-success-alert").hide();
+                });
+
+            },
+            error: function (error) {
+                if (active) {
+                    alert('Unable to enable location. Please contact ITSD. ' + error.responseJSON.message);
+                    $("#enableLocationConfirmButton").prop('disabled', '');
+                    $("#enableLocationConfirmButton").html('Enable');
+                }
+                else {
+                    alert('Unable to disable location. Please contact ITSD. ' + error.responseJSON.message);
+                    $("#disableLocationConfirmButton").prop('disabled', '');
+                    $("#disableLocationConfirmButton").html('Disable');
+                }
+            }
+        });
+    }
+
 }
 
 function CreateLocationAdminServices($resource) {

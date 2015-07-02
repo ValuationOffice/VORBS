@@ -8,6 +8,8 @@ using VORBS.Models;
 using VORBS.Models.DTOs;
 
 using VORBS.DAL;
+using VORBS.Utils;
+using System.Configuration;
 
 namespace VORBS.API
 {
@@ -188,12 +190,21 @@ namespace VORBS.API
         {
             try
             {
-                db.Locations.Add(newLocation);
-                db.SaveChanges();
+                var existingLocation = db.Locations.Any(l => l.ID == newLocation.ID);                
+                if (!existingLocation)
+                {
+                    db.Locations.Add(newLocation);
+                    db.SaveChanges();
 
-                _logger.Info("New location sucessfully added: " + newLocation.Name + "/" + newLocation.ID);
+                    _logger.Info("New location sucessfully added: " + newLocation.Name + "/" + newLocation.ID);
 
-                return new HttpResponseMessage(HttpStatusCode.OK);
+                    return new HttpResponseMessage(HttpStatusCode.OK);
+                }
+                else
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+
             }
             catch (Exception ex)
             {
@@ -201,5 +212,74 @@ namespace VORBS.API
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("{locationId:Int}/{active:bool}")]
+        public HttpResponseMessage EnableDisableLocation(int locationId, bool active)
+        {
+            try
+            {
+                Location location = db.Locations.Single(l => l.ID == locationId);
+                location.Active = active;
+                db.SaveChanges();
+
+                if (!active)
+                {
+                    List<Booking> bookings = db.Bookings.Where(b => b.Room.LocationID == locationId && b.StartDate >= DateTime.Now)
+                                                .OrderBy(b => b.Owner)
+                                                .ToList();                    
+
+                    if (bookings.Count() < 1)
+                        return Request.CreateResponse(HttpStatusCode.OK);
+
+                    List<Booking> ownerBookings = new List<Booking>();
+
+                    string currentOwner = bookings[0].Owner;
+
+                    foreach (var booking in bookings)
+                    {
+                        if (booking.Owner != currentOwner)
+                        {
+                            SendMultiplyBookingEmail(ownerBookings);
+
+                            ownerBookings = new List<Booking>();
+                            currentOwner = booking.Owner;
+                        }
+
+                        ownerBookings.Add(booking);
+                    }
+
+                    //Final Send the last owner bookings
+                    SendMultiplyBookingEmail(ownerBookings);
+
+                    db.Bookings.RemoveRange(bookings);
+                    db.SaveChanges();
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to enable/disable room.", ex);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
+
+        private void SendMultiplyBookingEmail(List<Booking> ownerBookings)
+        {
+            try
+            {
+                //Once Booking has been removed; Send Cancelltion Emails
+                string toEmail = AdQueries.GetUserByPid(ownerBookings[0].PID).EmailAddress;
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
+
+                Utils.EmailHelper.SendEmail(ConfigurationManager.AppSettings["fromEmail"], toEmail, "Meeting room booking(s) cancellation", body);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send admin multiple bookings email.", ex);
+            }
+        }
+
     }
 }
