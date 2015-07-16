@@ -128,7 +128,7 @@ function CreateNewRoom(newRoom) {
             ReloadRooms(null);
         },
         error: function (error) {
-            alert('Unable to create new room. Please contact ITSD. ' + error.responseJSON.message);
+            alert('Unable to create new room. Please contact ITSD. ' + error.responseText);
         }
     });
 }
@@ -159,7 +159,13 @@ function ReloadRooms(isModal) {
         $('#' + isModal).modal('hide');
     }
     var $scope = angular.element($("#roomControllerDiv")).scope();
-    $scope.Rooms = GetAllRooms.query({});
+
+    if ($scope.roomFilter.location === null && $scope.roomFilter.status < 0) {
+        $scope.Rooms = GetAllRooms.query({});
+    }
+    else {
+        $scope.GetRoomsByFilter();
+    }
 }
 
 function EnableDisableRoom(roomId, active) {
