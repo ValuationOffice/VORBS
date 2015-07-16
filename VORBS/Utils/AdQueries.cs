@@ -19,8 +19,11 @@ namespace VORBS.Utils
 
         public static UserPrincipal GetUserByCurrentUser(string currentIdentity)
         {
+            if (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK")
+                return CreateFakeUser();
+
             PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
-            if (currentIdentity == null)           
+            if (currentIdentity == null)
                 return null;
 
             //Remove the domain string
@@ -31,6 +34,9 @@ namespace VORBS.Utils
 
         public static UserPrincipal GetUserByPid(string pid)
         {
+            if (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK")
+                return CreateFakeUser();
+
             PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
             return UserPrincipal.FindByIdentity(sContext, IdentityType.SamAccountName, pid);
         }
@@ -83,8 +89,8 @@ namespace VORBS.Utils
                 if (!string.IsNullOrWhiteSpace(result.SamAccountName) && !string.IsNullOrWhiteSpace(result.EmailAddress) &&
                    (!string.IsNullOrEmpty(result.GivenName) || !string.IsNullOrEmpty(result.Surname)))
 
-                    users.Add(new AdminDTO() 
-                    { 
+                    users.Add(new AdminDTO()
+                    {
                         FirstName = result.GivenName,
                         LastName = result.Surname,
                         PID = result.SamAccountName,
@@ -93,6 +99,27 @@ namespace VORBS.Utils
             }
 
             return users;
+        }
+
+        public static UserPrincipal CreateFakeUser()
+        {
+            PrincipalContext sContext = new PrincipalContext(ContextType.Machine);
+
+            var fakserUser = UserPrincipal.FindByIdentity(sContext, IdentityType.Name, "VORBS");
+
+            if (fakserUser != null)
+                return fakserUser;
+
+            UserPrincipal uP = new UserPrincipal(sContext)
+            {
+                SamAccountName = "VORBS",
+                Enabled = true,
+                Name = "VORBS"
+            };
+
+            uP.Save();
+
+            return uP;
         }
     }
 }
