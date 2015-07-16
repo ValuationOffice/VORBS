@@ -139,6 +139,15 @@ function LocationsController($scope, $http, $resource) {
                     $('#newLocationModal').modal('hide');
                     $scope.Locations = Locations.query({});
 
+                    var $roomScope = angular.element($("#roomControllerDiv")).scope();
+
+                    $roomScope.Locations = Locations.query({},
+                        function (success) {
+                            $roomScope.currentLocation = $roomScope.Locations[0];
+                        });
+
+                    $roomScope.$digest();
+
                 });
                 res.error(function (error) {
                     alert('Unable to create new Location.');
@@ -275,7 +284,6 @@ function LocationsController($scope, $http, $resource) {
 }
 
 function CreateLocationAdminServices($resource) {
-
     Locations = $resource('/api/locations/:status', {
     }, {
         query: {
