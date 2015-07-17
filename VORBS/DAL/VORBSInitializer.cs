@@ -69,6 +69,14 @@ namespace VORBS.DAL
                 ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 24, SmartRoom = true, Active = true  }
 
                 ,new Room(){ LocationID = 2, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 24, SmartRoom = true, Active = true  }
+
+                ,new Room(){ LocationID = 3, RoomName = "room-name", ComputerCount = 12, PhoneCount = 0, SeatCount = 12, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 3, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 18, SmartRoom = true, Active = true }
+                ,new Room(){ LocationID = 3, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 6, SmartRoom = false, Active = true }
+
+                ,new Room(){ LocationID = 3, RoomName = "room-name", ComputerCount = 1, PhoneCount = 0, SeatCount = 8, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 3, RoomName = "room-name", ComputerCount = 0, PhoneCount = 0, SeatCount = 8, SmartRoom = false, Active = true }
+                ,new Room(){ LocationID = 3, RoomName = "room-name", ComputerCount = 1, PhoneCount = 0, SeatCount = 4, SmartRoom = false, Active = true }
             };
 
             rooms.ForEach(r => context.Rooms.Add(r));

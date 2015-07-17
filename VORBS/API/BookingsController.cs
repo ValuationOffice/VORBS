@@ -130,14 +130,11 @@ namespace VORBS.API
         [HttpGet]
         public List<BookingDTO> GetAllRoomBookingsForCurrentUser(DateTime start, string person)
         {
-            if (User.Identity.Name == null)
-                return new List<BookingDTO>();
-
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
 
             try
             {
-                string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1); //TODO: Change?
+                string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
                 List<Booking> bookings = db.Bookings
                     .Where(x => x.PID == currentPid && x.EndDate >= start).ToList()
@@ -208,7 +205,7 @@ namespace VORBS.API
                 //Get the current user
                 if (string.IsNullOrWhiteSpace(newBooking.PID))
                 {
-                    var user = AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                    var user = (AdQueries.IsOffline()) ? AdQueries.CreateFakeUser() : AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
                     if (user == null)
                         return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
@@ -226,6 +223,9 @@ namespace VORBS.API
                 newBooking.Room = bookingRoom;
 
                 _logger.Info("Booking sucessfully created: " + newBooking.ID);
+
+                if (AdQueries.IsOffline())
+                    return new HttpResponseMessage(HttpStatusCode.OK);
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
@@ -296,7 +296,7 @@ namespace VORBS.API
                         {
                             string body = "";
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", newBooking);
-                            Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("SMART room set up support on {0}", newBooking.StartDate.ToShortDateString()) , body);
+                            Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("SMART room set up support on {0}", newBooking.StartDate.ToShortDateString()), body);
                         }
                         catch (Exception ex)
                         {
@@ -350,7 +350,12 @@ namespace VORBS.API
 
                 db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
                 db.SaveChanges();
+
                 _logger.Info("Booking sucessfully editted: " + editBooking.ID);
+
+                if (AdQueries.IsOffline())
+                    return new HttpResponseMessage(HttpStatusCode.OK);
+
                 try
                 {
                     //Send Dso Email
@@ -367,7 +372,7 @@ namespace VORBS.API
                 //Send Owner Email
                 try
                 {
-                    
+
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
                     string toEmail = AdQueries.GetUserByPid(editBooking.PID).EmailAddress;
 
@@ -382,7 +387,7 @@ namespace VORBS.API
                         Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
                     }
 
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -408,7 +413,11 @@ namespace VORBS.API
 
                 db.Bookings.Remove(booking);
                 db.SaveChanges();
+
                 _logger.Info("Booking sucessfully cancelled: " + bookingId);
+
+                if (AdQueries.IsOffline())
+                    return new HttpResponseMessage(HttpStatusCode.OK);
 
                 Room locationRoom = db.Rooms.First(b => b.ID == booking.RoomID);
                 booking.Room = locationRoom;
@@ -419,12 +428,12 @@ namespace VORBS.API
                 try
                 {
                     //Once Booking has been removed; Send Cancelltion Emails
-                    
+
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
                     string toEmail = AdQueries.GetUserByPid(booking.PID).EmailAddress;
 
-                    
+
                     if (booking.PID.ToUpper() != currentUserPid.ToUpper())
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", booking);
                     else

@@ -19,9 +19,6 @@ namespace VORBS.Utils
 
         public static UserPrincipal GetUserByCurrentUser(string currentIdentity)
         {
-            if (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK")
-                return CreateFakeUser();
-
             PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
             if (currentIdentity == null)
                 return null;
@@ -34,9 +31,6 @@ namespace VORBS.Utils
 
         public static UserPrincipal GetUserByPid(string pid)
         {
-            if (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK")
-                return CreateFakeUser();
-
             PrincipalContext sContext = new PrincipalContext(ContextType.Domain);
             return UserPrincipal.FindByIdentity(sContext, IdentityType.SamAccountName, pid);
         }
@@ -101,25 +95,21 @@ namespace VORBS.Utils
             return users;
         }
 
+        public static bool IsOffline()
+        {
+            return (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK") ? true : false;
+        }
+
         public static UserPrincipal CreateFakeUser()
         {
             PrincipalContext sContext = new PrincipalContext(ContextType.Machine);
 
-            var fakserUser = UserPrincipal.FindByIdentity(sContext, IdentityType.Name, "VORBS");
-
-            if (fakserUser != null)
-                return fakserUser;
-
-            UserPrincipal uP = new UserPrincipal(sContext)
+            return  new UserPrincipal(sContext)
             {
-                SamAccountName = "VORBS",
+                SamAccountName = "localuser",
                 Enabled = true,
-                Name = "VORBS"
+                Name = "localuser"
             };
-
-            uP.Save();
-
-            return uP;
         }
     }
 }
