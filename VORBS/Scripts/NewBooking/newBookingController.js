@@ -21,7 +21,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.SearchBookings = function (viewAll) {
-
+       
         $("#bookingTable").html('');
         $("#bookingTable").html('<div class="loadingContainer"><img src="/Content/images/loading.gif" /></div>');
 
@@ -47,7 +47,7 @@ function NewBookingController($scope, $http, $resource) {
                     roomResults = success;
                     $scope.RenderBookings(roomResults);
                 });
-
+                
             }
             else {
 
@@ -95,7 +95,8 @@ function NewBookingController($scope, $http, $resource) {
                 eventData.push({
                     title: roomResults[i].bookings[b].owner,
                     start: roomResults[i].bookings[b].startDate,
-                    end: roomResults[i].bookings[b].endDate
+                    end: roomResults[i].bookings[b].endDate,
+                    isSmartMeeting: roomResults[i].bookings[b].isSmartMeeting
                 });
             }
 
@@ -104,7 +105,7 @@ function NewBookingController($scope, $http, $resource) {
             var roomDetails = '<div class="calendarRoomName">' + roomResults[i].roomName + '</div>';
 
             //if (roomResults[i].smartRoom === true) {
-
+                
             //}
             //else {
             //    var roomDetails = '<div class="calendarRoomName">' + roomResults[i].roomName + '</div>';
@@ -142,7 +143,7 @@ function NewBookingController($scope, $http, $resource) {
                 selectHelper: true,
                 eventBackgroundColor: 'rgba(33,132,110, 0.7)',
                 eventTextColor: 'black',
-                height: 425,
+                height: 600,
                 titleFormat: '' + roomName + '',
                 dayNames: ['', '', '', '', '', ''],
                 select: function (start, end, allDay) {
@@ -161,14 +162,14 @@ function NewBookingController($scope, $http, $resource) {
                         locationId: $scope.bookingFilter.location.id,
                         roomName: this.title
                     }, function (success) {
-                        if (!room.smartRoom) {
-                            $("#dssAssistChoice").css('display', 'none');
-                        } else {
-                            $("#dssAssistChoice").css('display', 'block');
-                        }
+                    if (!room.smartRoom) {
+                        $("#dssAssistChoice").css('display', 'none');
+                    } else {
+                        $("#dssAssistChoice").css('display', 'block');
+                    }
 
-                        $scope.newBooking.Room = room;
-                        $scope.newBooking.Room.RoomName = room.roomName;
+                    $scope.newBooking.Room = room;
+                    $scope.newBooking.Room.RoomName = room.roomName;
                     });
 
                     $scope.booking.StartTime = start.utc().format('H:mm');
@@ -187,7 +188,12 @@ function NewBookingController($scope, $http, $resource) {
                         color: 'rgba(158, 158, 158, 0.7)',
                         textColor: 'black'
                     }
-                ]
+                ],
+                eventRender: function (event, element) {
+                    if (event.isSmartMeeting) {
+                        $(element).prepend("<span class='glyphicon glyphicon-facetime-video' style='float:left;'></span>");
+                    }
+                }
             });
         }
     }
@@ -511,7 +517,7 @@ function NewBookingController($scope, $http, $resource) {
                 }
                 if ($scope.newBooking.Recurrence.WeeklyDay == null || $scope.newBooking.Recurrence.WeeklyDay == '' || isNaN($scope.newBooking.Recurrence.WeeklyDay)) {
                     valid = false;
-                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekDay", "Must specify a day of the week");
+                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekDay", "Must specify a day of the week");                    
                 }
                 break;
             case 'monthly':
@@ -543,7 +549,7 @@ function NewBookingController($scope, $http, $resource) {
         $("#newBookingRecurrenceModal").modal('hide');
 
         $("#recurringBreakDown").text('');
-
+        
     }
 
     $scope.CancelBookingClash = function () {
@@ -602,10 +608,10 @@ function CreateServices($resource) {
     });
 
     Users = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
-    {
+        {
             queryAll: { method: 'GET', isArray: true },
             querySurname: { method: 'GET', isArray: true }
-    });
+        });
 }
 
 
@@ -796,7 +802,7 @@ function IncrementCurrentTime(addMins) {
 }
 
 var advancedSearchActive = false;
-function ToggleAdvancedSearch() {
+function ToggleAdvancedSearch() {    
     if (advancedSearchActive) {
         $("#advancedSearch").hide();
         $("#toggleAdvancedSearchLink").text('Advanced Search');
@@ -812,7 +818,7 @@ function ToggleAdvancedSearch() {
 $(document).ready(function () {
     $("#onBehlafOfTextBox").keydown(function (e) {
         if (e.key !== "Tab") {
-            e.preventDefault();
+        e.preventDefault();
         }
     });
 

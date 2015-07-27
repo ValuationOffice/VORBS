@@ -60,7 +60,8 @@ namespace VORBS.API
                             ID = b.ID,
                             Owner = b.Owner,
                             StartDate = b.StartDate,
-                            EndDate = b.EndDate
+                            EndDate = b.EndDate,
+                            IsSmartMeeting = b.IsSmartMeeting
                         };
                         return bDto;
                     }).ToList()
@@ -111,7 +112,8 @@ namespace VORBS.API
                             ID = b.ID,
                             Owner = b.Owner,
                             StartDate = b.StartDate,
-                            EndDate = b.EndDate
+                            EndDate = b.EndDate,
+                            IsSmartMeeting = b.IsSmartMeeting
                         };
                         return bDto;
                     }).ToList()
@@ -161,7 +163,8 @@ namespace VORBS.API
                             ID = b.ID,
                             Owner = b.Owner,
                             StartDate = b.StartDate,
-                            EndDate = b.EndDate
+                            EndDate = b.EndDate,
+                            IsSmartMeeting = b.IsSmartMeeting
                         };
                         return bDto;
                     }).ToList()
@@ -211,7 +214,8 @@ namespace VORBS.API
                             ID = b.ID,
                             Owner = b.Owner,
                             StartDate = b.StartDate,
-                            EndDate = b.EndDate
+                            EndDate = b.EndDate,
+                            IsSmartMeeting = b.IsSmartMeeting
                         };
                         return bDto;
                     }).ToList()
@@ -260,7 +264,8 @@ namespace VORBS.API
                             ID = b.ID,
                             Owner = b.Owner,
                             StartDate = b.StartDate,
-                            EndDate = b.EndDate
+                            EndDate = b.EndDate,
+                            IsSmartMeeting = b.IsSmartMeeting
                         };
                         return bDto;
                     }).ToList()

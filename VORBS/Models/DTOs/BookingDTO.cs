@@ -24,5 +24,8 @@ namespace VORBS.Models.DTOs
 
         public bool Flipchart { get; set; }
         public bool Projector { get; set; }
+
+        public bool DssAssist { get; set; }
+        public bool IsSmartMeeting { get; set; }
     }
 }
