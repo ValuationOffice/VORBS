@@ -21,7 +21,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.SearchBookings = function (viewAll) {
-       
+
         $("#bookingTable").html('');
         $("#bookingTable").html('<div class="loadingContainer"><img src="/Content/images/loading.gif" /></div>');
 
@@ -39,14 +39,15 @@ function NewBookingController($scope, $http, $resource) {
             var formattedDate = new moment($scope.bookingFilter.startDate, ['DD-MM-YYYY']).format('dddd Do MMMM');
             $("#searchedDate").text(formattedDate);
             if (viewAll === true) {
-                $scope.roomBookings = AllRooms.query({
+                $scope.roomBookings = Available.query({
                     location: $scope.bookingFilter.location.name,
-                    startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false)
+                    startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false),
+                    smartRoom: false
                 }, function (success) {
                     roomResults = success;
                     $scope.RenderBookings(roomResults);
                 });
-                
+
             }
             else {
 
@@ -103,7 +104,7 @@ function NewBookingController($scope, $http, $resource) {
             var roomDetails = '<div class="calendarRoomName">' + roomResults[i].roomName + '</div>';
 
             //if (roomResults[i].smartRoom === true) {
-                
+
             //}
             //else {
             //    var roomDetails = '<div class="calendarRoomName">' + roomResults[i].roomName + '</div>';
@@ -160,14 +161,14 @@ function NewBookingController($scope, $http, $resource) {
                         locationId: $scope.bookingFilter.location.id,
                         roomName: this.title
                     }, function (success) {
-                    if (!room.smartRoom) {
-                        $("#dssAssistChoice").css('display', 'none');
-                    } else {
-                        $("#dssAssistChoice").css('display', 'block');
-                    }
+                        if (!room.smartRoom) {
+                            $("#dssAssistChoice").css('display', 'none');
+                        } else {
+                            $("#dssAssistChoice").css('display', 'block');
+                        }
 
-                    $scope.newBooking.Room = room;
-                    $scope.newBooking.Room.RoomName = room.roomName;
+                        $scope.newBooking.Room = room;
+                        $scope.newBooking.Room.RoomName = room.roomName;
                     });
 
                     $scope.booking.StartTime = start.utc().format('H:mm');
@@ -364,11 +365,10 @@ function NewBookingController($scope, $http, $resource) {
                             alert('Unable to Book Meeting Room. ' + error.responseText);
                             break;
                     }
-                    }                    
                     EnableNewBookingButton();
                 }
-            });
-
+            }
+            );
             $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
         } catch (e) {
             EnableNewBookingButton();
@@ -511,7 +511,7 @@ function NewBookingController($scope, $http, $resource) {
                 }
                 if ($scope.newBooking.Recurrence.WeeklyDay == null || $scope.newBooking.Recurrence.WeeklyDay == '' || isNaN($scope.newBooking.Recurrence.WeeklyDay)) {
                     valid = false;
-                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekDay", "Must specify a day of the week");                    
+                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekDay", "Must specify a day of the week");
                 }
                 break;
             case 'monthly':
@@ -543,7 +543,7 @@ function NewBookingController($scope, $http, $resource) {
         $("#newBookingRecurrenceModal").modal('hide');
 
         $("#recurringBreakDown").text('');
-        
+
     }
 
     $scope.CancelBookingClash = function () {
@@ -589,42 +589,23 @@ function CreateServices($resource) {
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
     {
-        query: {
-            method: 'GET', isArray: true
-        }
+        query: { method: 'GET', isArray: true }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
     {
-        query: {
-            method: 'GET', isArray: true
-        }
+        query: { method: 'GET', isArray: true }
     });
 
     Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
         query: { method: 'GET' }
     });
 
-    AllRooms = $resource('/api/availability/:location/:startDate', {
-        location: 'location', startDate: 'startDate'
-    },
-        {
-            query: {
-                method: 'GET', isArray: true
-            }
-        });
-
-    Users = $resource('/api/users/:allUsers', {
-        allUsers: 'allUsers'
-    },
-        {
-            queryAll: {
-                method: 'GET', isArray: true
-            },
-            querySurname: {
-                method: 'GET', isArray: true
-            }
-        });
+    Users = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
+    {
+            queryAll: { method: 'GET', isArray: true },
+            querySurname: { method: 'GET', isArray: true }
+    });
 }
 
 
@@ -815,7 +796,7 @@ function IncrementCurrentTime(addMins) {
 }
 
 var advancedSearchActive = false;
-function ToggleAdvancedSearch() {    
+function ToggleAdvancedSearch() {
     if (advancedSearchActive) {
         $("#advancedSearch").hide();
         $("#toggleAdvancedSearchLink").text('Advanced Search');
@@ -831,7 +812,7 @@ function ToggleAdvancedSearch() {
 $(document).ready(function () {
     $("#onBehlafOfTextBox").keydown(function (e) {
         if (e.key !== "Tab") {
-        e.preventDefault();
+            e.preventDefault();
         }
     });
 
