@@ -149,6 +149,7 @@
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Models\DTOs\AdminDTO.cs" />
     <Compile Include="Models\DTOs\LocationCredentialsDTO.cs" />
+    <Compile Include="Models\DTOs\RecurrenceDTO.cs" />
     <Compile Include="Models\DTOs\UserDTO.cs" />
     <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\LocationCredentials.cs" />
@@ -1094,6 +1095,7 @@
     <Content Include="Views\EmailTemplates\AdminMultiCancelledBooking.cshtml" />
     <Content Include="Views\Shared\Modals\EditRoomModal.cshtml" />
     <Content Include="Views\Shared\Modals\EditLocationModal.cshtml" />
+    <Content Include="Views\Shared\Modals\NewBookingRecurrenceModal.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

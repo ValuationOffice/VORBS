@@ -8,6 +8,7 @@ using VORBS.Models;
 using VORBS.DAL;
 using VORBS.Models.DTOs;
 using VORBS.Utils;
+using System.Data.Entity.Core.Objects;
 
 namespace VORBS.API
 {
@@ -267,6 +268,64 @@ namespace VORBS.API
                 _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
             }
             return rooms;
+        }
+
+        /// <summary>
+        /// Finds meetings that clash with a given booking
+        /// </summary>
+        /// <param name="originalBooking">Bookings to check for clashes</param>
+        /// <param name="clashedBooking">OUT Booking that possibly clashes with the booking</param>
+        /// <returns>Boolean based on whether there was a clash.</returns>
+        protected internal bool DoesMeetingClash(Booking originalBooking, out Booking clashedBooking)
+        {
+            var clashedBookings = db.Bookings
+                //Meetings in the same room
+                .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == originalBooking.Room.LocationID)
+                //Where meeting clashes
+                .Where(b => originalBooking.StartDate <= b.StartDate && originalBooking.EndDate >= b.StartDate)
+                .ToList();
+
+            clashedBooking = clashedBookings.FirstOrDefault();
+            return clashedBookings.Count > 0;
+
+        }
+
+        /// <summary>
+        /// Finds meetings that clash with a certain time on specific dates.
+        /// </summary>
+        /// <param name="room">Room to check for meetings in. Provided as this allows us to specify the room, rather than riskly grabbing the room of a random booking</param>
+        /// <param name="startTime">Time for which the meetings will begin</param>
+        /// <param name="endTime">Time for which the meetings will end</param>
+        /// <param name="dates">Dates for to check for meeting clashes</param>
+        /// <param name="clashedBookings">OUT bookings which clash with the given parameters</param>
+        /// <returns>Boolean based on whether there were any clashes</returns>
+        protected internal bool DoMeetingsClashRecurringly(Room room, TimeSpan startTime, TimeSpan endTime, IEnumerable<DateTime> dates, out IEnumerable<Booking> clashedBookings)
+        {
+            //Get dates only as we are checking against only the date portion in the DB
+            var datesOnly = dates.Select(x => x.Date);
+
+            var totalBookingsClashed = db.Bookings
+                    //Bookings only for this room
+                    .Where(x => x.RoomID == room.ID)
+                    //Only bookings on the certain days that we want to book for
+                    .Where(y => datesOnly.Cast<DateTime?>().ToList().Contains(EntityFunctions.TruncateTime(y.StartDate)))
+                    //Only bookings on the days that intersect our given time period
+                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second))
+                    .ToList();
+
+            clashedBookings = totalBookingsClashed;
+            return totalBookingsClashed.Count > 0;
+        }
+
+
+        protected internal Room GetAlternateRoom(TimeSpan startTime, TimeSpan endTime, int numberOfAttendees, int locationId)
+        {
+            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SeatCount >= numberOfAttendees && x.Active == true &&
+                               (x.Bookings.Where(b => startTime < EntityFunctions.CreateTime(b.EndDate.Hour, b.EndDate.Minute, b.EndDate.Second) && endTime > EntityFunctions.CreateTime(b.StartDate.Hour, b.StartDate.Minute, b.StartDate.Second)).Count() == 0))
+                .OrderBy(r => r.SeatCount)
+                .ToList();
+
+            return availableRooms.FirstOrDefault();
         }
     }
 }

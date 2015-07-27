@@ -4,6 +4,7 @@ function NewBookingController($scope, $http, $resource) {
     CreateServices($resource);
 
     $scope.locations = Locations.query({ status: true });
+    $scope.clashedBookings = [];
     //$scope.currentLocation = $scope.locations[0]
 
 
@@ -263,6 +264,9 @@ function NewBookingController($scope, $http, $resource) {
             $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm', true);
             $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
+            var originalRecurrenceEndDate = $scope.newBooking.Recurrence.EndDate;
+            $scope.newBooking.Recurrence.EndDate = FormatDateTimeForURL($scope.newBooking.Recurrence.EndDate, 'MM-DD-YYYY-HHmm', true);
+
             if ($scope.booking.ExternalNames.length > 0) {
                 $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
             }
@@ -277,14 +281,27 @@ function NewBookingController($scope, $http, $resource) {
                     window.location.href = "/MyBookings"; //Redirect to my bookings
                 },
                 error: function (error) {
+                    if (error.status == 409) {
+                        //conflict in booking(s)
+                        $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
+                        $scope.$apply();
+                        $("#meetingClashSelection").modal('show');
+                    } else {
                     alert('Unable to Book Meeting Room. Please Contact ITSD. ');
+                    }                    
                     EnableNewBookingButton();
                 }
             });
+
+            $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
         } catch (e) {
             EnableNewBookingButton();
         }
 
+    }
+
+    $scope.FormatDateToBritish = function(date) {
+        return moment(date).format("DD/MM/YYYY");
     }
 
     $('#confirmModal').on('show.bs.modal', function () {
@@ -327,10 +344,162 @@ function NewBookingController($scope, $http, $resource) {
         Projector: false,
         PID: '',
         Owner: '',
-        DSSAssist: false
+        DSSAssist: false,
+        Recurrence: {
+            IsRecurring: false,
+            SkipClashes: false,
+            AutoAlternateRoom: false,
+            Frequency: 'daily',
+            EndDate: new moment().utc().format('DD-MM-YYYY'),
+            DailyDayCount: 1,
+            WeeklyWeekCount: 1,
+            WeeklyDay: '',            
+            MonthlyMonthCount: 1,
+            MonthlyMonthDayCount: 1,
+            MonthlyMonthDay: 1
+        }
     };
 
+    //Added watch on frequency to update the recurrence settings section based on the current frequency value
+    $scope.$watch('newBooking.Recurrence.Frequency', function (newValue, oldValue) {
+        if (newValue != '' && newValue != null) {
+            var sectionId = '';
+            switch (newValue) {
+                case 'daily':
+                    sectionId = 'recDailySettings';
+                    break;
+                case 'weekly':
+                    sectionId = 'recWeeklySettings';
+                    break;
+                case 'monthly':
+                    sectionId = 'recMonthlySettings';
+                    break;
+            }
+
+            $("#newBookingRecurrenceModal #recSettings .recSettingsPanel").css('display', 'none');
+            $("#newBookingRecurrenceModal #recSettings #" + sectionId).css('display', 'block');
+        }
+    });
+
+    $scope.CreateRecurrence = function () {
+
+        if (ValidateRecurrenceSettings($scope.newBooking.Recurrence.Frequency)) {
+            $scope.newBooking.Recurrence.IsRecurring = true;
+            $scope.$apply();
+            var breakDownText = '';
+            switch ($scope.newBooking.Recurrence.Frequency) {
+                case 'daily':
+                    new moment().day(2).weekday
+                    breakDownText = 'Occurs every ' + $scope.newBooking.Recurrence.DailyDayCount + ' day(s) effective ' + $scope.bookingFilter.startDate + ' until ' + $scope.newBooking.Recurrence.EndDate + ' from ' + $scope.booking.StartTime + ' to ' + $scope.booking.EndTime;
+                    break;
+                case 'weekly':
+                    breakDownText = 'Occurs every ' + $scope.newBooking.Recurrence.WeeklyWeekCount + ' week(s) on ' + new moment().day($scope.newBooking.Recurrence.WeeklyDay).format('dddd') + ' effective ' + $scope.bookingFilter.startDate + ' until ' + $scope.newBooking.Recurrence.EndDate + ' from ' + $scope.booking.StartTime + ' to ' + $scope.booking.EndTime;;
+                    break;
+                case 'monthly':
+                    var dayContext = $("#recMonthlyMonthDayCount option[value='" + $("#recMonthlyMonthDayCount").val() + "']").text()
+                    var dayName = $("#recMonthlyMonthDay option[value='" + $("#recMonthlyMonthDay").val() + "']").text()
+                    breakDownText = 'Occurs the ' + dayContext + ' ' + dayName + ' of every ' + $scope.newBooking.Recurrence.MonthlyMonthCount + ' month(s) effective ' + $scope.bookingFilter.startDate + ' until ' + $scope.newBooking.Recurrence.EndDate + ' from ' + $scope.booking.StartTime + ' to ' + $scope.booking.EndTime;;
+                    break;
+            }
+            $("#recurringBreakDown").text(breakDownText);
+            $("#newBookingRecurrenceModal").modal('hide');
+        }
+    }
+
+    function ValidateRecurrenceSettings(frequency) {
+        ClearRecurrenceErrors();
+        valid = true;
+        if ($("#recEndDate").val() == null || $("#recEndDate").val() == '') {
+            valid = false;
+            AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Must specify a valid end date");
+        }
+
+        switch (frequency) {
+            case 'daily':
+                if ($("#recDailyDayCount").val() == "" || $("#recDailyDayCount").val() == null || isNaN($("#recDailyDayCount").val())) {
+                    valid = false;
+                    AddRecurrenceError("#newBookingRecurrenceModal #recDailyDayCountCont", "Must specify a valid daily count");
+                } else if ($("#recDailyDayCount").val() <= 0) {
+                    valid = false;
+                    AddRecurrenceError("#newBookingRecurrenceModal #recDailyDayCountCont", "Must specify a daily count greater than 0");
+                }
+                break;
+            case 'weekly':
+                if ($("#recWeeklyWeekCount").val() == "" || $("#recWeeklyWeekCount").val() == null || isNaN($("#recWeeklyWeekCount").val())) {
+                    valid = false;
+                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekCountCont", "Must specify a valid weekly count");
+                } else if ($("#recWeeklyWeekCount").val() <= 0) {
+                    valid = false;
+                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekCountCont", "Must specify a weekly count greater than 0");
+                }
+                if ($scope.newBooking.Recurrence.WeeklyDay == null || $scope.newBooking.Recurrence.WeeklyDay == '' || isNaN($scope.newBooking.Recurrence.WeeklyDay)) {
+                    valid = false;
+                    AddRecurrenceError("#newBookingRecurrenceModal #recWeeklyWeekDay", "Must specify a day of the week");                    
+                }
+                break;
+            case 'monthly':
+                if ($("#recMonthlyMonthDayCount").val() == "" || $("#recMonthlyMonthDayCount").val() == null || isNaN($("#recMonthlyMonthDayCount").val())) {
+                    valid = false;
+                    AddRecurrenceError("#recMonthlySettings #recMonthlyMonthDayCountCont", "Must specify a monthly day count");
+                }
+                if ($("#recMonthlyMonthDay").val() == "" || $("#recMonthlyMonthDay").val() == null || isNaN($("#recMonthlyMonthDay").val())) {
+                    valid = false;
+                    AddRecurrenceError("#recMonthlySettings #recMonthlyMonthDay", "Must specify a monthly day");
+                }
+                if ($("#recMonthlyMonthCount").val() == "" || $("#recMonthlyMonthCount").val() == null || isNaN($("#recMonthlyMonthCount").val())) {
+                    valid = false;
+                    AddRecurrenceError("#recMonthlySettings #recMonthlyMonthCount", "Must specify a monthly count");
+                }
+                break;
+        }
+        return valid;
+    }
+
+    $scope.ResetRecurrenceStatus = function () {
+        $scope.newBooking.Recurrence.IsRecurring = false;
+        $scope.newBooking.Recurrence.AutoAlternateRoom = false;
+        $scope.newBooking.Recurrence.SkipClashes = false;
+
+        ClearRecurrenceErrors();
+
+        $("#meetingClashSelection").modal('hide');
+        $("#newBookingRecurrenceModal").modal('hide');
+
+        $("#recurringBreakDown").text('');
+        
+    }
+
+    $scope.CancelBookingClash = function () {
+        $scope.ResetRecurrenceStatus();
+    }
+
+    $scope.SkipBookingClash = function () {
+        $scope.newBooking.Recurrence.AutoAlternateRoom = false;
+        $scope.newBooking.Recurrence.SkipClashes = true;
+
+        $("#meetingClashSelection").modal('hide');
+
+        $scope.NewBooking();
+    }
+
+    $scope.AlternateBookingClash = function () {
+        $scope.newBooking.Recurrence.AutoAlternateRoom = true;
+        $scope.newBooking.Recurrence.SkipClashes = false;
+
+        $("#meetingClashSelection").modal('hide');
+
+        $scope.NewBooking();
+    }
+
     $scope.bookingFilter.endTime = IncrementCurrentTime(30);
+
+    $("#newBookingRecurrenceModal").on("show.bs.modal", function () {
+        //$scope.newBooking.Recurrence.Frequency = 'daily';
+        if ($scope.newBooking.Recurrence.WeeklyDay == '') {
+            $scope.newBooking.Recurrence.WeeklyDay = new moment($scope.bookingFilter.startDate, ['DD-MM-YYYY']).day();
+}
+        $scope.$apply();        
+    })
 }
 
 
@@ -530,6 +699,26 @@ function ValidateSearchFilters(advancedSearch) {
         $("#searchFilterErrorCont").css('display', 'block');
     }
     return valid;
+}
+
+function ClearRecurrenceErrors() {
+    $("#recurrenceErrorCont").css('display', 'none');
+    $("#recurrenceErrorList").html('');
+
+    $("#newBookingRecurrenceModal .has-error").removeClass('has-error');
+}
+
+function AddRecurrenceError(elementSelector, errorMessage) {
+    $(elementSelector).addClass('has-error');
+    AddRecurrenceErrorMessage(errorMessage);
+}
+
+function AddRecurrenceErrorMessage(message) {
+    var errorList = $("#recurrenceErrorList");
+    if (errorList.children('li').length == 0) {
+        $("#recurrenceErrorCont").css('display', 'block');
+    }
+    errorList.append('<li>' + message + '</li>');
 }
 
 function IncrementCurrentTime(addMins) {

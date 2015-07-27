@@ -41,6 +41,12 @@ input[type='radio'], input[type='checkbox']{
     z-index: 2050 !important;
 }
 
+#recurringBreakDown{
+    float: right;
+    width: 70%;
+    font-size: small;
+}
+
 #logo_text #logoBanner {
     float: left;
     margin-left: 30px;

@@ -12,11 +12,11 @@
                     <div class="form-inline">
                         <div class="form-group">
                             <label class="control-label">Room Name</label>
-                            <input class="form-control" readonly="readonly" ng-model="newBooking.Room.RoomName">
+                            <input class="form-control" readonly="readonly" id="bookingModelRoomName" ng-model="newBooking.Room.RoomName">
                         </div>
                         <div class="form-group" style="padding-left:15px;">
                             <label class="control-label">Location</label>
-                            <input class="form-control" readonly="readonly" ng-model="bookingFilter.location.name">
+                            <input class="form-control" readonly="readonly" id="bookingModalLocationName" ng-model="bookingFilter.location.name">
                         </div>
                     </div>
                     <br />
@@ -37,12 +37,20 @@
                         <div class="form-group">
                             <label class="control-label">Subject</label>
                             <span style="padding-left:30px;">
-                                <input maxlength="140" class="form-control" ng-model="newBooking.Subject">
+                                <input maxlength="140" id="bookingModalSubject" class="form-control" ng-model="newBooking.Subject">
                             </span>
                         </div>
-                        <span style="padding-left:120px;">
-                            <button type="button" class="btn btn-primary" disabled="disabled">Recurring Meeting</button>
-                        </span>
+                    </div>
+                    <br />
+                    <div class="form-inline">
+                        <div class="form-group">
+                            <span>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" id="recurringMeetingButton" data-target="#newBookingRecurrenceModal">Recurring Meeting</button>
+                            </span>
+                            <div id="recurringBreakDown">
+
+                            </div>
+                        </div>
                     </div>
                     <hr />
 
@@ -78,23 +86,52 @@
                         <div class="form-group">
                             <div class="input-group ">
                                 <label class="control-label">Additional Equipment</label><br />
-                                <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
-                                <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
+                                <input type="checkbox" id="newBookingFlipChart" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
+                                <input type="checkbox" id="newBookingProjector" value="Projector" ng-model="newBooking.Projector" /> Projector
                             </div>
                         </div>
                         <div class="form-group" id="dssAssistChoice">
-                            <div class="input-group ">                                
-                                <input type="checkbox" value="DSSAssist" ng-model="newBooking.DSSAssist" /> Request DSS Assistance<br />                                
+                            <div class="input-group ">
+                                <input type="checkbox" value="DSSAssist" ng-model="newBooking.DSSAssist" /> Request DSS Assistance<br />
                             </div>
                         </div>
                     </div>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default" id="newBookingCancelButton" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="newBookingConfirmButton" ng-click="NewBooking()">Confirm Booking</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="meetingClashSelection" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">                
+                <h4 class="modal-title">Meeting clashes with these bookings</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table-striped table">
+                    <tr>
+                        <th>Date</th>
+                        <th>Owner</th>                        
+                    </tr>
+                    <tr ng-repeat="booking in clashedBookings">
+                        <td>{{ FormatDateToBritish(booking.StartDate) }}</td>
+                        <td>{{ booking.Owner }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="cancelBookingClash" ng-click="CancelBookingClash();">Cancel Recurrence</button>
+                <button type="button" class="btn btn-primary" id="skipBookingClash" ng-click="SkipBookingClash();">Skip Clashed Meetings</button>
+                <button type="button" class="btn btn-primary" id="alternateBookingClash" ng-click="AlternateBookingClash();">Application Chooses Rooms</button>
+            </div>
+        </div>
+    </div>>
+</div>
+
+@Html.Partial("Modals/NewBookingRecurrenceModal", null)

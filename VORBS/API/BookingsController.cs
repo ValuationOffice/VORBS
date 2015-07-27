@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Data.Entity;
 using System.Configuration;
+using System.Web.Script.Serialization;
 
 namespace VORBS.API
 {
@@ -214,11 +215,113 @@ namespace VORBS.API
                     newBooking.PID = user.SamAccountName;
                 }
 
-                //Reset Room as we dont want to create another room
-                newBooking.Room = null;
+                List<Booking> bookingsToCreate = new List<Booking>() { };
 
-                db.Bookings.Add(newBooking);
+                List<DateTime> recurringDates = new List<DateTime>();
+
+                TimeSpan startTime = new TimeSpan(newBooking.StartDate.Hour, newBooking.StartDate.Minute, newBooking.StartDate.Second);
+                TimeSpan endTime = new TimeSpan(newBooking.EndDate.Hour, newBooking.EndDate.Minute, newBooking.EndDate.Second);
+
+                if (newBooking.Recurrence.IsRecurring)
+                {
+                    AvailabilityController aC = new AvailabilityController();
+
+                    recurringDates = GetDatesForRecurrencePeriod(newBooking.StartDate, newBooking.Recurrence);
+
+                    IEnumerable<Booking> clashedBookings;
+                    bool doMeetingsClash = aC.DoMeetingsClashRecurringly(bookingRoom, TimeSpan.Parse(newBooking.StartDate.ToShortTimeString()), TimeSpan.Parse(newBooking.EndDate.ToShortTimeString()), recurringDates, out clashedBookings);
+                    if (doMeetingsClash)
+                    {
+                        if (newBooking.Recurrence.SkipClashes)
+                        {
+                            recurringDates.RemoveAll(x => clashedBookings.Select(c => c.StartDate.ToShortDateString()).Contains(x.Date.ToShortDateString()));
+                        }
+                        else if (newBooking.Recurrence.AutoAlternateRoom)
+                        {
+                            foreach (var cB in clashedBookings)
+                            {
+                                Room newRoom = aC.GetAlternateRoom(startTime, endTime, newBooking.Room.SeatCount, db.Rooms.Single(r => r.ID == newBooking.RoomID).LocationID);
+
+                                if (newRoom == null)
+                                    continue; //What Else ?
+
+                                DateTime startDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day);
+                                startDate = startDate + startTime;
+
+                                DateTime endDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day) +endTime;
+
+                                bookingsToCreate.Add(new Booking()
+                                {
+                                    DssAssist = newBooking.DssAssist,
+                                    ExternalNames = newBooking.ExternalNames,
+                                    Flipchart = newBooking.Flipchart,
+                                    NumberOfAttendees = newBooking.Room.SeatCount,
+                                    Owner = newBooking.Owner,
+                                    PID = newBooking.PID,
+                                    Projector = newBooking.Projector,
+                                    RoomID = newRoom.ID,
+                                    Subject = newBooking.Subject,
+                                    StartDate = startDate,
+                                    EndDate = endDate
+                                });
+
+                                //Remove date from recurringDates
+                                recurringDates.Remove(recurringDates.Single(r => r.Date == startDate.Date));
+                            }
+                        }
+                        else
+                        {
+                            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+                            clashedBookings.ToList().ForEach(x => bookingsDTO.Add(new BookingDTO()
+                            {
+                                ID = x.ID,
+                                EndDate = x.EndDate,
+                                StartDate = x.StartDate,
+                                Subject = x.Subject,
+                                Owner = x.Owner,
+                                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                            }));
+
+                            var clashedBookingsString = new JavaScriptSerializer().Serialize(bookingsDTO);
+                            return Request.CreateErrorResponse(HttpStatusCode.Conflict, clashedBookingsString);
+                        }
+                    }
+                }
+                else
+                    bookingsToCreate.Add(newBooking);
+
+                recurringDates.ForEach(x =>
+                {
+                    DateTime startDate = new DateTime(x.Year, x.Month, x.Day);
+                    startDate = startDate + startTime;
+
+                    DateTime endDate = new DateTime(x.Year, x.Month, x.Day);
+                    endDate = endDate + endTime;
+
+
+                    bookingsToCreate.Add(new Booking()
+                    {
+                        DssAssist = newBooking.DssAssist,
+                        ExternalNames = newBooking.ExternalNames,
+                        Flipchart = newBooking.Flipchart,
+                        NumberOfAttendees = newBooking.Room.SeatCount,
+                        Owner = newBooking.Owner,
+                        PID = newBooking.PID,
+                        Projector = newBooking.Projector,
+                        RoomID = newBooking.RoomID,
+                        Subject = newBooking.Subject,
+                        StartDate = startDate,
+                        EndDate = endDate
+                    });
+                });
+
+                //Reset Room as we dont want to create another room
+                bookingsToCreate.ForEach(x => x.Room = null);
+
+                db.Bookings.AddRange(bookingsToCreate);
                 db.SaveChanges();
+
 
                 newBooking.Room = bookingRoom;
 
@@ -505,5 +608,97 @@ namespace VORBS.API
             }
             return bookingsDTO;
         }
+
+        protected internal List<DateTime> GetDatesForRecurrencePeriod(DateTime startDate, RecurrenceDTO recurrenceDetails)
+        {
+            List<DateTime> recurringDates = new List<DateTime>();
+
+            switch (recurrenceDetails.Frequency)
+            {
+                case "daily":
+                    for (int i = 0; i <= ((recurrenceDetails.EndDate - startDate).Days + 1); i = i + (recurrenceDetails.DailyDayCount))
+                    {
+                        //exclude those days that are a weekend
+                        if (!new int[2] { 6, 0 }.ToList().Contains(((int)startDate.AddDays(i).DayOfWeek)))
+                        {
+                            recurringDates.Add(startDate.AddDays(i));
+                        }
+                    }
+                    break;
+                case "weekly":
+                    //Make a new copy of the date, as we may need to change it to get the next weekday matching users criteria
+                    DateTime nextStartDay = startDate;
+                    if ((int)startDate.DayOfWeek != recurrenceDetails.WeeklyDay)
+                    {
+                        int offset = recurrenceDetails.WeeklyDay - (int)nextStartDay.DayOfWeek;
+                        if (offset < 0)
+                            offset = 7 + offset;
+
+                        nextStartDay = nextStartDay.AddDays(offset);
+
+                        if (nextStartDay > recurrenceDetails.EndDate)
+                            break;
+                    }
+
+                    for (int i = 0; i <= (((recurrenceDetails.EndDate - nextStartDay).Days / (7 * recurrenceDetails.WeeklyWeekCount)) + 1); i++)
+                    {
+                        DateTime nextBookingDate = nextStartDay.AddDays((7 * recurrenceDetails.WeeklyWeekCount) * i);
+                        if (nextBookingDate.Date > recurrenceDetails.EndDate.Date)
+                            break;
+                        //exclude those days that are a weekend
+                        if (!new int[2] { 6, 0 }.ToList().Contains((int)nextBookingDate.DayOfWeek))
+                        {
+                            recurringDates.Add(nextBookingDate);
+                        }
+                    }
+                    break;
+                case "monthly":
+
+                    for (int i = 0; i <= (((recurrenceDetails.EndDate.Year - startDate.Year) * 12) + recurrenceDetails.EndDate.Month - startDate.Month); i++)
+                    {
+                        DateTime firstOfMonth = startDate.AddMonths(i * (recurrenceDetails.MonthlyMonthCount)).AddDays((-1 * (startDate.Day)) + 1);
+                        DateTime nextOccurence = new DateTime();
+
+                        if (recurrenceDetails.MonthlyMonthDayCount == 0)
+                        {
+                            DateTime lastDay = new DateTime(firstOfMonth.Year, firstOfMonth.Month, 1).AddMonths(1).AddDays(-1);
+                            DayOfWeek lastDow = lastDay.DayOfWeek;
+
+                            int diff = recurrenceDetails.MonthlyMonthDay - (int)lastDow;
+
+                            if (diff > 0) diff -= 7;
+
+                            nextOccurence = lastDay.AddDays(diff);
+                        }
+                        else
+                        {
+                            DateTime nextDayOccurence = firstOfMonth;
+
+                            if ((int)firstOfMonth.DayOfWeek != recurrenceDetails.WeeklyDay)
+                            {
+                                int offset = recurrenceDetails.MonthlyMonthDay - (int)firstOfMonth.DayOfWeek;
+                                if (offset < 0)
+                                    offset = 7 + offset;
+
+                                nextDayOccurence = firstOfMonth.AddDays(offset);
+                            }
+
+                            DateTime nextOccur = nextDayOccurence.AddDays(7 * (recurrenceDetails.MonthlyMonthDayCount - 1));
+
+                            if (!new int[2] { 6, 0 }.ToList().Contains((int)nextOccur.DayOfWeek))
+                            {
+                                nextOccurence = nextOccur;
+                            }
+                        }
+                        if (nextOccurence <= recurrenceDetails.EndDate && nextOccurence >= startDate)
+                        {
+                            recurringDates.Add(nextOccurence);
+                        }
+                    }
+                    break;
+            }
+            return recurringDates;
+        }
+
     }
 }

@@ -27,6 +27,9 @@ namespace VORBS.Models
         public bool Projector { get; set; }
 
         public bool DssAssist { get; set; }
+
+        [NotMapped]
+        public DTOs.RecurrenceDTO Recurrence { get; set; }
     }
 }
 
