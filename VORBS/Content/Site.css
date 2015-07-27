@@ -27,8 +27,8 @@ textarea {
 }
 
 /* THIS IS A TEMPORARY ADDITION AS BOOTSTRAP APPEARS TO BE PRODUCING CHECKBOX/RADIO MARGINS INCORRECTLY   */
-input[type='radio'], input[type='checkbox']{
-    margin-top:0;
+    input[type='radio'], input[type='checkbox'] {
+        margin-top: 0;
 }
 
 
@@ -41,7 +41,7 @@ input[type='radio'], input[type='checkbox']{
     z-index: 2050 !important;
 }
 
-#recurringBreakDown{
+#recurringBreakDown {
     float: right;
     width: 70%;
     font-size: small;
@@ -350,7 +350,7 @@ input[type='radio'], input[type='checkbox']{
     margin-top: 40px;
 }
 
-    #searchFilter #searchButton {
+.filterButton {
         background-color: #21846E;
         color: white;
         font-weight: bold;
@@ -525,7 +525,7 @@ input[type='radio'], input[type='checkbox']{
 }
 
 /*Admin Room Tab*/
-#newRoomAddButton{
+#newRoomAddButton {
     margin-top: 25px;
 }
 

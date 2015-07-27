@@ -78,6 +78,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -1094,6 +1095,7 @@
     <Content Include="Views\Help\Index.cshtml" />
     <Content Include="Views\EmailTemplates\AdminMultiCancelledBooking.cshtml" />
     <Content Include="Views\Shared\Modals\EditRoomModal.cshtml" />
+    <Content Include="Views\Administration\ReportsTab.cshtml" />
     <Content Include="Views\Shared\Modals\EditLocationModal.cshtml" />
     <Content Include="Views\Shared\Modals\NewBookingRecurrenceModal.cshtml" />
   </ItemGroup>

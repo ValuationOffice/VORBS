@@ -4,10 +4,14 @@ function MyBookingsController($scope, $http, $resource) {
 
     CreateServices($resource);
 
-    $scope.bookings = GetBookings.query({
-        startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
-        //person: '7220451' //TODO: Change To get UserName
-    });
+    $scope.GetBookings = function () {
+        $scope.bookings = Bookings.query({
+            startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
+            //person: '7220451' //TODO: Change To get UserName
+        });
+    }
+
+    $scope.GetBookings();
 
     $scope.bookingId = 0;
 
@@ -165,12 +169,13 @@ function MyBookingsController($scope, $http, $resource) {
                 bookingId: $scope.bookingId
             },
             function (success) {
-                location.reload();
+                $("#deleteModal").modal('hide');
+                $scope.GetBookings();
             },
             function (error) {
-                EnableDeleteBookingButton();
                 alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.message);
             });
+            EnableDeleteBookingButton();
         } catch (e) {
             EnableDeleteBookingButton();
         }
@@ -217,12 +222,12 @@ function CreateServices($resource) {
         roomNameFormatted: function () { return this.roomName.replace('_', '.'); }
     };
 
-    GetBookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
+    Bookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
     {
         query: { method: 'GET', isArray: true }
     });
 
-    GetBookings.prototype = {
+    Bookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
         startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
         endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },

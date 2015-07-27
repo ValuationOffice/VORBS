@@ -60,7 +60,8 @@ namespace VORBS.API
                                 ComputerCount = r.ComputerCount,
                                 PhoneCount = r.PhoneCount,
                                 SmartRoom = r.SmartRoom,
-                                SeatCount = r.SeatCount
+                                SeatCount = r.SeatCount,
+                                Active = r.Active
                             }; return rDto;
                     }).ToList()
                 }));
@@ -70,6 +71,36 @@ namespace VORBS.API
                 _logger.ErrorException("Unable to get list of locations: ", ex);
             }
             return locationsDTO;
+        }
+
+        [HttpGet]
+        [Route("{searchLoaction}")]
+        public List<string> GetSmartRoomLoactions(string searchLoaction)
+        {
+            List<string> locationNames = new List<string>();
+
+            try
+            {
+                List<Location> locations = db.Locations.Where(x => x.Active == true && x.Rooms.Where(r => r.SmartRoom == true && r.LocationID == x.ID).Count() > 0).ToList();
+
+                if (locations.Exists(l => l.Name == searchLoaction))
+                {
+                    if (locations.Single(l => l.Name == searchLoaction).Rooms.Count() <= 1)
+                        locations.Remove(locations.Single(l => l.Name == searchLoaction));
+                }
+
+                foreach (var loc in locations)
+                {
+                    foreach (var room in loc.Rooms.Where(r => r.SmartRoom == true && r.Active))
+                        locationNames.Add(loc.Name);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get list of smart locations", ex);
+            }
+            return locationNames;
         }
 
         [HttpGet]
@@ -87,7 +118,8 @@ namespace VORBS.API
                     ID = x.ID,
                     Name = x.Name,
                     Active = x.Active,
-                    Rooms = x.Rooms.Select(r =>
+                    //Only get smart rooms as we need them for SMART bookings.
+                    Rooms = x.Rooms.Where(y => y.SmartRoom == true && y.Active == true).Select(r => 
                     {
                         RoomDTO rDto = new RoomDTO()
                         {
@@ -96,7 +128,8 @@ namespace VORBS.API
                             ComputerCount = r.ComputerCount,
                             PhoneCount = r.PhoneCount,
                             SmartRoom = r.SmartRoom,
-                            SeatCount = r.SeatCount
+                            SeatCount = r.SeatCount,
+                            Active = r.Active
                         }; return rDto;
                     }).ToList()
                 }));
@@ -174,7 +207,7 @@ namespace VORBS.API
                 db.LocationCredentials.RemoveRange(credentials);
                 editLocation.LocationCredentials.ToList().ForEach(x => x.LocationID = id);
                 db.LocationCredentials.AddRange(editLocation.LocationCredentials);
-                
+
                 db.SaveChanges();
                 _logger.Info(string.Format("Location {0} successfully editted", id));
                 return new HttpResponseMessage(HttpStatusCode.OK);
@@ -192,7 +225,7 @@ namespace VORBS.API
         {
             try
             {
-                var existingLocation = db.Locations.Any(l => l.ID == newLocation.ID);                
+                var existingLocation = db.Locations.Any(l => l.ID == newLocation.ID);
                 if (!existingLocation)
                 {
                     db.Locations.Add(newLocation);
@@ -229,7 +262,7 @@ namespace VORBS.API
                 {
                     List<Booking> bookings = db.Bookings.Where(b => b.Room.LocationID == locationId && b.StartDate >= DateTime.Now)
                                                 .OrderBy(b => b.Owner)
-                                                .ToList();                    
+                                                .ToList();
 
                     if (bookings.Count() < 1)
                         return Request.CreateResponse(HttpStatusCode.OK);

@@ -215,16 +215,73 @@ namespace VORBS.API
                     newBooking.PID = user.SamAccountName;
                 }
 
-                List<Booking> bookingsToCreate = new List<Booking>() { };
+                AvailabilityController aC = null;
+
+                List<Booking> bookingsToCreate = new List<Booking>() {};
 
                 List<DateTime> recurringDates = new List<DateTime>();
 
                 TimeSpan startTime = new TimeSpan(newBooking.StartDate.Hour, newBooking.StartDate.Minute, newBooking.StartDate.Second);
                 TimeSpan endTime = new TimeSpan(newBooking.EndDate.Hour, newBooking.EndDate.Minute, newBooking.EndDate.Second);
 
+                if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
+                {
+                    List<Booking> clashedBookings = new List<Booking>();
+
+                    if (aC == null)
+                        aC = new AvailabilityController();
+
+                    foreach (var smartLoc in newBooking.SmartLoactions)
+                    {
+                        Room smartRoom = aC.GetAlternateSmartRoom(newBooking.StartDate, newBooking.EndDate, newBooking.Room.SeatCount, db.Locations.Single(l => l.Name == smartLoc).ID, newBooking.RoomID);
+
+                        if (smartRoom == null || bookingsToCreate.Select(x => x.Room).Contains(smartRoom))
+                        {
+                            clashedBookings.Add(new Booking()
+                            {
+                                StartDate = newBooking.StartDate,
+                                Owner = newBooking.Owner,
+                                Room = new Room()
+                                {
+                                    Location = new Location()
+                                    {
+                                        Name = smartLoc
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            bookingsToCreate.Add(new Booking()
+                            {
+                                DssAssist = newBooking.DssAssist,
+                                ExternalNames = newBooking.ExternalNames,
+                                Flipchart = newBooking.Flipchart,
+                                NumberOfAttendees = newBooking.Room.SeatCount,
+                                Owner = newBooking.Owner,
+                                PID = newBooking.PID,
+                                Projector = newBooking.Projector,
+                                RoomID = smartRoom.ID,
+                                Room = smartRoom,
+                                Subject = newBooking.Subject,
+                                StartDate = newBooking.StartDate,
+                                EndDate = newBooking.EndDate
+                            });
+                        }
+                    }
+
+                    //No Rooms avalible; Show clashes to users
+                    if (clashedBookings.Count() > 0)
+                    {
+                        var clashedBookingsString = new JavaScriptSerializer().Serialize(clashedBookings);
+                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, clashedBookingsString);
+                    }
+                }
+
                 if (newBooking.Recurrence.IsRecurring)
                 {
-                    AvailabilityController aC = new AvailabilityController();
+                    if (aC == null)
+                        aC = new AvailabilityController();
 
                     recurringDates = GetDatesForRecurrencePeriod(newBooking.StartDate, newBooking.Recurrence);
 
@@ -240,15 +297,15 @@ namespace VORBS.API
                         {
                             foreach (var cB in clashedBookings)
                             {
-                                Room newRoom = aC.GetAlternateRoom(startTime, endTime, newBooking.Room.SeatCount, db.Rooms.Single(r => r.ID == newBooking.RoomID).LocationID);
+                                Room newRoom = aC.GetAlternateRoom(startTime, endTime, newBooking.Room.SeatCount, db.Rooms.Single(r => r.ID == newBooking.RoomID).LocationID, true);
 
                                 if (newRoom == null)
-                                    continue; //What Else ?
+                                    return Request.CreateResponse(HttpStatusCode.InternalServerError, "No rooms avaliable.");
 
                                 DateTime startDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day);
                                 startDate = startDate + startTime;
 
-                                DateTime endDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day) +endTime;
+                                DateTime endDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day) + endTime;
 
                                 bookingsToCreate.Add(new Booking()
                                 {
@@ -299,7 +356,6 @@ namespace VORBS.API
                     DateTime endDate = new DateTime(x.Year, x.Month, x.Day);
                     endDate = endDate + endTime;
 
-
                     bookingsToCreate.Add(new Booking()
                     {
                         DssAssist = newBooking.DssAssist,
@@ -320,7 +376,8 @@ namespace VORBS.API
                 bookingsToCreate.ForEach(x => x.Room = null);
 
                 db.Bookings.AddRange(bookingsToCreate);
-                db.SaveChanges();
+
+                db.SaveChanges(bookingsToCreate);
 
 
                 newBooking.Room = bookingRoom;
@@ -409,6 +466,11 @@ namespace VORBS.API
                 }
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (BookingConflictException ex)
+            {
+                _logger.FatalException("Unable to save new booking: " + newBooking.Owner + "/" + newBooking.StartDate, ex);
+                return Request.CreateResponse(HttpStatusCode.NotAcceptable, ex.Message);
             }
             catch (Exception ex)
             {

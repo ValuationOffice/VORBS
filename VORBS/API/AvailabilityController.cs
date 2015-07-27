@@ -24,8 +24,8 @@ namespace VORBS.API
         }
 
         [HttpGet]
-        [Route("{location}/{start:DateTime}")]
-        public List<RoomDTO> GetAllRoomBookingsForLocation(string location, DateTime start)
+        [Route("{location}/{start:DateTime}/{smartRoom:bool}")]
+        public List<RoomDTO> GetAllRoomBookingsForLocation(string location, DateTime start, bool smartRoom)
         {
             List<RoomDTO> rooms = new List<RoomDTO>();
 
@@ -39,6 +39,9 @@ namespace VORBS.API
                 var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.Active == true)
                     .OrderBy(r => r.SeatCount)
                     .ToList();
+
+                if (smartRoom)
+                    availableRooms = availableRooms.Where(r => r.SmartRoom == true).ToList();
 
                 roomData.AddRange(availableRooms);
 
@@ -280,7 +283,7 @@ namespace VORBS.API
         {
             var clashedBookings = db.Bookings
                 //Meetings in the same room
-                .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == originalBooking.Room.LocationID)
+                .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == db.Rooms.FirstOrDefault(r => r.ID == x.RoomID).LocationID)
                 //Where meeting clashes
                 .Where(b => originalBooking.StartDate <= b.StartDate && originalBooking.EndDate >= b.StartDate)
                 .ToList();
@@ -318,12 +321,22 @@ namespace VORBS.API
         }
 
 
-        protected internal Room GetAlternateRoom(TimeSpan startTime, TimeSpan endTime, int numberOfAttendees, int locationId)
+        protected internal Room GetAlternateRoom(TimeSpan startTime, TimeSpan endTime, int numberOfAttendees, int locationId, bool orderAsc)
         {
             var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SeatCount >= numberOfAttendees && x.Active == true &&
-                               (x.Bookings.Where(b => startTime < EntityFunctions.CreateTime(b.EndDate.Hour, b.EndDate.Minute, b.EndDate.Second) && endTime > EntityFunctions.CreateTime(b.StartDate.Hour, b.StartDate.Minute, b.StartDate.Second)).Count() == 0))
-                .OrderBy(r => r.SeatCount)
-                .ToList();
+                               (x.Bookings.Where(b => startTime < EntityFunctions.CreateTime(b.EndDate.Hour, b.EndDate.Minute, b.EndDate.Second) && endTime > EntityFunctions.CreateTime(b.StartDate.Hour, b.StartDate.Minute, b.StartDate.Second)).Count() == 0));
+
+
+            availableRooms = (orderAsc) ? availableRooms.OrderBy(r => r.SeatCount) : availableRooms.OrderByDescending(r => r.SeatCount);
+
+            return availableRooms.FirstOrDefault();
+        }
+
+        protected internal Room GetAlternateSmartRoom(DateTime startDate, DateTime endDate, int numberOfAttendees, int locationId, int bookingRoomId)
+        {
+            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SeatCount >= numberOfAttendees && x.SmartRoom == true && x.Active == true && x.ID != bookingRoomId &&
+                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
+                                 .OrderByDescending(r => r.SeatCount);
 
             return availableRooms.FirstOrDefault();
         }

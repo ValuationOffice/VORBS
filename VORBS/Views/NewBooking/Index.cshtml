@@ -19,7 +19,7 @@
             <div class="form-group row">
                 <div class="col-xs-4" id="searchLocation">
                     <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location">
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="GetSmartLocations()">
                         <option value="" selected disabled>Select a location...</option>
                     </select>
                 </div>
@@ -27,6 +27,11 @@
                     <label class="col-sm-2 control-label">Date</label>
                     <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" />
                 </div>
+                <div class="col-xs-2">
+                    <label class="control-label">Smart Room</label>
+                    <input id="smartRoomCheckBox" type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
+                </div>
+
                 <div id="advancedSearch" style="display:none;">
                     <div class="col-xs-2" id="startTime">
                         <label class="control-label">Start</label>
@@ -40,17 +45,36 @@
                         <label class="control-label">Attendees</label>
                         <input type="number" id="attendeesControl" class="form-control numberControl touchSpinControl" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
                     </div>
-                    <div class="col-xs-2">
-                        <label class="control-label">Smart room</label>
-                        <input type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" />
-                    </div>
-
                 </div>
+
                 <div class="col-xs-3">
                     <label class="control-label">&nbsp</label>
-                    <input id="searchButton" type="button" class="form-control" ng-click="SearchBookings(false)" value="Search" />
+                    <input id="searchButton" type="button" class="form-control filterButton" ng-click="SearchBookings(false)" value="Search" />
                     <p><a href="#" id="toggleAdvancedSearchLink" onclick="ToggleAdvancedSearch();">Advanced Search</a></p>
                 </div>
+
+            </div>
+
+            <div id="smartRoomLocations" style="display: none;">
+                <div class="form-group row">
+                    <div class="col-xs-4">
+                        <label class="control-label">Smart Room(s)</label>
+                        <select id="smartLoactionDropDown" class="form-control" ng-options="o as o for o in smartLoactions" ng-model="currentSmartLocation">
+                            <option value="" selected disabled>Select a location...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xs-3">
+                        <label class="control-label">&nbsp</label>
+                        <input id="addSmartLoactionButton" type="button" class="form-control filterButton" ng-click="AddSmartLoaction()" value="Add" />
+                    </div>
+                </div>
+
+                <table id="smartLoactionsTable">
+                    <tr>
+                        <td ng-repeat="locName in newBooking.SmartLoactions track by $index">{{ locName }} <span class="btn glyphicon glyphicon-remove" ng-click="RemoveSmartLoaction(locName)"></span></td>
+                    </tr>
+                </table>
             </div>
         </form>
         <p>

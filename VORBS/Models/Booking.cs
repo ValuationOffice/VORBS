@@ -30,6 +30,9 @@ namespace VORBS.Models
 
         [NotMapped]
         public DTOs.RecurrenceDTO Recurrence { get; set; }
+
+        [NotMapped]
+        public string[] SmartLoactions { get; set; }
     }
 }
 

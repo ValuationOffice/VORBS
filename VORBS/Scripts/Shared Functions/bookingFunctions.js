@@ -78,12 +78,19 @@ function SaveEditBooking(existingId, editBooking) {
             url: "api/bookings/" + existingId,
             contentType: "application/json",
             success: function (data, status) {
-                alert('Edit booking confimed. Confirmation email has beeen sent.');
+                alert('Booking Updated Sucessfully.');
                 ReloadThisPage("bookings");
             },
             error: function (error) {
+                //Server Conflict
+                if (error.status == 406) {
+                    alert("Simultaneous booking conflict. Please try again.");
+                    ReloadThisPage("bookings");
+                }
+                else {
+                    alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
+                }
                 EnableEditBookingButton();
-                alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
             }
         });
     } catch (e) {

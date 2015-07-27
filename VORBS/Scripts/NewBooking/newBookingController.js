@@ -62,7 +62,8 @@ function NewBookingController($scope, $http, $resource) {
                 } else {
                     queryParams = {
                         location: $scope.bookingFilter.location.name,
-                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true)
+                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true),
+                        smartRoom: $scope.bookingFilter.smartRoom
                     };
                 }
 
@@ -154,8 +155,11 @@ function NewBookingController($scope, $http, $resource) {
                     }
 
                     var $scope = angular.element($("#controllerDiv")).scope();
-                    var room = $scope.GetRoomByName(this.title);
 
+                    var room = Room.query({
+                        locationId: $scope.bookingFilter.location.id,
+                        roomName: this.title
+                    }, function (success) {
                     if (!room.smartRoom) {
                         $("#dssAssistChoice").css('display', 'none');
                     } else {
@@ -164,6 +168,7 @@ function NewBookingController($scope, $http, $resource) {
 
                     $scope.newBooking.Room = room;
                     $scope.newBooking.Room.RoomName = room.roomName;
+                    });
 
                     $scope.booking.StartTime = start.utc().format('H:mm');
                     $scope.booking.EndTime = end.utc().format('H:mm');
@@ -217,6 +222,67 @@ function NewBookingController($scope, $http, $resource) {
     $scope.RemoveExternalAttendee = function (fullName) {
         SetModalErrorMessage('');
         $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
+    }
+
+    $scope.GetSmartLocations = function () {
+        if ($scope.bookingFilter.location === undefined || !$scope.bookingFilter.smartRoom) {
+            return;
+        }
+
+        $scope.smartLoactions = [];
+
+        for (var i = 0; i < $scope.locations.length; i++) {
+            for (var k = 0; k < $scope.locations[i].rooms.length; k++) {
+                if ($scope.locations[i].rooms[k].smartRoom && $scope.locations[i].rooms[k].active) {
+                    $scope.smartLoactions.push($scope.locations[i].name);
+                }
+            }
+        }
+
+        for (var i = 0; i < $scope.newBooking.SmartLoactions.length; i++) {
+            $scope.smartLoactions = $scope.RemoveLoaction($scope.newBooking.SmartLoactions[i], $scope.smartLoactions);
+        }
+
+        if ($scope.smartLoactions.indexOf($scope.bookingFilter.location.name) < 0) {
+            $scope.newBooking.SmartLoactions = $scope.RemoveLoaction($scope.bookingFilter.location.name, $scope.newBooking.SmartLoactions);
+        }
+        else {
+            $scope.smartLoactions = $scope.RemoveLoaction($scope.bookingFilter.location.name, $scope.smartLoactions);
+        }
+    }
+
+    $scope.ShowSmartLoactions = function () {
+        if ($scope.bookingFilter.smartRoom) {
+            $scope.GetSmartLocations();
+            $("#smartRoomLocations").css('display', 'block');
+        }
+        else {
+            $scope.newBooking.SmartLoactions = [];
+            $("#smartRoomLocations").css('display', 'none');
+        }
+    }
+
+    $scope.AddSmartLoaction = function () {
+        if ($("#smartLoactionDropDown")[0].selectedIndex > 0) {
+            $scope.newBooking.SmartLoactions.push($scope.currentSmartLocation);
+            $scope.smartLoactions = $scope.RemoveLoaction($scope.currentSmartLocation, $scope.smartLoactions);
+        }
+    }
+
+    $scope.RemoveSmartLoaction = function (locationName) {
+        $scope.newBooking.SmartLoactions = $scope.RemoveLoaction(locationName, $scope.newBooking.SmartLoactions);
+        $scope.smartLoactions.push(locationName);
+        $scope.smartLoactions = $scope.smartLoactions.sort();
+    }
+
+    $scope.RemoveLoaction = function (locationName, locationArray) {
+        for (var i = 0; i < locationArray.length; i++) {
+            if (locationArray[i] === locationName) {
+                locationArray.splice(i, 1);
+                break;
+            }
+        }
+        return locationArray;
     }
 
     $scope.NewBooking = function () {
@@ -281,13 +347,23 @@ function NewBookingController($scope, $http, $resource) {
                     window.location.href = "/MyBookings"; //Redirect to my bookings
                 },
                 error: function (error) {
-                    if (error.status == 409) {
-                        //conflict in booking(s)
-                        $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
-                        $scope.$apply();
-                        $("#meetingClashSelection").modal('show');
-                    } else {
-                    alert('Unable to Book Meeting Room. Please Contact ITSD. ');
+                    switch (error.status) {
+                        case 409:
+                            //conflict in booking(s)
+                            $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
+                            $scope.$apply();
+                            $("#meetingClashSelection").modal('show');
+                            break;
+                        case 406:
+                            //Server Conflict
+                            alert("Simultaneous booking conflict. Please try again.");
+                            $scope.SearchBookings(false);
+                            $("#confirmModal").modal('hide');
+                            break;
+                        default:
+                            alert('Unable to Book Meeting Room. ' + error.responseText);
+                            break;
+                    }
                     }                    
                     EnableNewBookingButton();
                 }
@@ -300,7 +376,7 @@ function NewBookingController($scope, $http, $resource) {
 
     }
 
-    $scope.FormatDateToBritish = function(date) {
+    $scope.FormatDateToBritish = function (date) {
         return moment(date).format("DD/MM/YYYY");
     }
 
@@ -345,6 +421,7 @@ function NewBookingController($scope, $http, $resource) {
         PID: '',
         Owner: '',
         DSSAssist: false,
+        SmartLoactions: [],
         Recurrence: {
             IsRecurring: false,
             SkipClashes: false,
@@ -353,7 +430,7 @@ function NewBookingController($scope, $http, $resource) {
             EndDate: new moment().utc().format('DD-MM-YYYY'),
             DailyDayCount: 1,
             WeeklyWeekCount: 1,
-            WeeklyDay: '',            
+            WeeklyDay: '',
             MonthlyMonthCount: 1,
             MonthlyMonthDayCount: 1,
             MonthlyMonthDay: 1
@@ -497,19 +574,17 @@ function NewBookingController($scope, $http, $resource) {
         //$scope.newBooking.Recurrence.Frequency = 'daily';
         if ($scope.newBooking.Recurrence.WeeklyDay == '') {
             $scope.newBooking.Recurrence.WeeklyDay = new moment($scope.bookingFilter.startDate, ['DD-MM-YYYY']).day();
-}
-        $scope.$apply();        
+        }
+
+        $scope.newBooking.Recurrence.EndDate = $scope.bookingFilter.startDate;
+        $scope.$apply();
     })
 }
 
 
 function CreateServices($resource) {
-    Locations = $resource('/api/locations/:status', {
-        status: 'active'
-    }, {
-        query: {
-            method: 'GET', isArray: true
-        }
+    Locations = $resource('/api/locations/:status', { status: 'active' }, {
+        query: { method: 'GET', isArray: true }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
@@ -524,6 +599,10 @@ function CreateServices($resource) {
         query: {
             method: 'GET', isArray: true
         }
+    });
+
+    Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
+        query: { method: 'GET' }
     });
 
     AllRooms = $resource('/api/availability/:location/:startDate', {
@@ -751,7 +830,9 @@ function ToggleAdvancedSearch() {
 
 $(document).ready(function () {
     $("#onBehlafOfTextBox").keydown(function (e) {
+        if (e.key !== "Tab") {
         e.preventDefault();
+        }
     });
 
     $('.touchSpinControl').TouchSpin({

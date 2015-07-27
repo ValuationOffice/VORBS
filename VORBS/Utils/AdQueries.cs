@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
+using System.IO;
 using System.Linq;
 using System.Security.Permissions;
 using System.Web;
@@ -83,8 +84,8 @@ namespace VORBS.Utils
                 if (!string.IsNullOrWhiteSpace(result.SamAccountName) && !string.IsNullOrWhiteSpace(result.EmailAddress) &&
                    (!string.IsNullOrEmpty(result.GivenName) || !string.IsNullOrEmpty(result.Surname)))
 
-                    users.Add(new AdminDTO()
-                    {
+                    users.Add(new AdminDTO() 
+                    { 
                         FirstName = result.GivenName,
                         LastName = result.Surname,
                         PID = result.SamAccountName,
@@ -97,6 +98,7 @@ namespace VORBS.Utils
 
         public static bool IsOffline()
         {
+            return false;
             return (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK") ? true : false;
         }
 

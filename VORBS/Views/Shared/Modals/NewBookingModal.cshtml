@@ -116,10 +116,12 @@
             <div class="modal-body">
                 <table class="table-striped table">
                     <tr>
+                        <th>Loaction</th>
                         <th>Date</th>
                         <th>Owner</th>                        
                     </tr>
                     <tr ng-repeat="booking in clashedBookings">
+                        <td>{{ booking.Room.Location.Name }}</td>
                         <td>{{ FormatDateToBritish(booking.StartDate) }}</td>
                         <td>{{ booking.Owner }}</td>
                     </tr>

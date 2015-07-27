@@ -284,6 +284,7 @@ function LocationsController($scope, $http, $resource) {
 }
 
 function CreateLocationAdminServices($resource) {
+
     Locations = $resource('/api/locations/:status', {
     }, {
         query: {

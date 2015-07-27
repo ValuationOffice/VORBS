@@ -95,6 +95,41 @@ namespace VORBS.API
         }
 
         [HttpGet]
+        [Route("{locationId:int}/{roomName}")]
+        public RoomDTO GetRoomByLocationAndName(int locationId, string roomName)
+        {
+            try
+            {
+                RoomDTO roomDTO = new RoomDTO();
+
+                Room room = db.Rooms.Single(r => r.LocationID == locationId && r.RoomName == roomName);
+
+                roomDTO = new RoomDTO()
+                {
+                    ID = room.ID,
+                    location = new LocationDTO()
+                    {
+                        ID = room.Location.ID,
+                        Name = room.Location.Name
+                    },
+                    RoomName = room.RoomName,
+                    ComputerCount = room.ComputerCount,
+                    SeatCount = room.SeatCount,
+                    PhoneCount = room.PhoneCount,
+                    SmartRoom = room.SmartRoom,
+                    Active = room.Active
+                };
+
+                return roomDTO;
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get room using room name: " + roomName, ex);
+                return new RoomDTO();
+            }
+        }
+
+        [HttpGet]
         [Route("{locationName}/{status:int}")]
         public List<RoomDTO> GetRoomsByLocationAndStatus(string locationName, int status)
         {
