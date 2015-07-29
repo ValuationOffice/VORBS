@@ -117,11 +117,13 @@
                 <table class="table-striped table">
                     <tr>
                         <th>Loaction</th>
+                        <th>Room</th>
                         <th>Date</th>
                         <th>Owner</th>                        
                     </tr>
                     <tr ng-repeat="booking in clashedBookings">
-                        <td>{{ booking.Room.Location.Name }}</td>
+                        <td>{{ booking.Location.Name }}</td>
+                        <td>{{ booking.Room.RoomName }}</td>
                         <td>{{ FormatDateToBritish(booking.StartDate) }}</td>
                         <td>{{ booking.Owner }}</td>
                     </tr>
@@ -131,6 +133,33 @@
                 <button type="button" class="btn btn-default" id="cancelBookingClash" ng-click="CancelBookingClash();">Cancel Recurrence</button>
                 <button type="button" class="btn btn-primary" id="skipBookingClash" ng-click="SkipBookingClash();">Skip Clashed Meetings</button>
                 <button type="button" class="btn btn-primary" id="alternateBookingClash" ng-click="AlternateBookingClash();">Application Chooses Rooms</button>
+            </div>
+        </div>
+    </div>>
+</div>
+
+<div class="modal fade" id="smartMeetingClashSelection" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">SMART Room Meeting clashes with these bookings:</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table-striped table">
+                    <tr>
+                        <th>Loaction</th>
+                        <th>Date</th>
+                        <th>Owner</th>
+                    </tr>
+                    <tr ng-repeat="booking in clashedBookings">
+                        <td>{{ booking.Location.Name }}</td>
+                        <td>{{ FormatDateToBritish(booking.StartDate) }}</td>
+                        <td>{{ booking.Owner }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="newBookingCancelButton" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>>

@@ -126,7 +126,7 @@ namespace VORBS.API
             return rooms;
         }
 
-        
+
         [HttpGet]
         [Route("{location}/{start:DateTime}/{numberOfPeople:int}/{smartRoom:bool}")]
         public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, int numberOfPeople, bool smartRoom)
@@ -174,7 +174,7 @@ namespace VORBS.API
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
-            }           
+            }
             return rooms;
         }
 
@@ -307,22 +307,45 @@ namespace VORBS.API
         /// <param name="dates">Dates for to check for meeting clashes</param>
         /// <param name="clashedBookings">OUT bookings which clash with the given parameters</param>
         /// <returns>Boolean based on whether there were any clashes</returns>
-        protected internal bool DoMeetingsClashRecurringly(Room room, TimeSpan startTime, TimeSpan endTime, IEnumerable<DateTime> dates, out IEnumerable<Booking> clashedBookings)
+        protected internal bool DoMeetingsClashRecurringly(Room room, TimeSpan startTime, TimeSpan endTime, DateTime date, out IEnumerable<Booking> clashedBookings)
         {
-            //Get dates only as we are checking against only the date portion in the DB
-            var datesOnly = dates.Select(x => x.Date);
+            ////Get dates only as we are checking against only the date portion in the DB
+            //var datesOnly = dates.Select(x => x.Date);
 
             var totalBookingsClashed = db.Bookings
-                    //Bookings only for this room
+                //Bookings only for this room
                     .Where(x => x.RoomID == room.ID)
-                    //Only bookings on the certain days that we want to book for
-                    .Where(y => datesOnly.Cast<DateTime?>().ToList().Contains(EntityFunctions.TruncateTime(y.StartDate)))
-                    //Only bookings on the days that intersect our given time period
+                //Only bookings on the certain days that we want to book for
+                    .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate))
+                //Only bookings on the days that intersect our given time period
                     .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second))
                     .ToList();
 
             clashedBookings = totalBookingsClashed;
             return totalBookingsClashed.Count > 0;
+        }
+
+        protected internal bool DoMeetingsClashRecurringly(List<Room> rooms, TimeSpan startTime, TimeSpan endTime, List<DateTime> dates, out List<Booking> allClashedBookings)
+        {
+            List<Booking> currentClashedBookings = new List<Booking>();
+            IEnumerable<Booking> clashedBookings;
+
+            bool clashed = false;
+            int k = 0;
+
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                if (DoMeetingsClashRecurringly(rooms[i], startTime, endTime, dates[k], out clashedBookings))
+                {
+                    currentClashedBookings.AddRange(clashedBookings);
+                    clashed = true;
+                }
+
+                k = (dates.Count() == (k + 1)) ? 0 : k + 1;
+            }
+
+            allClashedBookings = currentClashedBookings;
+            return clashed;
         }
 
 
@@ -337,9 +360,18 @@ namespace VORBS.API
             return availableRooms.FirstOrDefault();
         }
 
-        protected internal Room GetAlternateSmartRoom(DateTime startDate, DateTime endDate, int numberOfAttendees, int locationId, int bookingRoomId)
+        protected internal Room GetAlternateSmartRoom(int bookingRoomId, DateTime startDate, DateTime endDate, int locationId)
         {
-            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SeatCount >= numberOfAttendees && x.SmartRoom == true && x.Active == true && x.ID != bookingRoomId &&
+            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SmartRoom == true && x.Active == true && x.ID != bookingRoomId &&
+                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
+                                 .OrderByDescending(r => r.SeatCount);
+
+            return availableRooms.FirstOrDefault();
+        }
+
+        protected internal Room GetAlternateSmartRoom(IEnumerable<int> bookingRoomIds, DateTime startDate, DateTime endDate, int locationId)
+        {
+            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SmartRoom == true && x.Active == true && !bookingRoomIds.Contains(x.ID) &&
                                     (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
                                  .OrderByDescending(r => r.SeatCount);
 

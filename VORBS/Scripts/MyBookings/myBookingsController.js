@@ -171,11 +171,13 @@ function MyBookingsController($scope, $http, $resource) {
             function (success) {
                 $("#deleteModal").modal('hide');
                 $scope.GetBookings();
+                EnableDeleteBookingButton();
             },
             function (error) {
                 alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.message);
+                EnableDeleteBookingButton();
             });
-            EnableDeleteBookingButton();
+
         } catch (e) {
             EnableDeleteBookingButton();
         }

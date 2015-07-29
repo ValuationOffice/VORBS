@@ -205,8 +205,15 @@ namespace VORBS.API
         {
             try
             {
-                newBooking.RoomID = newBooking.Room.ID;
+                List<Booking> bookingsToCreate = new List<Booking>();
+                List<Booking> clashedBookings = new List<Booking>();
+
+                List<DateTime> recurringDates = new List<DateTime>();
+
                 Room bookingRoom = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault();
+                newBooking.RoomID = newBooking.Room.ID;
+
+                bool doMeetingsClash = false;
 
                 //Get the current user
                 if (string.IsNullOrWhiteSpace(newBooking.PID))
@@ -220,166 +227,95 @@ namespace VORBS.API
                     newBooking.PID = user.SamAccountName;
                 }
 
-                AvailabilityController aC = null;
-
-                List<Booking> bookingsToCreate = new List<Booking>() {};
-
-                List<DateTime> recurringDates = new List<DateTime>();
-
-                TimeSpan startTime = new TimeSpan(newBooking.StartDate.Hour, newBooking.StartDate.Minute, newBooking.StartDate.Second);
-                TimeSpan endTime = new TimeSpan(newBooking.EndDate.Hour, newBooking.EndDate.Minute, newBooking.EndDate.Second);
-
-                if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
-                {
-                    newBooking.IsSmartMeeting = true;
-                    List<Booking> clashedBookings = new List<Booking>();
-
-                    if (aC == null)
-                        aC = new AvailabilityController();
-
-                    foreach (var smartLoc in newBooking.SmartLoactions)
-                    {
-                        Room smartRoom = aC.GetAlternateSmartRoom(newBooking.StartDate, newBooking.EndDate, newBooking.Room.SeatCount, db.Locations.Single(l => l.Name == smartLoc).ID, newBooking.RoomID);
-
-                        if (smartRoom == null || bookingsToCreate.Select(x => x.Room).Contains(smartRoom))
-                        {
-                            clashedBookings.Add(new Booking()
-                            {
-                                StartDate = newBooking.StartDate,
-                                Owner = newBooking.Owner,
-                                IsSmartMeeting = true,
-                                Room = new Room()
-                                {
-                                    Location = new Location()
-                                    {
-                                        Name = smartLoc
-                                    }
-                                }
-                            });
-                        }
-                        else
-                        {
-                            bookingsToCreate.Add(new Booking()
-                            {
-                                DssAssist = newBooking.DssAssist,
-                                ExternalNames = newBooking.ExternalNames,
-                                Flipchart = newBooking.Flipchart,
-                                NumberOfAttendees = newBooking.Room.SeatCount,
-                                Owner = newBooking.Owner,
-                                PID = newBooking.PID,
-                                Projector = newBooking.Projector,
-                                RoomID = smartRoom.ID,
-                                Room = smartRoom,
-                                Subject = newBooking.Subject,
-                                StartDate = newBooking.StartDate,
-                                EndDate = newBooking.EndDate,
-                                IsSmartMeeting = true
-                            });
-                        }
-                    }
-
-                    //No Rooms avalible; Show clashes to users
-                    if (clashedBookings.Count() > 0)
-                    {
-                        var clashedBookingsString = new JavaScriptSerializer().Serialize(clashedBookings);
-                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, clashedBookingsString);
-                    }
-                }
-
                 if (newBooking.Recurrence.IsRecurring)
                 {
-                    if (aC == null)
-                        aC = new AvailabilityController();
+                    AvailabilityController aC = new AvailabilityController();
 
                     recurringDates = GetDatesForRecurrencePeriod(newBooking.StartDate, newBooking.Recurrence);
 
-                    IEnumerable<Booking> clashedBookings;
-                    bool doMeetingsClash = aC.DoMeetingsClashRecurringly(bookingRoom, TimeSpan.Parse(newBooking.StartDate.ToShortTimeString()), TimeSpan.Parse(newBooking.EndDate.ToShortTimeString()), recurringDates, out clashedBookings);
+                    if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
+                    {
+                        var smartBookings = GetSmartRoomBookings(newBooking, out clashedBookings);
+
+                        //No Rooms avalible; Show clashes to users
+                        if (clashedBookings.Count() > 0)
+                        {
+                            var clashedBookingsString = new JavaScriptSerializer().Serialize(ConvertBookingsToDTOs(clashedBookings));
+                            return Request.CreateErrorResponse(HttpStatusCode.BadGateway, clashedBookingsString);
+                        }
+
+                        newBooking.IsSmartMeeting = true;
+                        smartBookings.Add(newBooking);
+
+                        foreach (var smartBooking in smartBookings)
+                            bookingsToCreate.AddRange(GetBookingsForRecurringDates(recurringDates, smartBooking));
+                    }
+                    else
+                        bookingsToCreate.AddRange(GetBookingsForRecurringDates(recurringDates, newBooking));
+
+                    doMeetingsClash = aC.DoMeetingsClashRecurringly(bookingsToCreate.Select(x => x.Room).OrderBy(y => y.Location.ID).ToList(), TimeSpan.Parse(newBooking.StartDate.ToShortTimeString()), TimeSpan.Parse(newBooking.EndDate.ToShortTimeString()), recurringDates, out clashedBookings);
+
                     if (doMeetingsClash)
                     {
                         if (newBooking.Recurrence.SkipClashes)
                         {
-                            recurringDates.RemoveAll(x => clashedBookings.Select(c => c.StartDate.ToShortDateString()).Contains(x.Date.ToShortDateString()));
+                            bookingsToCreate.RemoveAll(x => clashedBookings.Select(c => c.StartDate.ToShortDateString()).Contains(x.StartDate.ToShortDateString()));
                         }
                         else if (newBooking.Recurrence.AutoAlternateRoom)
                         {
                             foreach (var cB in clashedBookings)
                             {
-                                Room newRoom = aC.GetAlternateRoom(startTime, endTime, newBooking.Room.SeatCount, db.Rooms.Single(r => r.ID == newBooking.RoomID).LocationID, true);
+                                Room newRoom;
+                                if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
+                                {
+                                    var unAvaliableRooms = bookingsToCreate.Where(y => cB.Room.LocationID == y.Room.LocationID && y.RoomID != cB.RoomID).Select(x => x.RoomID).Distinct();
+                                    newRoom = aC.GetAlternateSmartRoom(unAvaliableRooms, cB.StartDate, cB.EndDate, cB.Room.LocationID);
+                                }
+                                else
+                                {
+                                    TimeSpan startTime = new TimeSpan(newBooking.StartDate.Hour, newBooking.StartDate.Minute, newBooking.StartDate.Second);
+                                    TimeSpan endTime = new TimeSpan(newBooking.EndDate.Hour, newBooking.EndDate.Minute, newBooking.EndDate.Second);
+
+                                    newRoom = aC.GetAlternateRoom(startTime, endTime, newBooking.Room.SeatCount, cB.Room.LocationID, true);
+                                }
 
                                 if (newRoom == null)
-                                    return Request.CreateResponse(HttpStatusCode.InternalServerError, "No rooms avaliable.");
-
-                                DateTime startDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day);
-                                startDate = startDate + startTime;
-
-                                DateTime endDate = new DateTime(cB.StartDate.Year, cB.StartDate.Month, cB.StartDate.Day) + endTime;
-
-                                bookingsToCreate.Add(new Booking()
                                 {
-                                    DssAssist = newBooking.DssAssist,
-                                    ExternalNames = newBooking.ExternalNames,
-                                    Flipchart = newBooking.Flipchart,
-                                    NumberOfAttendees = newBooking.Room.SeatCount,
-                                    Owner = newBooking.Owner,
-                                    PID = newBooking.PID,
-                                    Projector = newBooking.Projector,
-                                    RoomID = newRoom.ID,
-                                    Subject = newBooking.Subject,
-                                    StartDate = startDate,
-                                    EndDate = endDate
-                                });
+                                    var clashedBookingsString = new JavaScriptSerializer().Serialize(new[]{ConvertBookingToDTO(cB)});
+                                    return Request.CreateErrorResponse(HttpStatusCode.BadGateway, clashedBookingsString);
+                                }
 
-                                //Remove date from recurringDates
-                                recurringDates.Remove(recurringDates.Single(r => r.Date == startDate.Date));
+                                Booking newClashedBooking = bookingsToCreate.First(x => x.RoomID == cB.RoomID && cB.StartDate == x.StartDate && cB.EndDate == x.EndDate);
+
+                                newClashedBooking.Room = newRoom;
+                                newClashedBooking.RoomID = newRoom.ID;
                             }
                         }
                         else
                         {
-                            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
-                            clashedBookings.ToList().ForEach(x => bookingsDTO.Add(new BookingDTO()
-                            {
-                                ID = x.ID,
-                                EndDate = x.EndDate,
-                                StartDate = x.StartDate,
-                                Subject = x.Subject,
-                                Owner = x.Owner,
-                                IsSmartMeeting = x.IsSmartMeeting,
-                                Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
-                                Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-                            }));
-
-                            var clashedBookingsString = new JavaScriptSerializer().Serialize(bookingsDTO);
+                            var clashedBookingsString = new JavaScriptSerializer().Serialize(ConvertBookingsToDTOs(clashedBookings));
                             return Request.CreateErrorResponse(HttpStatusCode.Conflict, clashedBookingsString);
                         }
                     }
                 }
+                else if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
+                {
+                    var smartBookings = GetSmartRoomBookings(newBooking, out clashedBookings);
+
+                    //No Rooms avalible; Show clashes to users
+                    if (clashedBookings.Count() > 0)
+                    {
+                        var clashedBookingsString = new JavaScriptSerializer().Serialize(ConvertBookingsToDTOs(clashedBookings));
+                        return Request.CreateErrorResponse(HttpStatusCode.BadGateway, clashedBookingsString);
+                    }
+
+                    newBooking.IsSmartMeeting = true;
+
+                    bookingsToCreate.Add(newBooking);
+                    bookingsToCreate.AddRange(smartBookings);
+                }
                 else
                     bookingsToCreate.Add(newBooking);
-
-                recurringDates.ForEach(x =>
-                {
-                    DateTime startDate = new DateTime(x.Year, x.Month, x.Day);
-                    startDate = startDate + startTime;
-
-                    DateTime endDate = new DateTime(x.Year, x.Month, x.Day);
-                    endDate = endDate + endTime;
-
-                    bookingsToCreate.Add(new Booking()
-                    {
-                        DssAssist = newBooking.DssAssist,
-                        ExternalNames = newBooking.ExternalNames,
-                        Flipchart = newBooking.Flipchart,
-                        NumberOfAttendees = newBooking.Room.SeatCount,
-                        Owner = newBooking.Owner,
-                        PID = newBooking.PID,
-                        Projector = newBooking.Projector,
-                        RoomID = newBooking.RoomID,
-                        Subject = newBooking.Subject,
-                        StartDate = startDate,
-                        EndDate = endDate
-                    });
-                });
 
                 //Reset Room as we dont want to create another room
                 bookingsToCreate.ForEach(x => x.Room = null);
@@ -387,7 +323,6 @@ namespace VORBS.API
                 db.Bookings.AddRange(bookingsToCreate);
 
                 db.SaveChanges(bookingsToCreate);
-
 
                 newBooking.Room = bookingRoom;
 
@@ -681,6 +616,44 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
+        protected internal Booking GetBookingForRecurringDate(DateTime recurringDate, Booking newBooking)
+        {
+            TimeSpan startTime = new TimeSpan(newBooking.StartDate.Hour, newBooking.StartDate.Minute, newBooking.StartDate.Second);
+            TimeSpan endTime = new TimeSpan(newBooking.EndDate.Hour, newBooking.EndDate.Minute, newBooking.EndDate.Second);
+
+            DateTime startDate = new DateTime(recurringDate.Year, recurringDate.Month, recurringDate.Day);
+            startDate = startDate + startTime;
+
+            DateTime endDate = new DateTime(recurringDate.Year, recurringDate.Month, recurringDate.Day);
+            endDate = endDate + endTime;
+
+            return new Booking()
+            {
+                DssAssist = newBooking.DssAssist,
+                ExternalNames = newBooking.ExternalNames,
+                Flipchart = newBooking.Flipchart,
+                NumberOfAttendees = newBooking.Room.SeatCount,
+                Owner = newBooking.Owner,
+                PID = newBooking.PID,
+                Projector = newBooking.Projector,
+                RoomID = newBooking.RoomID,
+                Room = newBooking.Room,
+                Subject = newBooking.Subject,
+                StartDate = startDate,
+                EndDate = endDate,
+                IsSmartMeeting = newBooking.IsSmartMeeting
+            };
+        }
+
+        protected internal List<Booking> GetBookingsForRecurringDates(List<DateTime> recurringDates, Booking newBooking)
+        {
+            List<Booking> bookingsToCreate = new List<Booking>();
+
+            recurringDates.ForEach(x => bookingsToCreate.Add(GetBookingForRecurringDate(x, newBooking)));
+
+            return bookingsToCreate;
+        }
+
         protected internal List<DateTime> GetDatesForRecurrencePeriod(DateTime startDate, RecurrenceDTO recurrenceDetails)
         {
             List<DateTime> recurringDates = new List<DateTime>();
@@ -772,5 +745,78 @@ namespace VORBS.API
             return recurringDates;
         }
 
+        protected internal List<Booking> GetSmartRoomBookings(Booking newBooking, out List<Booking> clashedBookings)
+        {
+            List<Booking> bookingsToCreate = new List<Booking>();
+            List<Booking> clashedBs = new List<Booking>();
+
+            AvailabilityController aC = new AvailabilityController();
+
+            foreach (var smartLoc in newBooking.SmartLoactions)
+            {
+                Room smartRoom = aC.GetAlternateSmartRoom(newBooking.RoomID, newBooking.StartDate, newBooking.EndDate, db.Locations.Single(l => l.Name == smartLoc).ID);
+
+                if (smartRoom == null || bookingsToCreate.Select(x => x.Room).Contains(smartRoom))
+                {
+                    clashedBs.Add(new Booking()
+                    {
+                        StartDate = newBooking.StartDate,
+                        Owner = newBooking.Owner,
+                        IsSmartMeeting = true,
+                        Room = new Room()
+                        {
+                            Location = new Location()
+                            {
+                                Name = smartLoc
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    bookingsToCreate.Add(new Booking()
+                    {
+                        DssAssist = newBooking.DssAssist,
+                        ExternalNames = newBooking.ExternalNames,
+                        Flipchart = newBooking.Flipchart,
+                        NumberOfAttendees = newBooking.Room.SeatCount,
+                        Owner = newBooking.Owner,
+                        PID = newBooking.PID,
+                        Projector = newBooking.Projector,
+                        RoomID = smartRoom.ID,
+                        Room = smartRoom,
+                        Subject = newBooking.Subject,
+                        StartDate = newBooking.StartDate,
+                        EndDate = newBooking.EndDate,
+                        IsSmartMeeting = true
+                    });
+                }
+            }
+
+            clashedBookings = clashedBs;
+            return bookingsToCreate;
+        }
+
+        protected internal BookingDTO ConvertBookingToDTO(Booking clashedBooking)
+        {
+            return new BookingDTO()
+            {
+                ID = clashedBooking.ID,
+                EndDate = clashedBooking.EndDate,
+                StartDate = clashedBooking.StartDate,
+                Subject = clashedBooking.Subject,
+                Owner = clashedBooking.Owner,
+                Location = new LocationDTO() { ID = clashedBooking.Room.Location.ID, Name = clashedBooking.Room.Location.Name },
+                Room = new RoomDTO() { ID = clashedBooking.Room.ID, RoomName = clashedBooking.Room.RoomName, ComputerCount = clashedBooking.Room.ComputerCount, PhoneCount = clashedBooking.Room.PhoneCount, SmartRoom = clashedBooking.Room.SmartRoom }
+            };
+        }
+
+        protected internal List<BookingDTO> ConvertBookingsToDTOs(List<Booking> clashedBookings)
+        {
+            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+            clashedBookings.ToList().ForEach(x => bookingsDTO.Add(ConvertBookingToDTO(x)));
+
+            return bookingsDTO;
+        }
     }
 }
