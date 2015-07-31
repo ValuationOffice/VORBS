@@ -1098,6 +1098,7 @@
     <Content Include="Views\Administration\ReportsTab.cshtml" />
     <Content Include="Views\Shared\Modals\EditLocationModal.cshtml" />
     <Content Include="Views\Shared\Modals\NewBookingRecurrenceModal.cshtml" />
+    <Content Include="Views\EmailTemplates\NewSmartBooking.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

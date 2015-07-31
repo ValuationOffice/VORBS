@@ -266,7 +266,7 @@ namespace VORBS.API
                             foreach (var cB in clashedBookings)
                             {
                                 Room newRoom;
-                                if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
+                                if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom) //TODO: Change when we introduce new validation check in UI
                                 {
                                     var unAvaliableRooms = bookingsToCreate.Where(y => cB.Room.LocationID == y.Room.LocationID && y.RoomID != cB.RoomID).Select(x => x.RoomID).Distinct();
                                     newRoom = aC.GetAlternateSmartRoom(unAvaliableRooms, cB.StartDate, cB.EndDate, cB.Room.LocationID);
@@ -281,7 +281,7 @@ namespace VORBS.API
 
                                 if (newRoom == null)
                                 {
-                                    var clashedBookingsString = new JavaScriptSerializer().Serialize(new[]{ConvertBookingToDTO(cB)});
+                                    var clashedBookingsString = new JavaScriptSerializer().Serialize(new[] { ConvertBookingToDTO(cB) });
                                     return Request.CreateErrorResponse(HttpStatusCode.BadGateway, clashedBookingsString);
                                 }
 
@@ -298,7 +298,7 @@ namespace VORBS.API
                         }
                     }
                 }
-                else if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
+                else if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom) //TODO: Change when we introduce new validation check in UI
                 {
                     var smartBookings = GetSmartRoomBookings(newBooking, out clashedBookings);
 
@@ -317,7 +317,7 @@ namespace VORBS.API
                 else
                     bookingsToCreate.Add(newBooking);
 
-                //Reset Room as we dont want to create another room
+                //Reset  Room as we dont want to create another room
                 bookingsToCreate.ForEach(x => x.Room = null);
 
                 db.Bookings.AddRange(bookingsToCreate);
@@ -343,7 +343,15 @@ namespace VORBS.API
                     if (newBooking.PID.ToUpper() != currentUserPid.ToUpper())
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewBooking.cshtml", newBooking);
                     else
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
+                    {
+                        if (newBooking.SmartLoactions.Count() > 0)
+                        {
+                            bookingsToCreate = GetRoomForBookings(bookingsToCreate);
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewSmartBooking.cshtml", bookingsToCreate);
+                        }
+                        else
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
+                    }
 
                     Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
                 }
@@ -616,6 +624,12 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
+        protected internal List<Booking> GetRoomForBookings(List<Booking> bookingsToCreate)
+        {
+            bookingsToCreate.ForEach(b => b.Room = db.Rooms.Single(r => r.ID == b.RoomID));
+            return bookingsToCreate;
+        }
+
         protected internal Booking GetBookingForRecurringDate(DateTime recurringDate, Booking newBooking)
         {
             TimeSpan startTime = new TimeSpan(newBooking.StartDate.Hour, newBooking.StartDate.Minute, newBooking.StartDate.Second);
@@ -749,12 +763,15 @@ namespace VORBS.API
         {
             List<Booking> bookingsToCreate = new List<Booking>();
             List<Booking> clashedBs = new List<Booking>();
+            List<int> smartRoomIds = new List<int>();
+
+            smartRoomIds.Add(newBooking.RoomID);
 
             AvailabilityController aC = new AvailabilityController();
 
             foreach (var smartLoc in newBooking.SmartLoactions)
             {
-                Room smartRoom = aC.GetAlternateSmartRoom(newBooking.RoomID, newBooking.StartDate, newBooking.EndDate, db.Locations.Single(l => l.Name == smartLoc).ID);
+                Room smartRoom = aC.GetAlternateSmartRoom(smartRoomIds, newBooking.StartDate, newBooking.EndDate, db.Locations.Single(l => l.Name == smartLoc).ID);
 
                 if (smartRoom == null || bookingsToCreate.Select(x => x.Room).Contains(smartRoom))
                 {
@@ -790,6 +807,8 @@ namespace VORBS.API
                         EndDate = newBooking.EndDate,
                         IsSmartMeeting = true
                     });
+
+                    smartRoomIds.Add(smartRoom.ID);
                 }
             }
 

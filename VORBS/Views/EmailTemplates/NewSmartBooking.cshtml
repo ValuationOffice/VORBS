@@ -1,0 +1,54 @@
+﻿@model IEnumerable<VORBS.Models.Booking>
+
+@{
+    Layout = null;
+}
+
+<html>
+<body>
+    <h2>You have booked the following SMART rooms:</h2>
+    @foreach (var item in Model)
+    {
+        <table cellspacing="0" cellpadding="10" border="1" width="600">
+            <thead>
+                <tr>
+                    <th>Location</th>
+                    <th>Room</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Subject</th>
+                    <th>Equipment</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td>@item.Room.Location.Name</td>
+                    <td>@item.Room.RoomName</td>
+                    <td>@item.StartDate.ToShortDateString()</td>
+                    <td>@item.StartDate.ToShortTimeString()</td>
+                    <td>@item.Subject</td>
+                    <td>
+                        <ul>
+                            @if (item.Projector)
+                            {
+                                <li>Projector</li>
+                            }
+                            @if (item.Flipchart)
+                            {
+                                <li>Flipchart</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <br />
+    }
+    <p>You still need to create a SMART room conference in Outlook using Lync. If you are unsure in how to do this please visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/Help"))">Help</a> page. </p>
+    <p>If you require assistance in setting up the video conferencing at the time of your meeting please contact <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/Help"))">Desktop Service Support</a></p>
+    <p>TTo edit or delete your booking visit <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/MyBookings"))">My Bookings</a> page </p>
+    <p>If you have any special requests or requirements visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/Help"))">Help</a> page</p>
+</body>
+</html>

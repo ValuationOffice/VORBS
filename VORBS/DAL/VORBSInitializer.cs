@@ -126,9 +126,27 @@ namespace VORBS.DAL
                 ,new Booking(){ RoomID = 20, Owner = "User4", StartDate = new DateTime(2015, 5, 28, 09, 00, 0), EndDate = new DateTime(2015, 5, 28, 17, 00, 0) }
             };
 
+            int dayOffset = 1;
+            foreach (var b in bookings.Take(22))
+            {
+                if (new int[2] { 6, 0 }.ToList().Contains(((int)b.StartDate.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1).DayOfWeek)))
+                    dayOffset = dayOffset + 3;
+
+                b.StartDate =  b.StartDate.Date.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1);
+                b.EndDate = b.EndDate.Date.AddDays((DateTime.Now.Date - b.EndDate.Date).Days + 1);
+            }
+
+            foreach (var b in bookings.Skip(22))
+            {
+                if (new int[2] { 6, 0 }.ToList().Contains(((int)b.StartDate.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1).DayOfWeek)))
+                    dayOffset = dayOffset + 3;
+
+                b.StartDate = b.StartDate.Date.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 2);
+                b.EndDate = b.EndDate.Date.AddDays((DateTime.Now.Date - b.EndDate.Date).Days + 2);
+            }
+
             bookings.ForEach(b => context.Bookings.Add(b));
             context.SaveChanges();
-
         }
     }
 }
