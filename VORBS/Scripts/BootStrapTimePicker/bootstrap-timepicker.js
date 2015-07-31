@@ -48,6 +48,7 @@
           'click.timepicker': $.proxy(this.highlightUnit, this),
           'keydown.timepicker': $.proxy(this.elementKeydown, this),
           'blur.timepicker': $.proxy(this.blurElement, this),
+          
           'mousewheel.timepicker DOMMouseScroll.timepicker': $.proxy(this.mousewheel, this)
         });
       } else {
@@ -56,6 +57,7 @@
             'focus.timepicker': $.proxy(this.showWidget, this),
             'click.timepicker': $.proxy(this.showWidget, this),
             'blur.timepicker': $.proxy(this.blurElement, this),
+            'focusout.timepicker': $.proxy(this.focusOut, this),
             'mousewheel.timepicker DOMMouseScroll.timepicker': $.proxy(this.mousewheel, this)
           });
         } else {
@@ -86,6 +88,12 @@
       }
 
       this.setDefaultTime(this.defaultTime);
+    },
+
+    focusOut: function () {
+        if ($(document.activeElement).data("timepickerele") == null) {
+            this.hideWidget();
+        }        
     },
 
     blurElement: function() {
@@ -255,16 +263,16 @@
 
       templateContent = '<table>' +
                '<tr>' +
-                 '<td><a href="#" data-action="incrementHour"><span class="glyphicon glyphicon-chevron-up"></span></a></td>' +
+                 '<td data-timepickerele><a href="#" data-action="incrementHour" data-timepickerele><span data-timepickerele class="glyphicon glyphicon-chevron-up"></span></a></td>' +
                  '<td class="separator">&nbsp;</td>' +
-                 '<td><a href="#" data-action="incrementMinute"><span class="glyphicon glyphicon-chevron-up"></span></a></td>' +
+                 '<td data-timepickerele><a href="#" data-action="incrementMinute" data-timepickerele><span class="glyphicon glyphicon-chevron-up" data-timepickerele></span></a></td>' +
                  (this.showSeconds ?
                    '<td class="separator">&nbsp;</td>' +
-                   '<td><a href="#" data-action="incrementSecond"><span class="glyphicon glyphicon-chevron-up"></span></a></td>'
+                   '<td data-timepickerele><a data-timepickerele href="#" data-action="incrementSecond"><span class="glyphicon glyphicon-chevron-up" data-timepickerele></span></a></td>'
                  : '') +
                  (this.showMeridian ?
                    '<td class="separator">&nbsp;</td>' +
-                   '<td class="meridian-column"><a href="#" data-action="toggleMeridian"><span class="glyphicon glyphicon-chevron-up"></span></a></td>'
+                   '<td data-timepickerele class="meridian-column"><a href="#" data-action="toggleMeridian" data-timepickerele><span class="glyphicon glyphicon-chevron-up" data-timepickerele></span></a></td>'
                  : '') +
                '</tr>' +
                '<tr>' +
@@ -281,16 +289,16 @@
                  : '') +
                '</tr>' +
                '<tr>' +
-                 '<td><a href="#" data-action="decrementHour"><span class="glyphicon glyphicon-chevron-down"></span></a></td>' +
+                 '<td data-timepickerele><a href="#" data-action="decrementHour" data-timepickerele><span class="glyphicon glyphicon-chevron-down" data-timepickerele></span></a></td>' +
                  '<td class="separator"></td>' +
-                 '<td><a href="#" data-action="decrementMinute"><span class="glyphicon glyphicon-chevron-down"></span></a></td>' +
+                 '<td data-timepickerele><a href="#" data-action="decrementMinute" data-timepickerele><span class="glyphicon glyphicon-chevron-down" data-timepickerele></span></a></td>' +
                  (this.showSeconds ?
                   '<td class="separator">&nbsp;</td>' +
-                  '<td><a href="#" data-action="decrementSecond"><span class="glyphicon glyphicon-chevron-down"></span></a></td>'
+                  '<td data-timepickerele><a href="#" data-action="decrementSecond" data-timepickerele><span class="glyphicon glyphicon-chevron-down" data-timepickerele></span></a></td>'
                  : '') +
                  (this.showMeridian ?
                   '<td class="separator">&nbsp;</td>' +
-                  '<td><a href="#" data-action="toggleMeridian"><span class="glyphicon glyphicon-chevron-down"></span></a></td>'
+                  '<td data-timepickerele><a href="#" data-action="toggleMeridian" data-timepickerele><span class="glyphicon glyphicon-chevron-down" data-timepickerele></span></a></td>'
                  : '') +
                '</tr>' +
              '</table>';

@@ -264,6 +264,9 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Scripts\IE7Compatibility\angular1.2.9.min.js" />
     <Content Include="Content\config.json" />
+    <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.min.js.map">
+      <DependentUpon>bootstrap-timepicker.min.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\FullCalandar\fullcalendar.min.js" />
     <Content Include="Scripts\i18n\angular-locale_aa-dj.js" />
