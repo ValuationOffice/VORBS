@@ -24,7 +24,7 @@
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody ng-cloak>
                     <tr ng-repeat="booking in bookings" class="MyBookingsBookingRow">
                         <td ng-if="booking.isSmartMeeting"><span class="glyphicon glyphicon-facetime-video" title="Is part of a smart booking"></span></td>
                         <td ng-if="!booking.isSmartMeeting">&nbsp;</td>
