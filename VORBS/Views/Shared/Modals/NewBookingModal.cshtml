@@ -110,7 +110,7 @@
 <div class="modal fade" id="meetingClashSelection" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">                
+            <div class="modal-header">
                 <h4 class="modal-title">Meeting clashes with these bookings</h4>
             </div>
             <div class="modal-body">
@@ -119,7 +119,7 @@
                         <th>Loaction</th>
                         <th>Room</th>
                         <th>Date</th>
-                        <th>Owner</th>                        
+                        <th>Owner</th>
                     </tr>
                     <tr ng-repeat="booking in clashedBookings">
                         <td>{{ booking.Location.Name }}</td>
@@ -130,9 +130,32 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="cancelBookingClash" ng-click="CancelBookingClash();">Cancel Recurrence</button>
-                <button type="button" class="btn btn-primary" id="skipBookingClash" ng-click="SkipBookingClash();">Skip Clashed Meetings</button>
-                <button type="button" class="btn btn-primary" id="alternateBookingClash" ng-click="AlternateBookingClash();">Application Chooses Rooms</button>
+                <button type="button" class="btn btn-default" id="cancelBookingClash" ng-click="CancelBookingClash();" title="Cancel the current recurrnce">Cancel Recurrence</button>
+                <button type="button" class="btn btn-primary" id="skipBookingClash" ng-click="SkipBookingClash();" title="Dont book the meetings that clash with the above bookings.">Skip Clashed</button>
+                <button type="button" class="btn btn-primary" id="alternateBookingClash" ng-click="AlternateBookingClash();" title="Application will pick alternative appropriate rooms">Auto Pick</button>
+                @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
+                {
+                    <button type="button" class="btn btn-primary" id="adminOverwriteClash" title="Overwrite will replace the bookings above, with your new bookings." data-toggle="modal" data-target="#adminOverwriteMessagePopup">Overwrite</button>
+                }
+            </div>
+        </div>
+    </div>>
+</div>
+
+<div class="modal fade" id="adminOverwriteMessagePopup" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Please enter a cancellation message</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <label class="control-label">Admin Message</label><br />
+                    <textarea ng-model="newBooking.Recurrence.AdminOverwriteMessage" cols="100" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="adminOverwriteFinish" ng-click="AdminOverwriteClash();" data-dismiss="modal">Finish</button>
             </div>
         </div>
     </div>>
@@ -159,7 +182,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="newBookingCancelButton" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="newBookingCancelButton" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>>

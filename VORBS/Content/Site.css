@@ -47,6 +47,11 @@ textarea {
     font-size: small;
 }
 
+#adminOverwriteMessagePopup textarea{
+    /*width: 100%;   */
+    max-width: 100%;
+}
+
 #logo_text #logoBanner {
     float: left;
     margin-left: 30px;

@@ -207,6 +207,7 @@ namespace VORBS.API
             {
                 List<Booking> bookingsToCreate = new List<Booking>();
                 List<Booking> clashedBookings = new List<Booking>();
+                List<Booking> deletedBookings = new List<Booking>();
 
                 List<DateTime> recurringDates = new List<DateTime>();
 
@@ -291,6 +292,28 @@ namespace VORBS.API
                                 newClashedBooking.RoomID = newRoom.ID;
                             }
                         }
+                        else if (newBooking.Recurrence.AdminOverwrite)
+                        {
+                            //checking they are still admin
+                            if (VORBS.Security.VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
+                            {
+                                try
+                                {
+                                    int[] ids = clashedBookings.Select(x => x.ID).ToArray();
+                                    var entityClashedBookings = db.Bookings.Where(x => ids.Contains(x.ID));
+                                    db.Bookings.RemoveRange(entityClashedBookings);
+                                    deletedBookings.AddRange(clashedBookings);
+                                }
+                                catch (Exception exn)
+                                {
+                                    _logger.ErrorException(string.Format("Unable to overwrite bookings as admin. Old Bookings: {0}.", clashedBookings.Select(x => x.ID)), exn);
+                                }
+                            }
+                            else
+                            {
+                                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unauthorised to overwrite bookings.");
+                            }
+                        }
                         else
                         {
                             var clashedBookingsString = new JavaScriptSerializer().Serialize(ConvertBookingsToDTOs(clashedBookings));
@@ -322,7 +345,28 @@ namespace VORBS.API
 
                 db.Bookings.AddRange(bookingsToCreate);
 
-                db.SaveChanges(bookingsToCreate);
+                db.SaveChanges(bookingsToCreate, true);
+
+                if (deletedBookings.Count > 0)
+                {
+                    foreach (string owner in deletedBookings.Select(x => x.PID).Distinct())
+                    {
+                        try
+                        {
+                            //Once Booking has been removed; Send Cancelltion Emails
+                            string toEmail = AdQueries.GetUserByPid(owner).EmailAddress;
+                            string errorMessage = (newBooking.Recurrence.AdminOverwriteMessage.Trim().Length > 0) ? newBooking.Recurrence.AdminOverwriteMessage : "An admin has cancelled these bookings.";
+                            string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBookingWithMessage.cshtml", new Models.ViewModels.AdminMultiCancelledBookingWithMessage(clashedBookings.Where(x => x.PID == owner), errorMessage));
+
+                            Utils.EmailHelper.SendEmail(ConfigurationManager.AppSettings["fromEmail"], toEmail, "Meeting room booking(s) cancellation", body);
+                        }
+                        catch (Exception exn)
+                        {
+                            _logger.ErrorException("Unable to send personal email for booking deletions by admin. Owner: " + owner, exn);
+                        }
+
+                    }
+                }
 
                 newBooking.Room = bookingRoom;
 
@@ -332,7 +376,7 @@ namespace VORBS.API
                     return new HttpResponseMessage(HttpStatusCode.OK);
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
-
+                newBooking.Room = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault();
                 try
                 {
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);

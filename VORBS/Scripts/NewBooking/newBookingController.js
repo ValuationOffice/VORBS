@@ -444,6 +444,8 @@ function NewBookingController($scope, $http, $resource) {
             IsRecurring: false,
             SkipClashes: false,
             AutoAlternateRoom: false,
+            AdminOverwrite: false,
+            AdminOverwriteMessage: '',
             Frequency: 'daily',
             EndDate: new moment().utc().format('DD-MM-YYYY'),
             DailyDayCount: 1,
@@ -571,6 +573,7 @@ function NewBookingController($scope, $http, $resource) {
     $scope.SkipBookingClash = function () {
         $scope.newBooking.Recurrence.AutoAlternateRoom = false;
         $scope.newBooking.Recurrence.SkipClashes = true;
+        $scope.newBooking.Recurrence.AdminOverwrite = false;
 
         $("#meetingClashSelection").modal('hide');
 
@@ -580,6 +583,17 @@ function NewBookingController($scope, $http, $resource) {
     $scope.AlternateBookingClash = function () {
         $scope.newBooking.Recurrence.AutoAlternateRoom = true;
         $scope.newBooking.Recurrence.SkipClashes = false;
+        $scope.newBooking.Recurrence.AdminOverwrite = false;
+
+        $("#meetingClashSelection").modal('hide');
+
+        $scope.NewBooking();
+    }
+
+    $scope.AdminOverwriteClash = function () {
+        $scope.newBooking.Recurrence.AutoAlternateRoom = false;
+        $scope.newBooking.Recurrence.SkipClashes = false;
+        $scope.newBooking.Recurrence.AdminOverwrite = true;
 
         $("#meetingClashSelection").modal('hide');
 

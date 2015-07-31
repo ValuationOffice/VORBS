@@ -21,42 +21,65 @@ namespace VORBS.DAL
         public DbSet<Admin> Admins { get; set; }
         public DbSet<LocationCredentials> LocationCredentials { get; set; }
 
-        public virtual int SaveChanges(Booking booking)
+        public virtual int SaveChanges(Booking booking, bool dontCheckClash)
         {
             Booking clashedBooking;
-            int objectsWritten;
-
-            using (var scope = TransactionUtils.CreateTransactionScope())
+            int objectsWritten = 0;
+            if (!dontCheckClash)
             {
-                if (new AvailabilityController().DoesMeetingClash(booking, out clashedBooking))
-                    throw new BookingConflictException("Simultaneous booking conflict, please try again.");
+                using (var scope = TransactionUtils.CreateTransactionScope())
+                {
+                    if (new AvailabilityController().DoesMeetingClash(booking, out clashedBooking))
+                        throw new BookingConflictException("Simultaneous booking conflict, please try again.");
 
-                objectsWritten = base.SaveChanges();
-                scope.Complete();
+                    objectsWritten = base.SaveChanges();
+                    scope.Complete();
+                }
             }
-
+            else
+            {
+                objectsWritten = base.SaveChanges();
+            }
             return objectsWritten;
+        }
+
+        public virtual int SaveChanges(Booking booking)
+        {
+            return SaveChanges(booking, false);
         }
 
         public virtual int SaveChanges(List<Booking> bookings)
         {
-            AvailabilityController aC = new AvailabilityController();
-            Booking clashedBooking;
+            return SaveChanges(bookings, false);
+        }
 
-            int objectsWritten;
+        public virtual int SaveChanges(List<Booking> bookings, bool dontCheckClash)
+        {
+            int objectsWritten = 0;
 
-            using (var scope = TransactionUtils.CreateTransactionScope())
+            if (!dontCheckClash)
             {
-                foreach (var b in bookings)
+                AvailabilityController aC = new AvailabilityController();
+                Booking clashedBooking;
+
+
+
+                using (var scope = TransactionUtils.CreateTransactionScope())
                 {
-                    if (aC.DoesMeetingClash(b, out clashedBooking))
-                        throw new BookingConflictException("Simultaneous booking conflict, please try again.");
+                    foreach (var b in bookings)
+                    {
+                        if (aC.DoesMeetingClash(b, out clashedBooking))
+                            throw new BookingConflictException("Simultaneous booking conflict, please try again.");
+                    }
+
+                    objectsWritten = base.SaveChanges();
+                    scope.Complete();
                 }
-
-                objectsWritten = base.SaveChanges();
-                scope.Complete();
             }
-
+            else
+            {
+                objectsWritten = base.SaveChanges();
+            }
             return objectsWritten;
         }
     }

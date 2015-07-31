@@ -10,6 +10,8 @@ namespace VORBS.Models.DTOs
         public bool IsRecurring { get; set; }
         public bool SkipClashes { get; set; }
         public bool AutoAlternateRoom { get; set; }
+        public bool AdminOverwrite { get; set; }
+        public string AdminOverwriteMessage { get; set; }
 
         public string Frequency { get; set; }
         public DateTime EndDate { get; set; }
