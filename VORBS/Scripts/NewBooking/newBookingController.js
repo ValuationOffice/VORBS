@@ -259,6 +259,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.ShowSmartLoactions = function () {
+        $scope.SearchBookings();
         if ($scope.bookingFilter.smartRoom) {
             $scope.GetSmartLocations();
             $("#smartRoomLocations").css('display', 'block');

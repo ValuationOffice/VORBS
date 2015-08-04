@@ -384,17 +384,34 @@ namespace VORBS.API
                     string toEmail = AdQueries.GetUserByPid(newBooking.PID).EmailAddress;
 
                     string body = "";
+
+                    if (newBooking.IsSmartMeeting)
+                        bookingsToCreate = GetRoomForBookings(bookingsToCreate);
+                    else
+                        newBooking.Room = GetRoomForBooking(newBooking);
+
+
                     if (newBooking.PID.ToUpper() != currentUserPid.ToUpper())
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewBooking.cshtml", newBooking);
+                        if (newBooking.IsSmartMeeting)
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewSmartBooking.cshtml", bookingsToCreate);
+                        else
+                        {
+                            if (newBooking.Recurrence.IsRecurring)
+                                body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewRecurringBooking.cshtml", new Models.ViewModels.NewRecurringBookingWithMessage(newBooking, GetRecurrenceSentance(newBooking)));
+                            else
+                                body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewBooking.cshtml", newBooking);
+                        }
                     else
                     {
-                        if (newBooking.SmartLoactions.Count() > 0)
-                        {
-                            bookingsToCreate = GetRoomForBookings(bookingsToCreate);
+                        if (newBooking.IsSmartMeeting)
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewSmartBooking.cshtml", bookingsToCreate);
-                        }
                         else
-                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
+                        {
+                            if (newBooking.Recurrence.IsRecurring)
+                                body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewRecurringBooking.cshtml", new Models.ViewModels.NewRecurringBookingWithMessage(newBooking, GetRecurrenceSentance(newBooking)));
+                            else
+                                body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
+                        }
                     }
 
                     Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
@@ -668,9 +685,14 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
+        private Room GetRoomForBooking(Booking newBooking)
+        {
+            return db.Rooms.Single(r => r.ID == newBooking.RoomID);
+        }
+
         protected internal List<Booking> GetRoomForBookings(List<Booking> bookingsToCreate)
         {
-            bookingsToCreate.ForEach(b => b.Room = db.Rooms.Single(r => r.ID == b.RoomID));
+            bookingsToCreate.ForEach(b => b.Room = GetRoomForBooking(b));
             return bookingsToCreate;
         }
 
@@ -880,6 +902,32 @@ namespace VORBS.API
             clashedBookings.ToList().ForEach(x => bookingsDTO.Add(ConvertBookingToDTO(x)));
 
             return bookingsDTO;
+        }
+
+        protected static internal string GetRecurrenceSentance(Booking newBooking)
+        {
+            string recurrenceSentance = null;
+            switch (newBooking.Recurrence.Frequency)
+            {
+                case "daily":
+                    recurrenceSentance = string.Format("Booking occurs every {0} day(s) effective {1} until {2} from {3} to {4}",
+                                            newBooking.Recurrence.DailyDayCount, newBooking.StartDate.ToShortDateString(), newBooking.Recurrence.EndDate.ToShortDateString(),
+                                            newBooking.StartDate.ToShortTimeString(), newBooking.EndDate.ToShortTimeString());
+                    break;
+                case "weekly":
+                    recurrenceSentance = string.Format("Booking occurs every {0} weeks(s) on {1} effective {2} until {3} from {4} to {5}",
+                                            newBooking.Recurrence.WeeklyWeekCount, (DayOfWeek)newBooking.Recurrence.WeeklyDay, newBooking.StartDate.ToShortDateString(),
+                                            newBooking.Recurrence.EndDate.ToShortDateString(), newBooking.StartDate.ToShortTimeString(), newBooking.EndDate.ToShortTimeString());
+                    break;
+                case "monthly":
+                    string[] words = new string[] {"Last", "First", "Second", "Third", "Fourth" };
+                    recurrenceSentance = string.Format("Booking occurs the {0} {1} of every {2} month(s) effective {3} until {4} from {5} to {6}",
+                                            words[newBooking.Recurrence.MonthlyMonthDayCount], (DayOfWeek)newBooking.Recurrence.MonthlyMonthDay, newBooking.Recurrence.MonthlyMonthCount, 
+                                            newBooking.StartDate.ToShortDateString(), newBooking.Recurrence.EndDate.ToShortDateString(), newBooking.StartDate.ToShortTimeString(), newBooking.EndDate.ToShortTimeString());
+                    break;
+            }
+
+            return recurrenceSentance;
         }
     }
 }

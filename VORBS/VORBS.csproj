@@ -155,6 +155,7 @@
     <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\LocationCredentials.cs" />
     <Compile Include="Models\ViewModels\AdminMultiCancelledBookingWithMessage.cs" />
+    <Compile Include="Models\ViewModels\NewRecurringBookingWithMessage.cs" />
     <Compile Include="Security\Authorisation.cs" />
     <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
@@ -1104,6 +1105,9 @@
     <Content Include="Views\Shared\Modals\NewBookingRecurrenceModal.cshtml" />
     <Content Include="Views\EmailTemplates\NewSmartBooking.cshtml" />
     <Content Include="Views\EmailTemplates\AdminMultiCancelledBookingWithMessage.cshtml" />
+    <Content Include="Views\EmailTemplates\AdminNewSmartBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\NewRecurringBooking.cshtml" />
+    <Content Include="Views\EmailTemplates\AdminNewRecurringBooking.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

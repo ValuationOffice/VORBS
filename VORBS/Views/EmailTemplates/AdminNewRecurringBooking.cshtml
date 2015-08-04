@@ -1,0 +1,46 @@
+﻿@model VORBS.Models.ViewModels.NewRecurringBookingWithMessage
+@{
+    Layout = null;
+}
+
+<html>
+<body>
+    <h2>An admin has made made the following recurring room booking:</h2>
+    <p>@Model.RecurringSentence</p>
+    <table cellspacing="0" cellpadding="10" border="1" width="600">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Equipment</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Booking.Room.Location.Name</td>
+                <td>@Model.Booking.Room.RoomName</td>
+                <td>@Model.Booking.StartDate.ToShortDateString()</td>
+                <td>@Model.Booking.StartDate.ToShortTimeString()</td>
+                <td>@Model.Booking.Subject</td>
+                <td>
+                    <ul>
+                        @if (Model.Booking.Projector)
+                        {
+                            <li>Projector</li>
+                        }
+                        @if (Model.Booking.Flipchart)
+                        {
+                            <li>Flipchart</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p>To edit or delete your booking visit <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/MyBookings"))">My Bookings</a> page </p>
+    <p>If you have any special requests or requirements visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/Help"))"> Help</a> page</p>
+</body>
+</html>
