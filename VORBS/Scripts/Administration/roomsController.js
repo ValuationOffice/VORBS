@@ -72,6 +72,7 @@ function RoomsController($scope, $http, $resource) {
     }
 
     $scope.newRoom = {
+        Active: false,
         RoomName: '',
         LocationID: 0,
         ComputerCount: 0,

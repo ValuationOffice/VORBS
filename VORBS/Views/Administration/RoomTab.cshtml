@@ -33,6 +33,10 @@
                 <label class="control-label">Smart Room</label>
                 <input type="checkbox" ng-model="newRoom.SmartRoom" class="form-control" />
             </div>
+            <div class="col-xs-2" id="roomActive">
+                <label class="control-label">Active</label>
+                <input type="checkbox" ng-model="newRoom.Active" class="form-control" />
+            </div>
             <div class="col-xs-3">
                 <label>&nbsp;</label>
                 <input id="newRoomAddButton" type="button" class="btn btn-primary" value="Add" ng-click="NewRoom()" />

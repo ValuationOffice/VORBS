@@ -188,8 +188,6 @@ namespace VORBS.API
                 if (db.Rooms.Where(r => r.RoomName.ToUpper() == newRoom.RoomName.ToUpper() && r.LocationID == newRoom.LocationID).Count() > 0)
                     return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", newRoom.RoomName, newRoom.Location.Name));
 
-                newRoom.Active = true;
-
                 db.Rooms.Add(newRoom);
                 db.SaveChanges();
 
