@@ -411,6 +411,7 @@ function NewBookingController($scope, $http, $resource) {
         $scope.newBooking.Projector = false
 
         ResetExternalNamesUI();
+        $scope.ResetRecurrenceStatus();
     })
 
     $scope.bookingFilter = {
