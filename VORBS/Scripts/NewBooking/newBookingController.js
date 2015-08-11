@@ -5,6 +5,9 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.locations = Locations.query({ status: true });
     $scope.clashedBookings = [];
+
+    $scope.externalFirstNameTextBox = '';
+    $scope.externalLastNameTextBox = '';
     //$scope.currentLocation = $scope.locations[0]
 
 

@@ -70,10 +70,10 @@
                         <div class="form-group">
                             <div class="form-inline">
                                 <label style="font-weight: normal !important;">First Name</label>
-                                <input class="form-control" id="externalFirstNameTextBox" />
+                                <input class="form-control" id="externalFirstNameTextBox"  ng-model="externalFirstNameTextBox"/>
                                 <label style="font-weight: normal !important;">Last Name</label>
-                                <input class="form-control" id="externalLastNameTextBox" />
-                                <button type="button" class="btn btn-primary" ng-click="AddExternalAttendee()">Add</button>
+                                <input class="form-control" id="externalLastNameTextBox" ng-model="externalLastNameTextBox"/>
+                                <button type="button" class="btn btn-primary" ng-disabled="externalFirstNameTextBox.length == 0 || externalLastNameTextBox.length == 0" ng-click="AddExternalAttendee()">Add</button>
                             </div>
                             <table>
                                 <tr ng-repeat="externalName in booking.ExternalNames">
