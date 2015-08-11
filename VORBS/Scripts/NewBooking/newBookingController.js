@@ -274,9 +274,30 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.AddSmartLoaction = function () {
+        var errors = [];
+        var valid = true;
         if ($("#smartLoactionDropDown")[0].selectedIndex > 0) {
             $scope.newBooking.SmartLoactions.push($scope.currentSmartLocation);
             $scope.smartLoactions = $scope.RemoveLoaction($scope.currentSmartLocation, $scope.smartLoactions);
+        }
+        else {
+            $("#searchFilter #smartLocationSelect").addClass('has-error');
+            errors.push('Please select your other meeting location(s) click the Add button');
+            valid = false;
+        }
+
+        if (!valid) {
+            for (var i = 0; i < errors.length; i++) {
+                $("#searchFilterErrorList").append('<li>' + errors[i] + '</li>');
+            }
+            $("#searchFilterErrorCont").css('display', 'block');
+        }
+    }
+
+    $scope.ValidateSelection = function () {
+        if ($("#smartLoactionDropDown")[0].selectedIndex > 0) {
+            $("#searchFilter #smartLocationSelect").removeClass('has-error');
+            $("#searchFilterErrorCont").css('display', 'none');
         }
     }
 
