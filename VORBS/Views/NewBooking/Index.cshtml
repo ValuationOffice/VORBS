@@ -19,7 +19,7 @@
             <div class="form-group row">
                 <div class="col-xs-4" id="searchLocation">
                     <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="GetSmartLocations()">
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="SearchBookings(false)">
                         <option value="" selected disabled>Select a location...</option>
                     </select>
                 </div>
