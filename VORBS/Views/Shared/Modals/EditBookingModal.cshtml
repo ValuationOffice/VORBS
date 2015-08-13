@@ -46,15 +46,15 @@
 
                                 <div class="col-xs-5">
                                     <label>First Name</label>
-                                    <input class="form-control" id="externalFirstNameTextBox" />
+                                    <input class="form-control" id="externalFirstNameTextBox" ng-model="editBookingExternalFirstName" />
                                 </div>
                                 <div class="col-xs-5">
                                     <label>Last Name</label>
-                                    <input class="form-control" id="externalLastNameTextBox" />
+                                    <input class="form-control" id="externalLastNameTextBox" ng-model="editBookingExternalLastName"/>
                                 </div>
                                 <div class="col-xs-2">
                                     <label>&nbsp;</label>
-                                    <input id="addExternal" type="button" class="form-control btn-primary btn-sm" ng-click="AddExternalAttendee()" value="Add" />
+                                    <input id="addExternal" type="button" class="form-control btn btn-primary" ng-disabled="editBookingExternalFirstName.length == 0 || editBookingExternalLastName.length == 0" ng-click="AddExternalAttendee()" value="Add" />
                                 </div>
                             </div>
                             <div class="form-group row">

@@ -4,6 +4,9 @@ function MyBookingsController($scope, $http, $resource) {
 
     CreateServices($resource);
 
+    $scope.editBookingExternalFirstName = '';
+    $scope.editBookingExternalLastName = '';
+
     $scope.GetBookings = function () {
         $scope.bookings = Bookings.query({
             startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
@@ -22,6 +25,8 @@ function MyBookingsController($scope, $http, $resource) {
     $scope.AddExternalAttendee = function () {
         SetModalErrorMessage('');
         $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
+        $scope.editBookingExternalFirstName = '';
+        $scope.editBookingExternalLastName = '';
     }
 
     $scope.RemoveExternalAttendee = function (fullName) {

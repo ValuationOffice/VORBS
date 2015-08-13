@@ -227,6 +227,8 @@ function NewBookingController($scope, $http, $resource) {
     $scope.AddExternalAttendee = function () {
         SetModalErrorMessage('');
         $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
+        $scope.externalFirstNameTextBox = '';
+        $scope.externalLastNameTextBox = '';
     }
 
     $scope.RemoveExternalAttendee = function (fullName) {
