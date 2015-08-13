@@ -8,9 +8,13 @@ function MyBookingsController($scope, $http, $resource) {
     $scope.editBookingExternalLastName = '';
 
     $scope.GetBookings = function () {
-        $scope.bookings = Bookings.query({
+
+        var period = 7;
+        period = (5 - new moment().utc().days()) + 1;
+
+        $scope.bookings = BookingsByPeriod.query({
             startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
-            //person: '7220451' //TODO: Change To get UserName
+            period: period
         });
     }
 
@@ -282,4 +286,18 @@ function CreateServices($resource) {
         query: { method: 'GET' },
         remove: { method: 'DELETE' }
     });
+
+
+    BookingsByPeriod = $resource('/api/bookings/:startDate/:period', { startDate: '', period: 7},
+    {
+        query: { method: 'GET', isArray: true },
+        remove: { method: 'DELETE' }
+    });
+
+    BookingsByPeriod.prototype = {
+        DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
+        startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
+        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
+        roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
+    };
 }

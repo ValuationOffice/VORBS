@@ -715,6 +715,47 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
+        [HttpGet]
+        [Route("{startDate:DateTime}/{period:int}")]
+        public IEnumerable<BookingDTO> GetBookingsForPeriod(DateTime startDate, int period)
+        {
+            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+
+            try
+            {
+                string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+
+                DateTime endDuration = startDate.AddDays(period - 1);
+
+                List<Booking> bookings = db.Bookings
+                    .Where(x => x.PID == currentPid && x.EndDate >= startDate && x.EndDate <= endDuration).ToList()                    
+                    .OrderBy(x => x.StartDate)
+                    .ToList();
+
+                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                {
+                    ID = x.ID,
+                    EndDate = x.EndDate,
+                    StartDate = x.StartDate,
+                    Subject = x.Subject,
+                    Owner = x.Owner,
+                    IsSmartMeeting = x.IsSmartMeeting,
+                    Location = new LocationDTO()
+                    {
+                        ID = x.Room.Location.ID,
+                        Name = x.Room.Location.Name,
+                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
+                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get bookings for current user", ex);
+            }
+            return bookingsDTO;
+        }
+
         private Room GetRoomForBooking(Booking newBooking)
         {
             return db.Rooms.Single(r => r.ID == newBooking.RoomID);
