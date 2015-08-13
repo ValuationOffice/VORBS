@@ -110,7 +110,8 @@ namespace VORBS.API
                     location = new LocationDTO()
                     {
                         ID = room.Location.ID,
-                        Name = room.Location.Name
+                        Name = room.Location.Name,
+                        LocationCredentials = room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
                     },
                     RoomName = room.RoomName,
                     ComputerCount = room.ComputerCount,
@@ -159,7 +160,8 @@ namespace VORBS.API
                     location = new LocationDTO()
                     {
                         ID = x.Location.ID,
-                        Name = x.Location.Name
+                        Name = x.Location.Name,
+                        LocationCredentials = x.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
                     },
                     RoomName = x.RoomName,
                     ComputerCount = x.ComputerCount,

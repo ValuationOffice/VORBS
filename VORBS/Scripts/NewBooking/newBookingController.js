@@ -168,7 +168,36 @@ function NewBookingController($scope, $http, $resource) {
                         if (!room.smartRoom) {
                             $("#dssAssistChoice").css('display', 'none');
                         } else {
-                            $("#dssAssistChoice").css('display', 'block');
+                            if (!GetLocationCredentialsFromList(dssCredentialsName, room.location.locationCredentials)) {
+                                $("#dssAssistChoice").css('display', 'none');
+                                $("#dssAssistContWarning").css("display", "block");
+                            } else {
+                                $("#dssAssistChoice").css('display', 'block');
+                                $("#dssAssistContWarning").css("display", "none");
+                            }                            
+                        }
+
+                        if (!GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials)) {
+                            $("#externalAttendeesCont").css("display", "none");
+
+                            var message = "This location does not have a dedicated security desk.";
+                            var facilities = GetLocationCredentialsFromList(facilitiesCredentialsName, room.location.locationCredentials);
+                            if (facilities) {
+                                message = message + " Please contact the local facilities officer at " + facilities.email + " for visitory access protocols.";
+                            }
+                            $("#externalAttendeesContWarning").text(message);
+                            $("#externalAttendeesContWarning").css("display", "block");
+                        } else {
+                            $("#externalAttendeesCont").css("display", "block");
+                            $("#externalAttendeesContWarning").css("display", "none");
+                        }
+
+                        if (!GetLocationCredentialsFromList(facilitiesCredentialsName, room.location.locationCredentials)) {
+                            $("#additionalEquipmentCont").css("display", "none");
+                            $("#additionalEquipmentContWarning").css("display", "block");
+                        } else {
+                            $("#additionalEquipmentCont").css("display", "block");
+                            $("#additionalEquipmentContWarning").css("display", "none");
                         }
 
                         $scope.newBooking.Room = room;

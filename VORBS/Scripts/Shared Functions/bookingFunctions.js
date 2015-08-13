@@ -1,4 +1,9 @@
-﻿
+﻿// GLOBAL VARIABLES //
+var securityCredentialsName = "security";
+var facilitiesCredentialsName = "facilities";
+var dssCredentialsName = "dss";
+
+
 //Modal Functions
 function SetModalErrorMessage(message) {
     if (message === "") {
@@ -282,3 +287,13 @@ function ReloadThisPage(tabId) {
 }
 
 ////////////////
+
+
+////Location related functions
+function GetLocationCredentialsFromList(name, list) {
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].department.toUpperCase() == name.toUpperCase()) {
+            return list[i];
+        }
+    }
+}

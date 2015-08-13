@@ -41,9 +41,9 @@
                                 </div>
                             </div>
                             <hr />
-                            <p><label class="control-label">External Attendees</label></p>
+                            <div id="externalAttendeesCont">
+                                <label class="control-label">External Attendees</label>
                             <div class="form-group row">
-
                                 <div class="col-xs-5">
                                     <label>First Name</label>
                                     <input class="form-control" id="externalFirstNameTextBox" ng-model="editBookingExternalFirstName" />
@@ -57,6 +57,7 @@
                                     <input id="addExternal" type="button" class="form-control btn btn-primary" ng-disabled="editBookingExternalFirstName.length == 0 || editBookingExternalLastName.length == 0" ng-click="AddExternalAttendee()" value="Add" />
                                 </div>
                             </div>
+
                             <div class="form-group row">
                                 <div class="col-xs-5">
                                     <label>
@@ -71,6 +72,10 @@
                                 </div>
                             </div>
                             <hr />
+                            </div>
+                            <div class="alert alert-warning" style="display: none;" id="externalAttendeesContWarning"></div>
+
+                            <div id="additionalEquipmentCont">
                             <div class="form-group row">
                                 <div class="col-xs-5">
                                     <label class="control-label">Additional Equipment</label><br />
@@ -78,6 +83,9 @@
                                     <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
                                 </div>
                             </div>
+                            </div>
+                            <div class="alert alert-warning" style="display: none;" id="additionalEquipmentContWarning">This location does not have a dedicated Local Facilities Officer. Setting up of the meeting room is the responsibility of the user.</div>
+
                         </form>
                     </div>
                     <div class="modal-footer">

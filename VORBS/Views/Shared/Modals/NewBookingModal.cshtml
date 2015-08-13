@@ -66,13 +66,14 @@
                     }
 
                     <div class="form-group">
-                        <label class="control-label">External Attendees</label>
-                        <div class="form-group">
+
+                        <div class="form-group" id="externalAttendeesCont">
+                            <label class="control-label">External Attendees</label>
                             <div class="form-inline">
                                 <label style="font-weight: normal !important;">First Name</label>
-                                <input class="form-control" id="externalFirstNameTextBox"  ng-model="externalFirstNameTextBox"/>
+                                <input class="form-control" id="externalFirstNameTextBox" ng-model="externalFirstNameTextBox" />
                                 <label style="font-weight: normal !important;">Last Name</label>
-                                <input class="form-control" id="externalLastNameTextBox" ng-model="externalLastNameTextBox"/>
+                                <input class="form-control" id="externalLastNameTextBox" ng-model="externalLastNameTextBox" />
                                 <button type="button" class="btn btn-primary" ng-disabled="externalFirstNameTextBox.length == 0 || externalLastNameTextBox.length == 0" ng-click="AddExternalAttendee()">Add</button>
                             </div>
                             <table>
@@ -81,20 +82,25 @@
                                     <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee(externalName)"></span></td>
                                 </tr>
                             </table>
+                            <hr />
                         </div>
-                        <hr />
-                        <div class="form-group">
+                        <div class="alert alert-warning" style="display: none;" id="externalAttendeesContWarning"></div>
+
+                        <div class="form-group" id="additionalEquipmentCont">
                             <div class="input-group ">
                                 <label class="control-label">Additional Equipment</label><br />
                                 <input type="checkbox" id="newBookingFlipChart" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
                                 <input type="checkbox" id="newBookingProjector" value="Projector" ng-model="newBooking.Projector" /> Projector
                             </div>
                         </div>
+                        <div class="alert alert-warning" style="display: none;" id="additionalEquipmentContWarning">This location does not have a dedicated Local Facilities Officer. Setting up of the meeting room is the responsibility of the user.</div>
+
                         <div class="form-group" id="dssAssistChoice">
                             <div class="input-group ">
                                 <input type="checkbox" value="DSSAssist" ng-model="newBooking.DSSAssist" /> Request DSS Assistance<br />
                             </div>
                         </div>
+                        <div class="alert alert-warning" style="display: none;" id="dssAssistContWarning">This location does not have a dedicated DSS officer, please contact ITSD for support on setting up SMART room meetings.</div>
                     </div>
 
                 </div>

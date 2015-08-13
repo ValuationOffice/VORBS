@@ -52,7 +52,12 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Location = new LocationDTO()
+                    {
+                        ID = x.Room.Location.ID,
+                        Name = x.Room.Location.Name,
+                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
                 }));
             }
@@ -85,7 +90,12 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Location = new LocationDTO()
+                    {
+                        ID = x.Room.Location.ID,
+                        Name = x.Room.Location.Name,
+                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
                 }));
             }
@@ -119,7 +129,12 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Location = new LocationDTO()
+                    {
+                        ID = x.Room.Location.ID,
+                        Name = x.Room.Location.Name,
+                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
                 }));
             }
@@ -153,7 +168,12 @@ namespace VORBS.API
                     Subject = x.Subject,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Location = new LocationDTO()
+                    {
+                        ID = x.Room.Location.ID,
+                        Name = x.Room.Location.Name,
+                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
                 }));
             }
@@ -187,7 +207,12 @@ namespace VORBS.API
                     Projector = booking.Projector,
                     PID = booking.PID,
                     IsSmartMeeting = booking.IsSmartMeeting,
-                    Location = new LocationDTO() { ID = booking.Room.Location.ID, Name = booking.Room.Location.Name },
+                    Location = new LocationDTO()
+                    {
+                        ID = booking.Room.Location.ID,
+                        Name = booking.Room.Location.Name,
+                        LocationCredentials = booking.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
                     Room = new RoomDTO() { ID = booking.Room.ID, RoomName = booking.Room.RoomName, ComputerCount = booking.Room.ComputerCount, PhoneCount = booking.Room.PhoneCount, SmartRoom = booking.Room.SmartRoom }
                 };
 
@@ -672,7 +697,12 @@ namespace VORBS.API
                     Subject = x.Subject,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
-                    Location = new LocationDTO() { ID = x.Room.Location.ID, Name = x.Room.Location.Name },
+                    Location = new LocationDTO()
+                    {
+                        ID = x.Room.Location.ID,
+                        Name = x.Room.Location.Name,
+                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                    },
                     Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
                 }));
 
