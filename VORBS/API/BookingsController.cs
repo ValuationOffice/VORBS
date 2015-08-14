@@ -726,6 +726,7 @@ namespace VORBS.API
                 string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
                 DateTime endDuration = startDate.AddDays(period - 1);
+                endDuration = DateTime.Parse(endDuration.ToShortDateString()).AddHours(23).AddMinutes(59).AddSeconds(59);
 
                 List<Booking> bookings = db.Bookings
                     .Where(x => x.PID == currentPid && x.EndDate >= startDate && x.EndDate <= endDuration).ToList()                    
