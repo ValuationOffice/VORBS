@@ -305,22 +305,16 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.AddSmartLoaction = function () {
-        var errors = [];
-        var valid = true;
         if ($("#smartLoactionDropDown")[0].selectedIndex > 0) {
             $scope.newBooking.SmartLoactions.push($scope.currentSmartLocation);
             $scope.smartLoactions = $scope.RemoveLoaction($scope.currentSmartLocation, $scope.smartLoactions);
+            $scope.currentSmartLocation = '';
+            $("#smartLoactionDropDown")[0].selectedIndex = 0;
         }
         else {
             $("#searchFilter #smartLocationSelect").addClass('has-error');
-            errors.push('Please select your other meeting location(s) click the Add button');
-            valid = false;
-        }
-
-        if (!valid) {
-            for (var i = 0; i < errors.length; i++) {
-                $("#searchFilterErrorList").append('<li>' + errors[i] + '</li>');
-            }
+            var errors = 'Please select your other meeting location(s) click the Add button';
+            $("#searchFilterErrorList").replaceWith('<li>' + errors + '</li>');
             $("#searchFilterErrorCont").css('display', 'block');
         }
     }
@@ -625,6 +619,10 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.CancelBookingClash = function () {
         $scope.ResetRecurrenceStatus();
+    }
+
+    $scope.CancelRecurrenceBooking = function () {
+        $scope.newBooking.Recurrence = {};
     }
 
     $scope.SkipBookingClash = function () {
