@@ -56,9 +56,13 @@
             </div>
 
             <div id="smartRoomLocations" style="display: none;">
+                <p>
+                    <div class="alert alert-info" id="smartRoomHelpText">Please select the other SMART Room Location(s) using the 'Add' button below.</div>
+                </p>
+
                 <div class="form-group row">
                     <div class="col-xs-4" id="smartLocationSelect">
-                        <label class="control-label">Smart Room(s)</label>
+                        <label class="control-label">Smart Location(s)</label>
                         <select id="smartLoactionDropDown" class="form-control" ng-options="o as o for o in smartLoactions" ng-model="currentSmartLocation" ng-change="ValidateSelection()">
                             <option value="" selected disabled>Select a location...</option>
                         </select>
@@ -77,11 +81,13 @@
                 </table>
             </div>
         </form>
+
         <p>
             <div class="alert alert-danger" id="searchFilterErrorCont" style="display: none;">
                 <ul id="searchFilterErrorList"></ul>
             </div>
         </p>
+
 
         <hr />
 

@@ -77,6 +77,12 @@ function NewBookingController($scope, $http, $resource) {
                 });
                 $("#newSearchResults").css('display', 'block');
             }
+
+            if ($scope.bookingFilter.smartRoom) {
+                $scope.GetSmartLocations();
+                $("#smartRoomLocations").css('display', 'block');
+            }
+
         } else {
             $("#bookingTable").html('');
             $("#newSearchResults").css('display', 'none');
@@ -161,6 +167,16 @@ function NewBookingController($scope, $http, $resource) {
 
                     var $scope = angular.element($("#controllerDiv")).scope();
 
+                    ResetSearchFilterErrorList();
+
+                    if ($("#smartLoactionDropDown")[0].selectedIndex > 0 && $scope.bookingFilter.smartRoom) {
+                        $("#searchFilter #smartLocationSelect").addClass('has-error');
+                        var errors = 'Please select your other meeting location(s) click the Add button';
+                        $("#searchFilterErrorList").replaceWith('<li>' + errors + '</li>');
+                        $("#searchFilterErrorCont").css('display', 'block');
+                        return;
+                    }
+
                     var room = Room.query({
                         locationId: $scope.bookingFilter.location.id,
                         roomName: this.title
@@ -174,7 +190,7 @@ function NewBookingController($scope, $http, $resource) {
                             } else {
                                 $("#dssAssistChoice").css('display', 'block');
                                 $("#dssAssistContWarning").css("display", "none");
-                            }                            
+                            }
                         }
 
                         if (!GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials)) {
@@ -305,6 +321,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.AddSmartLoaction = function () {
+        ResetSearchFilterErrorList();
         if ($("#smartLoactionDropDown")[0].selectedIndex > 0) {
             $scope.newBooking.SmartLoactions.push($scope.currentSmartLocation);
             $scope.smartLoactions = $scope.RemoveLoaction($scope.currentSmartLocation, $scope.smartLoactions);
@@ -479,7 +496,9 @@ function NewBookingController($scope, $http, $resource) {
     };
 
     $scope.newBooking = {
-        Room: { RoomName: '' },
+        Room: {
+            RoomName: ''
+        },
         Subject: '',
         NumberOfAttendees: 1,
         ExternalNames: null,
@@ -622,7 +641,8 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.CancelRecurrenceBooking = function () {
-        $scope.newBooking.Recurrence = {};
+        $scope.newBooking.Recurrence = {
+        };
     }
 
     $scope.SkipBookingClash = function () {
@@ -670,31 +690,57 @@ function NewBookingController($scope, $http, $resource) {
 
 
 function CreateServices($resource) {
-    Locations = $resource('/api/locations/:status', { status: 'active' }, {
-        query: { method: 'GET', isArray: true }
+    Locations = $resource('/api/locations/:status', {
+        status: 'active'
+    }, {
+        query: {
+            method: 'GET', isArray: true
+        }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
     {
-        query: { method: 'GET', isArray: true }
+        query: {
+            method: 'GET', isArray: true
+        }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
     {
-        query: { method: 'GET', isArray: true }
+        query: {
+            method: 'GET', isArray: true
+        }
     });
 
-    Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
-        query: { method: 'GET' }
+    Room = $resource('/api/room/:locationId/:roomName', {
+        locationId: 'locationId', roomName: 'roomName'
+    }, {
+        query: {
+            method: 'GET'
+        }
     });
 
-    Users = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
+    Users = $resource('/api/users/:allUsers', {
+        allUsers: 'allUsers'
+    },
         {
-            queryAll: { method: 'GET', isArray: true },
-            querySurname: { method: 'GET', isArray: true }
+            queryAll: {
+                method: 'GET', isArray: true
+            },
+            querySurname: {
+                method: 'GET', isArray: true
+            }
         });
 }
 
+function ResetSearchFilterErrorList() {
+    $("#searchFilterErrorList").html('');
+    $("#searchFilterErrorCont").css('display', 'none');
+
+    if ($("#smartRoomLocations").css('display') == 'block') {
+        $("#searchFilter #smartLocationSelect").removeClass('has-error');
+    }
+}
 
 //Caladner UI Functions
 
@@ -795,8 +841,7 @@ function AdEmailExist(email, currentEmails) {
 function ValidateSearchFilters(advancedSearch) {
     var valid = true;
 
-    $("#searchFilterErrorList").html('');
-    $("#searchFilterErrorCont").css('display', 'none');
+    ResetSearchFilterErrorList();
     var errors = [];
 
     if ($("#searchFilter #searchLocation select")[0].selectedIndex == 0) {

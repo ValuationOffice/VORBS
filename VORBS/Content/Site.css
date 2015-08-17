@@ -562,3 +562,7 @@ textarea {
 .btn {
     border-radius: 0;
 }
+
+#smartRoomHelpText{
+    width:50%;
+}
