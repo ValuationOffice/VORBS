@@ -9,23 +9,51 @@
         <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
         <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
 
-        <h2>My bookings</h2>
-        
-        <div id="myBookingsTable">
+        <h2>My bookings</h2>        
+
+        <form role="form" id="searchFilter">
+            <div class="form-group row">
+                <div class="col-xs-4" id="searchLocation">
+                    <label class="col-sm-2 control-label">Location</label>
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="">
+                        <option value="" selected disabled>Select a location...</option>
+                    </select>
+                </div>
+                <div class="col-xs-2" id="room">
+                    <label class="col-sm-2 control-label">Room</label>
+                    <input id="room" class="form-control" ng-model="bookingFilter.room" />
+                </div>
+                <div class="col-xs-2" id="date">
+                    <label class="col-sm-2 control-label">Date</label>
+                    <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" />
+                </div>
+                <div class="col-xs-2">
+                    <label class="control-label">Smart Room</label>
+                    <input id="smartRoomCheckBox" type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
+                </div>
+
+                <div class="col-xs-3">
+                    <label class="control-label">&nbsp</label>
+                    <input id="searchButton" type="button" class="form-control filterButton" ng-click="SearchBookings()" value="Filter" />
+                </div>
+            </div>
+        </form>
+
+        <div id="myBookingsTable">            
             <table class="table table-striped">
-                <thead>
+                <thead>                    
                     <tr>
                         <th>&nbsp;</th>
-                        <th>Location</th>
-                        <th>Room</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Subject</th>
+                        <th><a href="#" ng-click="orderByField='location.name'; reverseSort = !reverseSort">Location<span ng-show="orderByField == 'location.name'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='roomNameFormatted()'; reverseSort = !reverseSort">Room<span ng-show="orderByField == 'roomNameFormatted()'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='DateFormatted()'; reverseSort = !reverseSort">Date<span ng-show="orderByField == 'DateFormatted()'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='startTimeFormatted()'; reverseSort = !reverseSort">Time<span ng-show="orderByField == 'startTimeFormatted()'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='subject'; reverseSort = !reverseSort">Subject<span ng-show="orderByField == 'subject'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody ng-cloak>
-                    <tr ng-repeat="booking in bookings" class="MyBookingsBookingRow">
+                    <tr ng-repeat="booking in bookings|orderBy:orderByField:reverseSort" class="MyBookingsBookingRow">
                         <td ng-if="booking.isSmartMeeting"><span class="glyphicon glyphicon-facetime-video" title="Is part of a smart booking"></span></td>
                         <td ng-if="!booking.isSmartMeeting">&nbsp;</td>
                         <td>{{ booking.location.name}}</td>

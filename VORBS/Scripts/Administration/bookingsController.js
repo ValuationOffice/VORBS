@@ -104,8 +104,8 @@ function MyBookingsController($scope, $http, $resource) {
 
         try {
             //Create Date String
-            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true);
-            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true);
+            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true);
+            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true);
 
             if ($scope.booking.ExternalNames.length > 0) {
                 $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
@@ -119,8 +119,8 @@ function MyBookingsController($scope, $http, $resource) {
             else {
                 $scope.availableRooms = Available.query({
                     location: $scope.editBooking.location.name,
-                    startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true),
-                    endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true),
+                    startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
+                    endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
                     smartRoom: false,
                     numberOfAttendees: $scope.booking.numberOfAttendees,
                     existingBookingId: $scope.bookingId
@@ -192,7 +192,7 @@ function MyBookingsController($scope, $http, $resource) {
 
         $scope.bookings = GetBookings.query({
             owner: $('#fullNameTextBox').typeahead('val'),
-            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY', true)
+            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY', true, true)
         },
         function (success) {
             if (success.length === 0) {

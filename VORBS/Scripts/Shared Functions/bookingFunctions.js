@@ -185,13 +185,20 @@ function ValidateUnSavedAttendee() {
 ////////////////
 
 //Formating (Date/Time)
-function FormatDateTimeForURL(date, formatString, toUtc) {
+function FormatDateTimeForURL(date, formatString, toUtc, validate) {
 
     date = date.trim();
+
     if (date === "") {
-        alert('Please Enter a Valid Date');
-        throw new Error();
+        //Added validate to this method as sometimes we want either the formatted date back or a blank, and adding the alert in here can bring on behaviour we wont need always
+        if (validate) {
+            alert('Please Enter a Valid Date');
+            throw new Error();
+        } else {
+            return "";
+        }
     }
+
 
     var timeDate = date.split(' ');
 

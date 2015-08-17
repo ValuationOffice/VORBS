@@ -4,6 +4,26 @@ function MyBookingsController($scope, $http, $resource) {
 
     CreateServices($resource);
 
+    $scope.orderByField = 'date';
+    $scope.reverseSort = false;
+
+    $scope.locations = Locations.query({ status: true });
+    $scope.bookingFilter = {
+        location: { name : '', id : 0 },
+        room: '',
+        startDate: '',
+        smartRoom: false
+    };  
+
+    $scope.SearchBookings = function () {
+        $scope.bookings = FilterBookings.query({
+                locationId: $scope.bookingFilter.location.id,
+                room: $scope.bookingFilter.room,
+                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, false),
+                smartRoom: $scope.bookingFilter.smartRoom
+        });                
+    }
+
     $scope.editBookingExternalFirstName = '';
     $scope.editBookingExternalLastName = '';
 
@@ -146,12 +166,12 @@ function MyBookingsController($scope, $http, $resource) {
 
         try {
             //Create Date String
-            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true);
-            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true);
+            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true);
+            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true);
 
             if ($scope.booking.ExternalNames.length > 0) {
                 $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
-            }
+        }
 
             //Validate if Date/Time/Attendees has changed
             if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
@@ -160,11 +180,11 @@ function MyBookingsController($scope, $http, $resource) {
             }
             else {
                 $scope.availableRooms = Available.query({
-                    location: $scope.editBooking.location.name,
-                    startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true),
-                    endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true),
+                        location: $scope.editBooking.location.name,
+                        startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
+                        endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
                     smartRoom: false,
-                    numberOfAttendees: $scope.booking.numberOfAttendees,
+                        numberOfAttendees: $scope.booking.numberOfAttendees,
                     existingBookingId: $scope.bookingId
                 },
                 function (success) {
@@ -179,13 +199,13 @@ function MyBookingsController($scope, $http, $resource) {
                         EnableAcceptBookingButton();
                         SetEditActiveTab('confirmEditBooking');
                         $scope.currentRoom = $scope.availableRooms[0];
-                    }
+            }
                 },
                 function (error) {
                     EnableAcceptBookingButton();
                     alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
                 });
-            }
+                }
 
         } catch (e) {
             EnableAcceptBookingButton();
@@ -258,6 +278,13 @@ function MyBookingsController($scope, $http, $resource) {
 
 
 function CreateServices($resource) {
+
+    Locations = $resource('/api/locations/:status', {
+    status: 'active'
+    }, {
+        query: { method: 'GET', isArray: true }
+        });
+
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom/:existingBookingId', {
         location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom', existingBookingId: 'existingBookingId'
     },
@@ -295,6 +322,16 @@ function CreateServices($resource) {
     });
 
     BookingsByPeriod.prototype = {
+        DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
+        startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
+        endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
+        roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
+    };
+    
+    FilterBookings = $resource('/api/bookings/search', {}, {
+        query : { method: 'GET', isArray: true }
+    });
+    FilterBookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
         startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
         endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },

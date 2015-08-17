@@ -16,6 +16,9 @@ using System.Data.Entity;
 using System.Configuration;
 using System.Web.Script.Serialization;
 
+using System.Linq.Expressions;
+using System.Linq.Dynamic;
+
 namespace VORBS.API
 {
     [RoutePrefix("api/bookings")]
@@ -729,7 +732,7 @@ namespace VORBS.API
                 endDuration = DateTime.Parse(endDuration.ToShortDateString()).AddHours(23).AddMinutes(59).AddSeconds(59);
 
                 List<Booking> bookings = db.Bookings
-                    .Where(x => x.PID == currentPid && x.EndDate >= startDate && x.EndDate <= endDuration).ToList()                    
+                    .Where(x => x.PID == currentPid && x.EndDate >= startDate && x.EndDate <= endDuration).ToList()
                     .OrderBy(x => x.StartDate)
                     .ToList();
 
@@ -755,6 +758,93 @@ namespace VORBS.API
                 _logger.ErrorException("Unable to get bookings for current user", ex);
             }
             return bookingsDTO;
+        }
+
+        /// <summary>
+        /// API Endpoint to handle dynamic filters
+        /// </summary>
+        /// <param name="locationId">ID of location</param>
+        /// <param name="startDate">Date of booking (any time)</param>
+        /// <param name="room">Room</param>
+        /// <param name="smartRoom">Smart meeting</param>
+        /// <returns>List of bookings based on filters</returns>
+        [HttpGet]
+        [Route("search")]
+        public IEnumerable<BookingDTO> GetBookingsFilterSearch(int? locationId, DateTime? startDate, string room, bool smartRoom)
+        {
+
+            //Building up a string of Lambda C# string (Using Linq.Dynamic) so we can on the fly change the where clause based on the concatanation
+            string queryExpression = "";
+
+            try
+            {
+                //Standard pattern used all below, if the value is null to start, we wont filter on it if it isnt null, check if the string is empty already. If the string is not empty, start with the AND keyword as we are concatanating on otherwise start with your expression as it is the begging of the expression
+                queryExpression += (locationId == null || locationId == 0) ? "" : (queryExpression.Length > 0) ? " AND Room.LocationID = " + locationId : "Room.LocationID = " + locationId;
+
+                if (startDate != null)
+                {
+                    //Need to get 00:00 and 23:59 times for the day as this allows us to get any booking during the day. We cant use .toshortdatestring etc inside a linq expression, even when not using dynamic linq
+                    DateTime startDate00Hours = DateTime.Parse(DateTime.Parse(startDate.ToString()).ToShortDateString());
+                    //Need to do a format string which looks like " DateTime(YEAR, MONTH, DAY, HOUR, MINUTE) " so that we can parse it in the expression and let Linq interperite it as a datetime creation
+                    string startDate00HoursFormatted = "DateTime(" + startDate00Hours.Year + ", " + startDate00Hours.Month + ", " + startDate00Hours.Day + ", " + startDate00Hours.Hour + ", " + startDate00Hours.Minute + ", " + startDate00Hours.Second + ")";
+                    DateTime startDate2359Hours = DateTime.Parse(DateTime.Parse(startDate.ToString()).ToShortDateString()).AddHours(23).AddMinutes(59).AddSeconds(59);
+                    string startDate2359HoursFormatted = "DateTime(" + startDate2359Hours.Year + ", " + startDate2359Hours.Month + ", " + startDate2359Hours.Day + ", " + startDate2359Hours.Hour + ", " + startDate2359Hours.Minute + ", " + startDate2359Hours.Second + ")";
+                    queryExpression += (startDate == null) ? "" : (queryExpression.Length > 0) ? " AND StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted + "" : " StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted;
+                }
+                else
+                {
+                    DateTime now = DateTime.Now;
+                    string nowFormatted = "DateTime(" + now.Year + ", " + now.Month + ", " + now.Day + ", " + now.Hour + ", " + now.Minute + ", " + now.Second + ")";
+                    //queryExpression += (startDate == null) ? "" : (queryExpression.Length > 0) ? " AND StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted + "" : " StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted;
+                    queryExpression += (queryExpression.Length > 0) ? " AND StartDate >= " + nowFormatted : "StartDate >= " + nowFormatted;
+                }
+
+                queryExpression += (room == null) ? "" : (queryExpression.Length > 0) ? " AND Room.RoomName = \"" + room + "\"" : "Room.RoomName = \"" + room + "\"";
+                queryExpression += (!smartRoom) ? "" : (queryExpression.Length > 0) ? " AND IsSmartMeeting = " + smartRoom : "IsSmartMeeting = " + smartRoom;
+            }
+            catch (Exception exn)
+            {
+                queryExpression = "";
+                _logger.ErrorException("Unable to create query expression for filter in bookings", exn);                
+            }
+            
+
+            //If expression is empty, dont try and filter on it .. where() does not work.
+            if (queryExpression.Trim().Length > 0)
+            {
+                try
+                {
+                    //Filter on the expression we built as if it was written in C# POCO
+                    var bookings = db.Bookings.Where(queryExpression).ToList();
+
+                    List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+                    bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                    {
+                        ID = x.ID,
+                        EndDate = x.EndDate,
+                        StartDate = x.StartDate,
+                        Subject = x.Subject,
+                        Owner = x.Owner,
+                        IsSmartMeeting = x.IsSmartMeeting,
+                        Location = new LocationDTO()
+                        {
+                            ID = x.Room.Location.ID,
+                            Name = x.Room.Location.Name,
+                            LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                        },
+                        Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                    }));
+
+                    return bookingsDTO;
+                }
+                catch (Exception exn)
+                {
+                    _logger.ErrorException("Unable to filter bookings based on query expression", exn);
+                }
+                
+            }
+            //If we didnt filter on anything, then return nothing
+            return new List<BookingDTO>();
         }
 
         private Room GetRoomForBooking(Booking newBooking)
@@ -994,7 +1084,7 @@ namespace VORBS.API
                 case "monthly":
                     string[] words = new string[] {"Last", "First", "Second", "Third", "Fourth" };
                     recurrenceSentance = string.Format("Booking occurs the {0} {1} of every {2} month(s) effective {3} until {4} from {5} to {6}",
-                                            words[newBooking.Recurrence.MonthlyMonthDayCount], (DayOfWeek)newBooking.Recurrence.MonthlyMonthDay, newBooking.Recurrence.MonthlyMonthCount, 
+                                            words[newBooking.Recurrence.MonthlyMonthDayCount], (DayOfWeek)newBooking.Recurrence.MonthlyMonthDay, newBooking.Recurrence.MonthlyMonthCount,
                                             newBooking.StartDate.ToShortDateString(), newBooking.Recurrence.EndDate.ToShortDateString(), newBooking.StartDate.ToShortTimeString(), newBooking.EndDate.ToShortTimeString());
                     break;
             }

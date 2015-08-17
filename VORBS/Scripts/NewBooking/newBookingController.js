@@ -44,7 +44,7 @@ function NewBookingController($scope, $http, $resource) {
             if (viewAll === true) {
                 $scope.roomBookings = Available.query({
                     location: $scope.bookingFilter.location.name,
-                    startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false),
+                    startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, true),
                     smartRoom: false
                 }, function (success) {
                     roomResults = success;
@@ -58,15 +58,15 @@ function NewBookingController($scope, $http, $resource) {
                 if (advancedSearchActive) {
                     queryParams = {
                         location: $scope.bookingFilter.location.name,
-                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true),
-                        endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true),
+                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
+                        endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true, true),
                         smartRoom: $scope.bookingFilter.smartRoom,
                         numberOfAttendees: $scope.bookingFilter.numberOfAttendees
                     };
                 } else {
                     queryParams = {
                         location: $scope.bookingFilter.location.name,
-                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true),
+                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
                         smartRoom: $scope.bookingFilter.smartRoom
                     };
                 }
@@ -373,8 +373,8 @@ function NewBookingController($scope, $http, $resource) {
 
             //Validate that new time does not clash
             var newEvent = {
-                start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null),
-                end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null)
+                start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null, true),
+                end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null, true)
             };
 
             if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName.replace('.', '_') + "_calendar").fullCalendar('clientEvents'))) {
@@ -383,12 +383,12 @@ function NewBookingController($scope, $http, $resource) {
                 return;
             };
 
-            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm', true);
-            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm', true);
+            $scope.newBooking.StartDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, 'MM-DD-YYYY-HHmm', true, true);
+            $scope.newBooking.EndDate = FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, 'MM-DD-YYYY-HHmm', true, true);
             $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
             var originalRecurrenceEndDate = $scope.newBooking.Recurrence.EndDate;
-            $scope.newBooking.Recurrence.EndDate = FormatDateTimeForURL($scope.newBooking.Recurrence.EndDate, 'MM-DD-YYYY-HHmm', true);
+            $scope.newBooking.Recurrence.EndDate = FormatDateTimeForURL($scope.newBooking.Recurrence.EndDate, 'MM-DD-YYYY-HHmm', true, true);
 
             if ($scope.booking.ExternalNames.length > 0) {
                 $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
