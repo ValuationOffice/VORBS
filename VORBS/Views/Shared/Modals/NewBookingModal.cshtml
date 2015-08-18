@@ -66,26 +66,52 @@
                     }
 
                     <div class="form-group">
-
-                        <div class="form-group" id="externalAttendeesCont">
-                            <label class="control-label">External Attendees</label>
-                            <div class="form-inline">
-                                <label style="font-weight: normal !important;">First Name</label>
-                                <input class="form-control" id="externalFirstNameTextBox" ng-model="externalFirstNameTextBox" />
-                                <label style="font-weight: normal !important;">Last Name</label>
-                                <input class="form-control" id="externalLastNameTextBox" ng-model="externalLastNameTextBox" />
-                                <button type="button" class="btn btn-primary" ng-disabled="externalFirstNameTextBox.length == 0 || externalLastNameTextBox.length == 0" ng-click="AddExternalAttendee()">Add</button>
+                        <div class="form-group row">
+                            <div class="form-group" id="externalAttendeesCont">
+                                <label style="padding-left:10px;" class="control-label">External Attendees</label>
+                                <div>
+                                    <div class="col-xs-6">
+                                        <label style="font-weight: normal !important;">Full Name</label>
+                                        <input class="form-control" id="externalFullNameTextBox" ng-model="externalFullNameTextBox" />
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <label style="font-weight: normal !important;">Company Name</label>
+                                        <input class="form-control" id="externalCompanyNameTextBox" ng-model="externalCompanyNameTextBox" />
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <label style="font-weight: normal !important;">Pass Required</label>
+                                        <input class="form-control" type="checkbox" id="externalPassRequired" ng-model="externalPassRequired" />
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label style="font-weight: normal !important;">&nbsp;</label>
+                                        <button type="button" class="btn btn-primary" ng-disabled="externalFullNameTextBox.length == 0 || externalCompanyNameTextBox.length == 0" ng-click="AddExternalAttendee()">Add</button>
+                                    </div>
+                                    <div id="externalAttendeesDisplay" style="display:none;">
+                                        <label style="margin-left: 10px;">
+                                            Attendees
+                                        </label>
+                                        <table id="externalAttendeesTable">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Company</th>
+                                                <th>Pass Required</th>
+                                            </tr>
+                                            <tr ng-repeat="externalName in booking.ExternalAttendees">
+                                                <td>{{ externalName.fullName }} </td>
+                                                <td>{{ externalName.companyName }}</td>
+                                                <td>{{ externalName.passRequired }}</td>
+                                                <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee($index)"></span></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>                               
                             </div>
-                            <table>
-                                <tr ng-repeat="externalName in booking.ExternalNames">
-                                    <td>{{ externalName }}</td>
-                                    <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee(externalName)"></span></td>
-                                </tr>
-                            </table>
-                            <hr />
+                           
                         </div>
                         <div class="alert alert-warning" style="display: none;" id="externalAttendeesContWarning"></div>
 
+                        <hr />
+                    
                         <div class="form-group" id="additionalEquipmentCont">
                             <div class="input-group ">
                                 <label class="control-label">Additional Equipment</label><br />

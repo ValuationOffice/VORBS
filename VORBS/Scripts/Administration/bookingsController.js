@@ -14,13 +14,17 @@ function MyBookingsController($scope, $http, $resource) {
 
     $scope.AddExternalAttendee = function () {
         SetModalErrorMessage('');
-        $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
+        $scope.booking.externalAttendees = AddExternalName($scope.booking.externalAttendees);
     }
 
     $scope.RemoveExternalAttendee = function (fullName) {
         SetModalErrorMessage('');
-        $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
+        $scope.booking.externalAttendees = RemoveExternalName(fullName, $scope.booking.externalAttendees);
     }
+
+    $scope.externalFullNameTextBox = '';
+    $scope.externalCompanyNameTextBox = '';
+    $scope.externalPassRequired = false;
 
     $('#fullNameTextBox').typeahead({
         hint: false,
@@ -50,11 +54,11 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.Projector = $scope.editBooking.projector;
             $scope.newBooking.RoomID = $scope.editBooking.room.id;
 
-            if ($scope.editBooking.externalNames !== null) {
-                $scope.booking.ExternalNames = $scope.editBooking.externalNames.split(';');
+            if ($scope.editBooking.externalAttendees !== null) {
+                $scope.booking.externalAttendees = $scope.editBooking.externalAttendees;//.split(';');
             }
             else {
-                $scope.booking.ExternalNames = []; //Reset External Name List
+                $scope.booking.externalAttendees = []; //Reset External Name List
             }
 
             $scope.booking.numberOfAttendees = $scope.editBooking.numberOfAttendees;
@@ -82,7 +86,7 @@ function MyBookingsController($scope, $http, $resource) {
         }
 
         //Validate Number of External Names is not graether than attendees
-        ValidateNoAttendees($scope.booking.numberOfAttendees, $scope.booking.ExternalNames.length);
+        ValidateNoAttendees($scope.booking.numberOfAttendees, $scope.booking.externalAttendees.length);
         $scope.newBooking.NumberOfAttendees = $scope.booking.numberOfAttendees;
 
         var unsavedAttendee = ValidateUnSavedAttendee();
@@ -107,8 +111,9 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true);
             $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true);
 
-            if ($scope.booking.ExternalNames.length > 0) {
-                $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
+            if ($scope.booking.externalAttendees.length > 0) {
+                //$scope.newBooking.externalAttendees = $scope.booking.ExternalNames.join(';');
+                $scope.newBooking.externalAttendees = $scope.booking.externalAttendees;
             }
 
             //Validate if Date/Time/Attendees has changed
@@ -206,7 +211,7 @@ function MyBookingsController($scope, $http, $resource) {
         Subject: '',
         NumberOfAttendees: 0,
         RoomID: 0,
-        ExternalNames: null,
+        externalAttendees: [],
         StartDate: new Date(),
         EndDate: new Date(),
         FlipChart: false,
@@ -218,7 +223,7 @@ function MyBookingsController($scope, $http, $resource) {
         endTime: '',
         date: new Date(),
         numberOfAttendees: 0,
-        externalNames: []
+        externalAttendees: []
     }
 
     $scope.existingBooking = {

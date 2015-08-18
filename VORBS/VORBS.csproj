@@ -156,10 +156,12 @@
     <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Models\DTOs\AdminDTO.cs" />
+    <Compile Include="Models\DTOs\ExternalAttendeesDTO.cs" />
     <Compile Include="Models\DTOs\LocationCredentialsDTO.cs" />
     <Compile Include="Models\DTOs\RecurrenceDTO.cs" />
     <Compile Include="Models\DTOs\UserDTO.cs" />
     <Compile Include="Models\Admin.cs" />
+    <Compile Include="Models\ExternalAttendees.cs" />
     <Compile Include="Models\LocationCredentials.cs" />
     <Compile Include="Models\ViewModels\AdminMultiCancelledBookingWithMessage.cs" />
     <Compile Include="Models\ViewModels\NewRecurringBookingWithMessage.cs" />

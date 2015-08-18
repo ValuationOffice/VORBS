@@ -55,6 +55,17 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
+                    ExternalAttendees = x.ExternalAttendees.Select(y =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = y.ID,
+                            BookingID = y.BookingID,
+                            FullName = y.FullName,
+                            CompanyName = y.CompanyName,
+                            PassRequired = y.PassRequired
+                        };
+                    }),
                     Location = new LocationDTO()
                     {
                         ID = x.Room.Location.ID,
@@ -93,6 +104,17 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
+                    ExternalAttendees = x.ExternalAttendees.Select(y =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = y.ID,
+                            BookingID = y.BookingID,
+                            FullName = y.FullName,
+                            CompanyName = y.CompanyName,
+                            PassRequired = y.PassRequired
+                        };
+                    }),
                     Location = new LocationDTO()
                     {
                         ID = x.Room.Location.ID,
@@ -132,6 +154,17 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
+                    ExternalAttendees = x.ExternalAttendees.Select(y =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = y.ID,
+                            BookingID = y.BookingID,
+                            FullName = y.FullName,
+                            CompanyName = y.CompanyName,
+                            PassRequired = y.PassRequired
+                        };
+                    }),
                     Location = new LocationDTO()
                     {
                         ID = x.Room.Location.ID,
@@ -171,13 +204,32 @@ namespace VORBS.API
                     Subject = x.Subject,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
+                    ExternalAttendees = x.ExternalAttendees.Select(y =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = y.ID,
+                            BookingID = y.BookingID,
+                            FullName = y.FullName,
+                            CompanyName = y.CompanyName,
+                            PassRequired = y.PassRequired
+                        };
+                    }),
                     Location = new LocationDTO()
                     {
                         ID = x.Room.Location.ID,
                         Name = x.Room.Location.Name,
                         LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
                     },
-                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                    Room = new RoomDTO()
+                    {
+                        ID = x.Room.ID,
+                        RoomName = x.Room.RoomName,
+                        ComputerCount = x.Room.ComputerCount,
+                        PhoneCount = x.Room.PhoneCount,
+                        SmartRoom = x.Room.SmartRoom,
+                        SeatCount = x.Room.SeatCount
+                    }
                 }));
             }
             catch (Exception ex)
@@ -205,7 +257,17 @@ namespace VORBS.API
                     Subject = booking.Subject,
                     Owner = booking.Owner,
                     NumberOfAttendees = booking.NumberOfAttendees,
-                    ExternalNames = booking.ExternalNames,
+                    ExternalAttendees = booking.ExternalAttendees.Select(x =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = x.ID,
+                            BookingID = x.BookingID,
+                            FullName = x.FullName,
+                            CompanyName = x.CompanyName,
+                            PassRequired = x.PassRequired
+                        };
+                    }),
                     Flipchart = booking.Flipchart,
                     Projector = booking.Projector,
                     PID = booking.PID,
@@ -216,7 +278,15 @@ namespace VORBS.API
                         Name = booking.Room.Location.Name,
                         LocationCredentials = booking.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
                     },
-                    Room = new RoomDTO() { ID = booking.Room.ID, RoomName = booking.Room.RoomName, ComputerCount = booking.Room.ComputerCount, PhoneCount = booking.Room.PhoneCount, SmartRoom = booking.Room.SmartRoom }
+                    Room = new RoomDTO()
+                    {
+                        ID = booking.Room.ID,
+                        RoomName = booking.Room.RoomName,
+                        ComputerCount = booking.Room.ComputerCount,
+                        PhoneCount = booking.Room.PhoneCount,
+                        SmartRoom = booking.Room.SmartRoom,
+                        SeatCount = booking.Room.SeatCount
+                    }
                 };
 
                 return bookingsDTO;
@@ -372,6 +442,7 @@ namespace VORBS.API
                 bookingsToCreate.ForEach(x => x.Room = null);
 
                 db.Bookings.AddRange(bookingsToCreate);
+                db.ExternalAttendees.AddRange(newBooking.ExternalAttendees);
 
                 db.SaveChanges(bookingsToCreate, true);
 
@@ -470,7 +541,7 @@ namespace VORBS.API
                     }
                 }
 
-                if (newBooking.ExternalNames != null)
+                if (newBooking.ExternalAttendees != null && newBooking.ExternalAttendees.Count > 0)
                 {
                     string securityEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
                     if (securityEmail != null)
@@ -555,6 +626,14 @@ namespace VORBS.API
                 }
 
                 db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
+                db.ExternalAttendees.RemoveRange(db.ExternalAttendees.Where(x => x.BookingID == editBooking.ID));
+
+                if (editBooking.ExternalAttendees != null )
+                {
+                    editBooking.ExternalAttendees.ToList().ForEach(x => x.BookingID = editBooking.ID);
+                    db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
+                }
+
                 db.SaveChanges();
 
                 _logger.Info("Booking sucessfully editted: " + editBooking.ID);
@@ -699,6 +778,17 @@ namespace VORBS.API
                     StartDate = x.StartDate,
                     Subject = x.Subject,
                     Owner = x.Owner,
+                    ExternalAttendees = x.ExternalAttendees.Select(y =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = y.ID,
+                            BookingID = y.BookingID,
+                            FullName = y.FullName,
+                            CompanyName = y.CompanyName,
+                            PassRequired = y.PassRequired
+                        };
+                    }),
                     IsSmartMeeting = x.IsSmartMeeting,
                     Location = new LocationDTO()
                     {
@@ -744,6 +834,17 @@ namespace VORBS.API
                     Subject = x.Subject,
                     Owner = x.Owner,
                     IsSmartMeeting = x.IsSmartMeeting,
+                    ExternalAttendees = x.ExternalAttendees.Select(y =>
+                    {
+                        return new ExternalAttendeesDTO()
+                        {
+                            ID = y.ID,
+                            BookingID = y.BookingID,
+                            FullName = y.FullName,
+                            CompanyName = y.CompanyName,
+                            PassRequired = y.PassRequired
+                        };
+                    }),
                     Location = new LocationDTO()
                     {
                         ID = x.Room.Location.ID,
@@ -805,9 +906,9 @@ namespace VORBS.API
             catch (Exception exn)
             {
                 queryExpression = "";
-                _logger.ErrorException("Unable to create query expression for filter in bookings", exn);                
+                _logger.ErrorException("Unable to create query expression for filter in bookings", exn);
             }
-            
+
 
             //If expression is empty, dont try and filter on it .. where() does not work.
             if (queryExpression.Trim().Length > 0)
@@ -826,6 +927,17 @@ namespace VORBS.API
                         Subject = x.Subject,
                         Owner = x.Owner,
                         IsSmartMeeting = x.IsSmartMeeting,
+                        ExternalAttendees = x.ExternalAttendees.Select(y =>
+                        {
+                            return new ExternalAttendeesDTO()
+                            {
+                                ID = y.ID,
+                                BookingID = y.BookingID,
+                                FullName = y.FullName,
+                                CompanyName = y.CompanyName,
+                                PassRequired = y.PassRequired
+                            };
+                        }),
                         Location = new LocationDTO()
                         {
                             ID = x.Room.Location.ID,
@@ -841,7 +953,7 @@ namespace VORBS.API
                 {
                     _logger.ErrorException("Unable to filter bookings based on query expression", exn);
                 }
-                
+
             }
             //If we didnt filter on anything, then return nothing
             return new List<BookingDTO>();
@@ -872,7 +984,7 @@ namespace VORBS.API
             return new Booking()
             {
                 DssAssist = newBooking.DssAssist,
-                ExternalNames = newBooking.ExternalNames,
+                ExternalAttendees = newBooking.ExternalAttendees,
                 Flipchart = newBooking.Flipchart,
                 NumberOfAttendees = newBooking.Room.SeatCount,
                 Owner = newBooking.Owner,
@@ -1022,7 +1134,7 @@ namespace VORBS.API
                     bookingsToCreate.Add(new Booking()
                     {
                         DssAssist = newBooking.DssAssist,
-                        ExternalNames = newBooking.ExternalNames,
+                        ExternalAttendees = newBooking.ExternalAttendees,
                         Flipchart = newBooking.Flipchart,
                         NumberOfAttendees = newBooking.Room.SeatCount,
                         Owner = newBooking.Owner,
@@ -1082,7 +1194,7 @@ namespace VORBS.API
                                             newBooking.Recurrence.EndDate.ToShortDateString(), newBooking.StartDate.ToShortTimeString(), newBooking.EndDate.ToShortTimeString());
                     break;
                 case "monthly":
-                    string[] words = new string[] {"Last", "First", "Second", "Third", "Fourth" };
+                    string[] words = new string[] { "Last", "First", "Second", "Third", "Fourth" };
                     recurrenceSentance = string.Format("Booking occurs the {0} {1} of every {2} month(s) effective {3} until {4} from {5} to {6}",
                                             words[newBooking.Recurrence.MonthlyMonthDayCount], (DayOfWeek)newBooking.Recurrence.MonthlyMonthDay, newBooking.Recurrence.MonthlyMonthCount,
                                             newBooking.StartDate.ToShortDateString(), newBooking.Recurrence.EndDate.ToShortDateString(), newBooking.StartDate.ToShortTimeString(), newBooking.EndDate.ToShortTimeString());

@@ -16,34 +16,41 @@ function SetModalErrorMessage(message) {
 }
 
 function ResetExternalNamesUI() {
-    $('#externalFirstNameTextBox').val('');
-    $('#externalLastNameTextBox').val('');
+    $('#externalFullNameTextBox').val('');
+    $('#externalCompanyNameTextBox').val('');
 }
 
 function AddExternalName(attendeeArray) {
-    var fName = $('#externalFirstNameTextBox').val();
-    var lName = $('#externalLastNameTextBox').val();
+    var fullName = $('#externalFullNameTextBox').val();
+    var companyName = $('#externalCompanyNameTextBox').val();
+    var passRequired = $("#externalPassRequired").is(':checked');
 
-    if (fName.trim() === "" || lName.trim() === "") {
+    if (fullName.trim() === "" || companyName.trim() === "") {
         SetModalErrorMessage("Invalid external attendee.");
     }
     else {
-        var fullName = fName + ' ' + lName;
-        if (attendeeArray.indexOf(fullName) <= -1) {
-            attendeeArray.push(fullName);
-        }
+        attendeeArray.push({
+            fullName: fullName,
+            companyName: companyName,
+            passRequired: passRequired
+        });
+        //var fullName = fName + ' ' + lName;
+        //if (attendeeArray.indexOf(fullName) <= -1) {
+        //    attendeeArray.push(fullName);
+        //}
         ResetExternalNamesUI();
     }
     return attendeeArray;
 }
 
-function RemoveExternalName(fullName, attendeeArray) {
-    for (var i = 0; i < attendeeArray.length; i++) {
-        if (attendeeArray[i] === fullName) {
-            attendeeArray.splice(i, 1);
-            break;
-        }
-    }
+function RemoveExternalName(index, attendeeArray) {
+    attendeeArray.splice(index, 1);
+    //for (var i = 0; i < attendeeArray.length; i++) {
+    //    if (attendeeArray[i] === fullName) {
+    //        attendeeArray.splice(i, 1);
+    //        break;
+    //    }
+    //}
     return attendeeArray;
 }
 
@@ -175,7 +182,7 @@ function ValidateEmail(email) {
 }
 
 function ValidateUnSavedAttendee() {
-    if ($('#externalFirstNameTextBox').val().trim() !== "" || $('#externalLastNameTextBox').val().trim() !== "") {
+    if ($('#externalFullNameTextBox').val().trim() !== "" || $('#externalCompanyNameTextBox').val().trim() !== "") {
         return "Unsaved external attendee. Please press add to save external attendee.";
     }
     return "";

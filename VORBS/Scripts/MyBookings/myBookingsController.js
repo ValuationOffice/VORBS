@@ -9,23 +9,24 @@ function MyBookingsController($scope, $http, $resource) {
 
     $scope.locations = Locations.query({ status: true });
     $scope.bookingFilter = {
-        location: { name : '', id : 0 },
+        location: { name: '', id: 0 },
         room: '',
         startDate: '',
         smartRoom: false
-    };  
+    };
 
     $scope.SearchBookings = function () {
         $scope.bookings = FilterBookings.query({
-                locationId: $scope.bookingFilter.location.id,
-                room: $scope.bookingFilter.room,
-                startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, false),
-                smartRoom: $scope.bookingFilter.smartRoom
-        });                
+            locationId: $scope.bookingFilter.location.id,
+            room: $scope.bookingFilter.room,
+            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, false),
+            smartRoom: $scope.bookingFilter.smartRoom
+        });
     }
 
-    $scope.editBookingExternalFirstName = '';
-    $scope.editBookingExternalLastName = '';
+    $scope.externalFullNameTextBox = '';
+    $scope.externalCompanyNameTextBox = '';
+    $scope.externalPassRequired = false;
 
     $scope.GetBookings = function () {
 
@@ -48,14 +49,15 @@ function MyBookingsController($scope, $http, $resource) {
 
     $scope.AddExternalAttendee = function () {
         SetModalErrorMessage('');
-        $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
-        $scope.editBookingExternalFirstName = '';
-        $scope.editBookingExternalLastName = '';
+        $scope.booking.externalAttendees = AddExternalName($scope.booking.externalAttendees);
+        $scope.externalFullNameTextBox = '';
+        $scope.externalCompanyNameTextBox = '';
+        $scope.externalPassRequired = false;
     }
 
-    $scope.RemoveExternalAttendee = function (fullName) {
+    $scope.RemoveExternalAttendee = function (index) {
         SetModalErrorMessage('');
-        $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
+        $scope.booking.ExternalNames = RemoveExternalName(index, $scope.booking.externalAttendees);
     }
 
     $scope.LoadEditBooking = function (bookingId) {
@@ -76,11 +78,12 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.Projector = $scope.editBooking.projector;
             $scope.newBooking.RoomID = $scope.editBooking.room.id;
 
-            if ($scope.editBooking.externalNames !== null) {
-                $scope.booking.ExternalNames = $scope.editBooking.externalNames.split(';');
+            if ($scope.editBooking.externalAttendees !== null) {
+                //$scope.booking.externalAttendees = $scope.editBooking.externalNames.split(';');
+                $scope.booking.externalAttendees = $scope.editBooking.externalAttendees;
             }
             else {
-                $scope.booking.ExternalNames = []; //Reset External Name List
+                $scope.booking.externalAttendees = []; //Reset External Name List
             }
 
             $scope.booking.numberOfAttendees = $scope.editBooking.numberOfAttendees;
@@ -94,7 +97,7 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.existingBooking.endTime = $scope.booking.endTime;
             $scope.existingBooking.date = $scope.booking.date;
 
-            
+
             //Uncomment this to enable DSS checks when we have DSS support for edit
             //if (!$scope.editBooking.room.smartRoom) {
             //    $("#dssAssistChoice").css('display', 'none');
@@ -144,7 +147,7 @@ function MyBookingsController($scope, $http, $resource) {
         }
 
         //Validate Number of External Names is not graether than attendees
-        ValidateNoAttendees($scope.booking.numberOfAttendees, $scope.booking.ExternalNames.length);
+        ValidateNoAttendees($scope.editBooking.room.seatCount, $scope.booking.externalAttendees.length);
         $scope.newBooking.NumberOfAttendees = $scope.booking.numberOfAttendees;
 
         var unsavedAttendee = ValidateUnSavedAttendee();
@@ -169,9 +172,9 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.StartDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true);
             $scope.newBooking.EndDate = FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true);
 
-            if ($scope.booking.ExternalNames.length > 0) {
-                $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
-        }
+            if ($scope.booking.externalAttendees.length > 0) {
+                $scope.newBooking.externalAttendees = $scope.booking.externalAttendees;//.join(';');
+            }
 
             //Validate if Date/Time/Attendees has changed
             if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
@@ -180,11 +183,11 @@ function MyBookingsController($scope, $http, $resource) {
             }
             else {
                 $scope.availableRooms = Available.query({
-                        location: $scope.editBooking.location.name,
-                        startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
-                        endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                    location: $scope.editBooking.location.name,
+                    startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
+                    endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
                     smartRoom: false,
-                        numberOfAttendees: $scope.booking.numberOfAttendees,
+                    numberOfAttendees: $scope.booking.numberOfAttendees,
                     existingBookingId: $scope.bookingId
                 },
                 function (success) {
@@ -199,13 +202,13 @@ function MyBookingsController($scope, $http, $resource) {
                         EnableAcceptBookingButton();
                         SetEditActiveTab('confirmEditBooking');
                         $scope.currentRoom = $scope.availableRooms[0];
-            }
+                    }
                 },
                 function (error) {
                     EnableAcceptBookingButton();
                     alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
                 });
-                }
+            }
 
         } catch (e) {
             EnableAcceptBookingButton();
@@ -265,7 +268,7 @@ function MyBookingsController($scope, $http, $resource) {
         endTime: '',
         date: new Date(),
         numberOfAttendees: 0,
-        externalNames: []
+        externalAttendees: []
     }
 
     $scope.existingBooking = {
@@ -280,10 +283,10 @@ function MyBookingsController($scope, $http, $resource) {
 function CreateServices($resource) {
 
     Locations = $resource('/api/locations/:status', {
-    status: 'active'
+        status: 'active'
     }, {
         query: { method: 'GET', isArray: true }
-        });
+    });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom/:existingBookingId', {
         location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom', existingBookingId: 'existingBookingId'
@@ -315,7 +318,7 @@ function CreateServices($resource) {
     });
 
 
-    BookingsByPeriod = $resource('/api/bookings/:startDate/:period', { startDate: '', period: 7},
+    BookingsByPeriod = $resource('/api/bookings/:startDate/:period', { startDate: '', period: 7 },
     {
         query: { method: 'GET', isArray: true },
         remove: { method: 'DELETE' }
@@ -327,9 +330,9 @@ function CreateServices($resource) {
         endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
         roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
     };
-    
+
     FilterBookings = $resource('/api/bookings/search', {}, {
-        query : { method: 'GET', isArray: true }
+        query: { method: 'GET', isArray: true }
     });
     FilterBookings.prototype = {
         DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },

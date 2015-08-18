@@ -7,12 +7,27 @@
 <body>
     <h2>@Model.Owner has scheduled a meeting with the following external guests on @Model.StartDate.ToShortDateString() at @Model.StartDate.ToShortTimeString():</h2>
     <p>
-        <ul>
-            @foreach (var attendee in Model.ExternalNames.Split(';'))
+        <table cellspacing="0" cellpadding="10" border="1" width="600">
+            <tr>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Pass Required</th>
+            </tr>
+            @foreach (var attendee in Model.ExternalAttendees)
+            {
+                <tr>
+                    <td>@attendee.FullName</td>
+                    <td>@attendee.CompanyName</td>
+                    <td>@attendee.PassRequired</td>
+                </tr>
+            }
+        </table>
+        @*<ul>
+            @foreach (var attendee in Model.ExternalAttendees)
             {
                 <li>@attendee</li>
             }
-        </ul>
+        </ul>*@
 
     </p>
 </body>

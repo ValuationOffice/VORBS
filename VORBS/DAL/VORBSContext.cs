@@ -20,6 +20,7 @@ namespace VORBS.DAL
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<LocationCredentials> LocationCredentials { get; set; }
+        public DbSet<ExternalAttendees> ExternalAttendees { get; set; }
 
         public virtual int SaveChanges(Booking booking, bool dontCheckClash)
         {

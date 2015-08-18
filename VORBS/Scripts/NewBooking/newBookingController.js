@@ -6,8 +6,9 @@ function NewBookingController($scope, $http, $resource) {
     $scope.locations = Locations.query({ status: true });
     $scope.clashedBookings = [];
 
-    $scope.externalFirstNameTextBox = '';
-    $scope.externalLastNameTextBox = '';
+    $scope.externalFullNameTextBox = '';
+    $scope.externalCompanyNameTextBox = '';
+    $scope.externalPassRequired = false;
     //$scope.currentLocation = $scope.locations[0]
 
 
@@ -190,7 +191,7 @@ function NewBookingController($scope, $http, $resource) {
                             } else {
                                 $("#dssAssistChoice").css('display', 'block');
                                 $("#dssAssistContWarning").css("display", "none");
-                            }
+                            }                            
                         }
 
                         if (!GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials)) {
@@ -271,14 +272,20 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.AddExternalAttendee = function () {
         SetModalErrorMessage('');
-        $scope.booking.ExternalNames = AddExternalName($scope.booking.ExternalNames);
-        $scope.externalFirstNameTextBox = '';
-        $scope.externalLastNameTextBox = '';
+        $scope.booking.ExternalAttendees = AddExternalName($scope.booking.ExternalAttendees);
+        $("#externalAttendeesDisplay").css('display', 'block');
+
+        $scope.externalFullNameTextBox = '';
+        $scope.externalCompanyNameTextBox = '';
+        $scope.externalPassRequired = false;
     }
 
-    $scope.RemoveExternalAttendee = function (fullName) {
+    $scope.RemoveExternalAttendee = function (index) {
         SetModalErrorMessage('');
-        $scope.booking.ExternalNames = RemoveExternalName(fullName, $scope.booking.ExternalNames);
+        $scope.booking.ExternalAttendees = RemoveExternalName(index, $scope.booking.ExternalAttendees);
+        if ($scope.booking.ExternalAttendees.length === 0) {
+            $("#externalAttendeesDisplay").css('display', 'none');
+        }
     }
 
     $scope.GetSmartLocations = function () {
@@ -368,7 +375,7 @@ function NewBookingController($scope, $http, $resource) {
 
         try {
             //Validate Number of External Names is not graether than attendees
-            ValidateNoAttendees($scope.newBooking.Room.seatCount, $scope.booking.ExternalNames.length);
+            ValidateNoAttendees($scope.newBooking.Room.seatCount, $scope.booking.ExternalAttendees.length);
 
             //Validate Subject
             //ValidateSubject($scope.newBooking.Subject);
@@ -405,10 +412,10 @@ function NewBookingController($scope, $http, $resource) {
             $scope.newBooking.NumberOfAttendees = $scope.bookingFilter.numberOfAttendees;
 
             var originalRecurrenceEndDate = $scope.newBooking.Recurrence.EndDate;
-            $scope.newBooking.Recurrence.EndDate = FormatDateTimeForURL($scope.newBooking.Recurrence.EndDate, 'MM-DD-YYYY-HHmm', true, true);
+            $scope.newBooking.Recurrence.EndDate = FormatDateTimeForURL($scope.newBooking.Recurrence.EndDate, 'MM-DD-YYYY-HHmm', true, false);
 
-            if ($scope.booking.ExternalNames.length > 0) {
-                $scope.newBooking.ExternalNames = $scope.booking.ExternalNames.join(';');
+            if ($scope.booking.ExternalAttendees.length > 0) {
+                $scope.newBooking.ExternalAttendees = $scope.booking.ExternalAttendees;//.join(';');
             }
 
             $.ajax({
@@ -492,7 +499,7 @@ function NewBookingController($scope, $http, $resource) {
     $scope.booking = {
         StartTime: '',
         EndTime: '',
-        ExternalNames: []
+        ExternalAttendees: []
     };
 
     $scope.newBooking = {
@@ -501,7 +508,7 @@ function NewBookingController($scope, $http, $resource) {
         },
         Subject: '',
         NumberOfAttendees: 1,
-        ExternalNames: null,
+        ExternalAttendees: [],
         StartDate: new Date(),
         EndDate: new Date(),
         FlipChart: false,
@@ -517,7 +524,7 @@ function NewBookingController($scope, $http, $resource) {
             AdminOverwrite: false,
             AdminOverwriteMessage: '',
             Frequency: 'daily',
-            EndDate: new moment().utc().format('DD-MM-YYYY'),
+            EndDate: '',
             DailyDayCount: 1,
             WeeklyWeekCount: 1,
             WeeklyDay: '',
@@ -579,6 +586,10 @@ function NewBookingController($scope, $http, $resource) {
         if ($("#recEndDate").val() == null || $("#recEndDate").val() == '') {
             valid = false;
             AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Must specify a valid end date");
+        }
+        else if ($("#recEndDate").val() == $("#recStartDate").val()) {
+            valid = false;
+            AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "End date must be ahead of start date");
         }
 
         switch (frequency) {
@@ -683,7 +694,7 @@ function NewBookingController($scope, $http, $resource) {
             $scope.newBooking.Recurrence.WeeklyDay = new moment($scope.bookingFilter.startDate, ['DD-MM-YYYY']).day();
         }
 
-        $scope.newBooking.Recurrence.EndDate = $scope.bookingFilter.startDate;
+        //$scope.newBooking.Recurrence.EndDate = $scope.bookingFilter.startDate;
         $scope.$apply();
     })
 }
@@ -712,12 +723,8 @@ function CreateServices($resource) {
         }
     });
 
-    Room = $resource('/api/room/:locationId/:roomName', {
-        locationId: 'locationId', roomName: 'roomName'
-    }, {
-        query: {
-            method: 'GET'
-        }
+    Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
+        query: { method: 'GET', cache: false }
     });
 
     Users = $resource('/api/users/:allUsers', {

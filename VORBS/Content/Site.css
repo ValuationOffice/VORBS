@@ -195,6 +195,18 @@ textarea {
 }
 
 
+#externalAttendeesTable{
+    margin: 10px 0 0 10px; 
+}
+
+#externalAttendeesTable tr{
+    border: none;
+}
+
+#externalAttendeesTable tr th{
+    width: 150px;     
+    font-size: 14px;   
+}
 
 /*#attendeesInputFilter {
     margin-right:-30px;

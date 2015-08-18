@@ -17,7 +17,7 @@ namespace VORBS.Models.DTOs
         public LocationDTO Location { get; set; }
 
         public int NumberOfAttendees { get; set; }
-        public string ExternalNames { get; set; }
+        public IEnumerable<ExternalAttendeesDTO> ExternalAttendees { get; set; }
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

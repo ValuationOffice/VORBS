@@ -43,46 +43,75 @@
                             <hr />
                             <div id="externalAttendeesCont">
                                 <label class="control-label">External Attendees</label>
-                            <div class="form-group row">
-                                <div class="col-xs-5">
-                                    <label>First Name</label>
-                                    <input class="form-control" id="externalFirstNameTextBox" ng-model="editBookingExternalFirstName" />
+                                <div class="form-group row">
+                                    <div class="col-xs-4">
+                                        <label style="font-weight: normal !important;">Full Name</label>
+                                        <input class="form-control" id="externalFullNameTextBox" ng-model="externalFullNameTextBox" />
+                                    </div>
+                                    <div class="col-xs-4">
+                                        <label style="font-weight: normal !important;">Company Name</label>
+                                        <input class="form-control" id="externalCompanyNameTextBox" ng-model="externalCompanyNameTextBox" />
+                                    </div>
+                                    <div class="col-xs-3">
+                                        <label style="font-weight: normal !important;">Pass Required</label>
+                                        <input class="form-control" type="checkbox" id="externalPassRequired" ng-model="externalPassRequired" />
+                                    </div>
+                                    <div class="col-xs-2">
+                                        <label style="font-weight: normal !important;">&nbsp;</label><br/>
+                                        <button type="button" class="btn btn-primary" ng-disabled="externalFullNameTextBox.length == 0 || externalCompanyNameTextBox.length == 0" ng-click="AddExternalAttendee()">Add</button>
+                                    </div>
+                                    @*<div class="col-xs-5">
+                                            <label>First Name</label>
+                                            <input class="form-control" id="externalFirstNameTextBox" ng-model="editBookingExternalFirstName" />
+                                        </div>
+                                        <div class="col-xs-5">
+                                            <label>Last Name</label>
+                                            <input class="form-control" id="externalLastNameTextBox" ng-model="editBookingExternalLastName"/>
+                                        </div>
+                                        <div class="col-xs-2">
+                                            <label>&nbsp;</label>
+                                            <input id="addExternal" type="button" class="form-control btn btn-primary" ng-disabled="editBookingExternalFirstName.length == 0 || editBookingExternalLastName.length == 0" ng-click="AddExternalAttendee()" value="Add" />
+                                        </div>*@
                                 </div>
-                                <div class="col-xs-5">
-                                    <label>Last Name</label>
-                                    <input class="form-control" id="externalLastNameTextBox" ng-model="editBookingExternalLastName"/>
-                                </div>
-                                <div class="col-xs-2">
-                                    <label>&nbsp;</label>
-                                    <input id="addExternal" type="button" class="form-control btn btn-primary" ng-disabled="editBookingExternalFirstName.length == 0 || editBookingExternalLastName.length == 0" ng-click="AddExternalAttendee()" value="Add" />
-                                </div>
-                            </div>
 
-                            <div class="form-group row">
-                                <div class="col-xs-5">
-                                    <label>
-                                        Attendees
-                                    </label>
-                                    <table>
-                                        <tr ng-repeat="externalName in booking.ExternalNames">
-                                            <td>{{ externalName }}</td>
-                                            <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee(externalName)"></span></td>
-                                        </tr>
-                                    </table>
+                                <div class="form-group row">
+                                    <div>
+                                        <label style="margin-left: 10px;">
+                                            Attendees
+                                        </label>
+                                        <table id="externalAttendeesTable">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Company</th>
+                                                <th>Pass Required</th>
+                                            </tr>
+                                            <tr ng-repeat="externalName in booking.externalAttendees">
+                                                <td>{{ externalName.fullName }} </td>
+                                                <td>{{ externalName.companyName }}</td>
+                                                <td>{{ externalName.passRequired }}</td>
+                                                <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee($index)"></span></td>
+                                            </tr>
+                                        </table>
+                                        @*<table>
+                                                <tr ng-repeat="externalName in booking.ExternalNames">
+                                                    <td>{{ externalName }}</td>
+                                                    <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee(externalName)"></span></td>
+                                                </tr>
+                                            </table>*@
+                                    </div>
                                 </div>
-                            </div>
-                            <hr />
+                                <hr />
                             </div>
                             <div class="alert alert-warning" style="display: none;" id="externalAttendeesContWarning"></div>
 
                             <div id="additionalEquipmentCont">
-                            <div class="form-group row">
-                                <div class="col-xs-5">
-                                    <label class="control-label">Additional Equipment</label><br />
-                                    <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
-                                    <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
+                                <div class="form-group row">
+                                    <div class="col-xs-5">
+                                        <label class="control-label">Additional Equipment</label><br />
+                                        <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
+                                        <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                             <div class="alert alert-warning" style="display: none;" id="additionalEquipmentContWarning">This location does not have a dedicated Local Facilities Officer. Setting up of the meeting room is the responsibility of the user.</div>
 
