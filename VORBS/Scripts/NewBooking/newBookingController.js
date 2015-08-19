@@ -173,7 +173,7 @@ function NewBookingController($scope, $http, $resource) {
                     if (($("#smartLoactionDropDown")[0].selectedIndex > 0 || $scope.newBooking.SmartLoactions.length < 1) && $scope.bookingFilter.smartRoom) {
                         $("#searchFilter #smartLocationSelect").addClass('has-error');
                         var errors = 'Please select your other meeting location(s) and click the Add button';
-                        $("#searchFilterErrorList").replaceWith('<li>' + errors + '</li>');
+                        $("#searchFilterErrorList").append('<li>' + errors + '</li>');
                         $("#searchFilterErrorCont").css('display', 'block');
                         return;
                     }
@@ -342,7 +342,7 @@ function NewBookingController($scope, $http, $resource) {
         else {
             $("#searchFilter #smartLocationSelect").addClass('has-error');
             var errors = 'Please select your other meeting location(s) and click the Add button';
-            $("#searchFilterErrorList").replaceWith('<li>' + errors + '</li>');
+            $("#searchFilterErrorList").append('<li>' + errors + '</li>');
             $("#searchFilterErrorCont").css('display', 'block');
         }
     }
