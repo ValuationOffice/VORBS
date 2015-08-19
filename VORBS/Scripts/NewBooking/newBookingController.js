@@ -182,10 +182,12 @@ function NewBookingController($scope, $http, $resource) {
                         locationId: $scope.bookingFilter.location.id,
                         roomName: this.title
                     }, function (success) {
-                        if (!room.smartRoom) {
+                        if (!room.smartRoom || !$scope.bookingFilter.smartRoom) {
                             $("#dssAssistChoice").css('display', 'none');
+                            $("#dssAssistContWarning").css("display", "none");
                         } else {
-                            if (!GetLocationCredentialsFromList(dssCredentialsName, room.location.locationCredentials)) {
+                            var dssDetails = GetLocationCredentialsFromList(dssCredentialsName, room.location.locationCredentials);
+                            if (!dssDetails || dssDetails.email === "") {
                                 $("#dssAssistChoice").css('display', 'none');
                                 $("#dssAssistContWarning").css("display", "block");
                             } else {
@@ -194,7 +196,8 @@ function NewBookingController($scope, $http, $resource) {
                             }                            
                         }
 
-                        if (!GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials)) {
+                        var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials);
+                        if (!securityDetails || securityDetails.email === "") {
                             $("#externalAttendeesCont").css("display", "none");
 
                             var message = "This location does not have a dedicated security desk.";
@@ -209,7 +212,8 @@ function NewBookingController($scope, $http, $resource) {
                             $("#externalAttendeesContWarning").css("display", "none");
                         }
 
-                        if (!GetLocationCredentialsFromList(facilitiesCredentialsName, room.location.locationCredentials)) {
+                        var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, room.location.locationCredentials);
+                        if (!facilitiesDetails || facilitiesDetails.email === "") {
                             $("#additionalEquipmentCont").css("display", "none");
                             $("#additionalEquipmentContWarning").css("display", "block");
                         } else {
@@ -596,9 +600,9 @@ function NewBookingController($scope, $http, $resource) {
             valid = false;
             AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Must specify a valid end date");
         }
-        else if (Date.parse($("#recEndDate").val()) <= Date.parse($("#recStartDate").text())) {
+        else if (FormatDateTimeForURL($("#recEndDate").val(), null, false, true) <= FormatDateTimeForURL($("#recStartDate").text(), null, false, true)) {
             valid = false;
-            AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "End date must be ahead of start date");
+            AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Start date cannot be later then end date.");
         }
 
         switch (frequency) {

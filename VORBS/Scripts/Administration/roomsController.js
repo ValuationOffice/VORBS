@@ -196,21 +196,29 @@ function EnableDisableRoom(roomId, active) {
             else {
                 ReloadRooms("disableRoomModal");
             }
+            EnableModalButton(active);
         },
         error: function (error) {
+            EnableModalButton(active);
             if (active) {
                 alert('Unable to enable room. Please contact ITSD. ' + error.responseJSON.message);
-                $("#enableBookingConfirmButton").prop('disabled', '');
-                $("#enableBookingConfirmButton").html('Enable');
             }
             else {
                 alert('Unable to disable room. Please contact ITSD. ' + error.responseJSON.message);
-                $("#disableBookingConfirmButton").prop('disabled', '');
-                $("#disableBookingConfirmButton").html('Disable');
             }
         }
     });
+}
 
+function EnableModalButton(active) {
+    if (active) {
+        $("#enableBookingConfirmButton").prop('disabled', '');
+        $("#enableBookingConfirmButton").html('Enable');
+    }
+    else {
+        $("#disableBookingConfirmButton").prop('disabled', '');
+        $("#disableBookingConfirmButton").html('Disable');
+    }
 }
 
 function ValidateRoom(edit, existingRooms, newRoom, newLocation) {
