@@ -88,7 +88,7 @@
                                             <tr ng-repeat="externalName in booking.externalAttendees">
                                                 <td>{{ externalName.fullName }} </td>
                                                 <td>{{ externalName.companyName }}</td>
-                                                <td>{{ externalName.passRequired }}</td>
+                                                <td>{{ FormatPassRequired(externalName.passRequired) }}</td>
                                                 <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee($index)"></span></td>
                                             </tr>
                                         </table>

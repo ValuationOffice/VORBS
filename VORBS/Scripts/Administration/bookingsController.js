@@ -36,6 +36,15 @@ function MyBookingsController($scope, $http, $resource) {
         source: SubstringMatcher($scope.owners)
     });
 
+    $scope.FormatPassRequired = function (required) {
+        if (required) {
+            return "Yes";
+        }
+        else {
+            return "No";
+        }
+    }
+
     $scope.LoadEditBooking = function (bookingId) {
         //Reset Any Error Messages
         SetModalErrorMessage('');

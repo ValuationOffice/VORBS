@@ -251,6 +251,15 @@ function MyBookingsController($scope, $http, $resource) {
         }
     }
 
+    $scope.FormatPassRequired = function (required) {
+        if (required) {
+            return "Yes";
+        }
+        else {
+            return "No";
+        }
+    }
+
     $scope.newBooking = {
         Room: { RoomName: '' },
         Subject: '',

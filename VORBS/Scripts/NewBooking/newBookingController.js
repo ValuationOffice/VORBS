@@ -172,7 +172,7 @@ function NewBookingController($scope, $http, $resource) {
 
                     if ($("#smartLoactionDropDown")[0].selectedIndex > 0 && $scope.bookingFilter.smartRoom) {
                         $("#searchFilter #smartLocationSelect").addClass('has-error');
-                        var errors = 'Please select your other meeting location(s) click the Add button';
+                        var errors = 'Please select your other meeting location(s) and click the Add button';
                         $("#searchFilterErrorList").replaceWith('<li>' + errors + '</li>');
                         $("#searchFilterErrorCont").css('display', 'block');
                         return;
@@ -337,7 +337,7 @@ function NewBookingController($scope, $http, $resource) {
         }
         else {
             $("#searchFilter #smartLocationSelect").addClass('has-error');
-            var errors = 'Please select your other meeting location(s) click the Add button';
+            var errors = 'Please select your other meeting location(s) and click the Add button';
             $("#searchFilterErrorList").replaceWith('<li>' + errors + '</li>');
             $("#searchFilterErrorCont").css('display', 'block');
         }
@@ -470,6 +470,15 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.FormatDateToBritish = function (date) {
         return moment(date).format("DD/MM/YYYY");
+    }
+
+    $scope.FormatPassRequired = function (required) {
+        if (required) {
+            return "Yes";
+        }
+        else {
+            return "No";
+        }
     }
 
     $('#confirmModal').on('show.bs.modal', function () {
