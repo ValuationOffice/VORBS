@@ -587,7 +587,7 @@ function NewBookingController($scope, $http, $resource) {
             valid = false;
             AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Must specify a valid end date");
         }
-        else if ($("#recEndDate").val() == $("#recStartDate").val()) {
+        else if (Date.parse($("#recEndDate").val()) <= Date.parse($("#recStartDate").text())) {
             valid = false;
             AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "End date must be ahead of start date");
         }
@@ -652,7 +652,21 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.CancelRecurrenceBooking = function () {
+        ClearRecurrenceErrors();
         $scope.newBooking.Recurrence = {
+            IsRecurring: false,
+            SkipClashes: false,
+            AutoAlternateRoom: false,
+            AdminOverwrite: false,
+            AdminOverwriteMessage: '',
+            Frequency: 'daily',
+            EndDate: '',
+            DailyDayCount: 1,
+            WeeklyWeekCount: 1,
+            WeeklyDay: '',
+            MonthlyMonthCount: 1,
+            MonthlyMonthDayCount: 1,
+            MonthlyMonthDay: 1
         };
     }
 
