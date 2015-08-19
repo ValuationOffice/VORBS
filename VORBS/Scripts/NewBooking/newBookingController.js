@@ -193,7 +193,7 @@ function NewBookingController($scope, $http, $resource) {
                             } else {
                                 $("#dssAssistChoice").css('display', 'block');
                                 $("#dssAssistContWarning").css("display", "none");
-                            }                            
+                            }
                         }
 
                         var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials);
@@ -647,10 +647,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.ResetRecurrenceStatus = function () {
-        $scope.newBooking.Recurrence.IsRecurring = false;
-        $scope.newBooking.Recurrence.AutoAlternateRoom = false;
-        $scope.newBooking.Recurrence.SkipClashes = false;
-
+        $scope.ResetRecurrenceObject();
         ClearRecurrenceErrors();
 
         $("#meetingClashSelection").modal('hide');
@@ -664,8 +661,7 @@ function NewBookingController($scope, $http, $resource) {
         $scope.ResetRecurrenceStatus();
     }
 
-    $scope.CancelRecurrenceBooking = function () {
-        ClearRecurrenceErrors();
+    $scope.ResetRecurrenceObject = function () {
         $scope.newBooking.Recurrence = {
             IsRecurring: false,
             SkipClashes: false,
@@ -681,6 +677,10 @@ function NewBookingController($scope, $http, $resource) {
             MonthlyMonthDayCount: 1,
             MonthlyMonthDay: 1
         };
+    }
+
+    $scope.CloseRecurrenceScreen = function () {
+        ClearRecurrenceErrors();
     }
 
     $scope.SkipBookingClash = function () {
