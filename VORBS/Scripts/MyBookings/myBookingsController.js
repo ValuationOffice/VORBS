@@ -77,6 +77,7 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.FlipChart = $scope.editBooking.flipchart;
             $scope.newBooking.Projector = $scope.editBooking.projector;
             $scope.newBooking.RoomID = $scope.editBooking.room.id;
+            $scope.newBooking.IsSmartMeeting = $scope.editBooking.isSmartMeeting;
 
             if ($scope.editBooking.externalAttendees !== null) {
                 //$scope.booking.externalAttendees = $scope.editBooking.externalNames.split(';');
@@ -186,7 +187,7 @@ function MyBookingsController($scope, $http, $resource) {
                     location: $scope.editBooking.location.name,
                     startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
                     endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
-                    smartRoom: false,
+                    smartRoom: $scope.newBooking.IsSmartMeeting,
                     numberOfAttendees: $scope.booking.numberOfAttendees,
                     existingBookingId: $scope.bookingId
                 },
@@ -269,7 +270,8 @@ function MyBookingsController($scope, $http, $resource) {
         StartDate: new Date(),
         EndDate: new Date(),
         FlipChart: false,
-        Projector: false
+        Projector: false,
+        IsSmartMeeting: false
     };
 
     $scope.booking = {
