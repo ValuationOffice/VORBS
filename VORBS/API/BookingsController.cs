@@ -599,9 +599,13 @@ namespace VORBS.API
             {
                 //Find Existing Booking
                 Booking existingBooking = db.Bookings.Single(b => b.ID == existingBookingId);
+
+                //Check to see if booking has changed
+                if (!BookingHasChanged(editBooking, existingBooking))
+                    return Request.CreateResponse(HttpStatusCode.NotModified, "Booking has not changed.");
+
                 editBooking.ID = existingBookingId;
 
-                //TODO: Maybe change when booking on behalf of user
                 editBooking.Owner = existingBooking.Owner;
                 editBooking.PID = existingBooking.PID;
 
@@ -628,7 +632,7 @@ namespace VORBS.API
                 db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
                 db.ExternalAttendees.RemoveRange(db.ExternalAttendees.Where(x => x.BookingID == editBooking.ID));
 
-                if (editBooking.ExternalAttendees != null )
+                if (editBooking.ExternalAttendees != null)
                 {
                     editBooking.ExternalAttendees.ToList().ForEach(x => x.BookingID = editBooking.ID);
                     db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
@@ -1176,6 +1180,42 @@ namespace VORBS.API
             clashedBookings.ToList().ForEach(x => bookingsDTO.Add(ConvertBookingToDTO(x)));
 
             return bookingsDTO;
+        }
+
+        protected internal bool BookingHasChanged(Booking editBooking, Booking existingBooking)
+        {
+            //Return true so we can handle the orginial error
+            if (editBooking == null || existingBooking == null)
+                return true;
+
+            if (editBooking.StartDate == existingBooking.StartDate && editBooking.EndDate == existingBooking.EndDate &&
+                editBooking.NumberOfAttendees == existingBooking.NumberOfAttendees && editBooking.Subject == existingBooking.Subject &&
+                editBooking.Flipchart == existingBooking.Flipchart && editBooking.Projector == existingBooking.Projector &&
+                editBooking.DssAssist == existingBooking.DssAssist)
+            {
+                //External Attendess had multiply possible values
+                if ((editBooking.ExternalAttendees == null && existingBooking.ExternalAttendees.Count == 0))
+                    return false;
+
+                if (existingBooking.ExternalAttendees.Count() != editBooking.ExternalAttendees.Count())
+                    return true;
+
+                List<ExternalAttendees> existingAttendees = existingBooking.ExternalAttendees.ToList();
+                List<ExternalAttendees> newAttendees = editBooking.ExternalAttendees.ToList();
+
+                for (int i = 0; i < newAttendees.Count; i++)
+                {
+                    if (existingAttendees[i].FullName != newAttendees[i].FullName || existingAttendees[i].CompanyName != newAttendees[i].CompanyName ||
+                        existingAttendees[i].PassRequired != newAttendees[i].PassRequired)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         protected static internal string GetRecurrenceSentance(Booking newBooking)

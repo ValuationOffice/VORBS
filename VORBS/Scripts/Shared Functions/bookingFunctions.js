@@ -90,8 +90,15 @@ function SaveEditBooking(existingId, editBooking) {
             url: "api/bookings/" + existingId,
             contentType: "application/json",
             success: function (data, status) {
-                alert('Booking Updated Sucessfully.');
-                ReloadThisPage("bookings");
+                if (status === "notmodified") {
+                    alert('Booking has not been Modified.');
+                    EnableEditBookingButton();
+                }
+                else {
+                    alert('Booking Updated Sucessfully.');
+                    ReloadThisPage("bookings");
+                }
+
             },
             error: function (error) {
                 //Server Conflict
