@@ -96,7 +96,7 @@ function NewBookingController($scope, $http, $resource) {
         $("#bookingTable").html('');
 
         if (roomResults.length == 0) {
-            $('#bookingTable').append('<div id="noMeetingsError" class="alert alert-danger alert-dismissible" role="alert">Sorry, there are no rooms available at the required time.</div>');
+            $('#bookingTable').append('<div id="noMeetingsError" class="alert alert-danger alert-dismissible" role="alert">There are no meeting rooms that meet your requirements.</div>');
         }
 
         for (var i = 0; i < roomResults.length; i++) {
