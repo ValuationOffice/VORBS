@@ -45,11 +45,12 @@
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to disable this location?</p>
-                    <p><b>All bookings for rooms in this location will be deleted. Email notifications will be sent to affected users.</b></p>
+                    <p><b>All future bookings for rooms in this loaction will be <span style="color:red;">DELETED</span>. Email notifications will be sent to affected users.</b></p>
+                    <p>Please exit this screen and create a block booking if location will be tempoary unavaliable.</p>
                 </div>
                 <div class="modal-footer">
-                    <button id="disableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="DisableLocation()">Disable</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button id="disableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="DisableLocation()">Disable Location</button>
                 </div>
             </div>
         </div>
@@ -66,8 +67,8 @@
                     <p>Are you sure you want to enable this location?</p>
                 </div>
                 <div class="modal-footer">
-                    <button id="enableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="EnableLocation()">Enable</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button id="enableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="EnableLocation()">Enable Location</button>
                 </div>
             </div>
         </div>

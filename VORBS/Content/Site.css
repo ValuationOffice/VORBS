@@ -550,7 +550,7 @@ textarea {
 
 #userSearchButton {
     margin-bottom: -21px;
-    width: 75px;
+    width: auto;
     margin-left: 14px;
 }
 

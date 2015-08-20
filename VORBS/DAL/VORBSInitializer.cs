@@ -132,8 +132,8 @@ namespace VORBS.DAL
                 if (new int[2] { 6, 0 }.ToList().Contains(((int)b.StartDate.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1).DayOfWeek)))
                     dayOffset = dayOffset + 3;
 
-                b.StartDate =  b.StartDate.Date.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1);
-                b.EndDate = b.EndDate.Date.AddDays((DateTime.Now.Date - b.EndDate.Date).Days + 1);
+                b.StartDate =  b.StartDate.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1);
+                b.EndDate = b.EndDate.AddDays((DateTime.Now.Date - b.EndDate.Date).Days + 1);
             }
 
             foreach (var b in bookings.Skip(22))
@@ -141,8 +141,8 @@ namespace VORBS.DAL
                 if (new int[2] { 6, 0 }.ToList().Contains(((int)b.StartDate.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 1).DayOfWeek)))
                     dayOffset = dayOffset + 3;
 
-                b.StartDate = b.StartDate.Date.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 2);
-                b.EndDate = b.EndDate.Date.AddDays((DateTime.Now.Date - b.EndDate.Date).Days + 2);
+                b.StartDate = b.StartDate.AddDays((DateTime.Now.Date - b.StartDate.Date).Days + 2);
+                b.EndDate = b.EndDate.AddDays((DateTime.Now.Date - b.EndDate.Date).Days + 2);
             }
 
             bookings.ForEach(b => context.Bookings.Add(b));

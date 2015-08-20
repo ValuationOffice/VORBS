@@ -7,7 +7,7 @@ function MyBookingsController($scope, $http, $resource) {
     $scope.orderByField = 'date';
     $scope.reverseSort = false;
 
-    $scope.locations = Locations.query({ status: true });
+    $scope.locations = Locations.query({ status: true, extraInfo: false });
     $scope.bookingFilter = {
         location: { name: '', id: 0 },
         room: '',
@@ -291,8 +291,8 @@ function MyBookingsController($scope, $http, $resource) {
 
 function CreateServices($resource) {
 
-    Locations = $resource('/api/locations/:status', {
-        status: 'active'
+    Locations = $resource('/api/locations/:status/:extraInfo', {
+        status: 'active', extraInfo: 'extraInfo'
     }, {
         query: { method: 'GET', isArray: true }
     });

@@ -3,7 +3,7 @@
 function NewBookingController($scope, $http, $resource) {
     CreateServices($resource);
 
-    $scope.locations = Locations.query({ status: true });
+    $scope.locations = Locations.query({ status: true, extraInfo: false });
     $scope.clashedBookings = [];
 
     $scope.externalFullNameTextBox = '';
@@ -728,12 +728,8 @@ function NewBookingController($scope, $http, $resource) {
 
 
 function CreateServices($resource) {
-    Locations = $resource('/api/locations/:status', {
-        status: 'active'
-    }, {
-        query: {
-            method: 'GET', isArray: true
-        }
+    Locations = $resource('/api/locations/:status/:extraInfo', { status: 'active', extraInfo: 'extraInfo' }, {
+        query: { method: 'GET', isArray: true }
     });
 
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',

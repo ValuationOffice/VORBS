@@ -119,19 +119,19 @@ function EnableAcceptBookingButton() {
 function EnableConfirmBookingButton() {
     //Change the "new booking" button to stop multiple bookings
     $("#confirmBookingConfirmButton").prop('disabled', '');
-    $("#confirmBookingConfirmButton").html('Confirm');
+    $("#confirmBookingConfirmButton").html('Confirm Booking');
 }
 
 function EnableDeleteBookingButton() {
     //Change the "delete booking" button to stop multiple bookings
     $("#deleteBookingConfirmButton").prop('disabled', '');
-    $("#deleteBookingConfirmButton").html('Delete');
+    $("#deleteBookingConfirmButton").html('Delete Booking');
 }
 
 function EnableEditBookingButton() {
     //Change the "edit booking" button to stop multiple bookings
     $("#acceptBookingConfirmButton").prop('disabled', '');
-    $("#acceptBookingConfirmButton").html('Accept');
+    $("#acceptBookingConfirmButton").html('Accept Changes');
 }
 
 
@@ -232,7 +232,7 @@ function FormatDateTimeForURL(date, formatString, toUtc, validate) {
 
 function FormatTimeDate(dateTime, returnDate) {
     if (dateTime === "") {
-        alert('Please Enter a Valid Date');
+        alert('Please Enter a Valid Date.');
         throw new Error();
     }
 

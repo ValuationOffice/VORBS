@@ -15,26 +15,34 @@ function UsersController($scope, $http, $resource) {
     $scope.AddAdmin = function () {
         SetAdminErrorMessage('');
 
+        //Validate PID
+        if ($scope.adminUser.PID === "") {
+            SetAdminErrorMessage('Invalid PID.');
+            return;
+        }
+
         //Validate Location
         if ($scope.adminUser.Location.name === undefined) {
-            SetAdminErrorMessage('Invalid Location.');
+            SetAdminErrorMessage('Invalid location.');
             return;
         }
         else {
             $scope.adminUser.Location = $scope.adminUser.Location.name;
         }
 
-        //Validate First & Last Name
-        if ($scope.adminUser.FirstName === "" || $scope.adminUser.LastName === "") {
-            SetAdminErrorMessage('Invalid First/Last Name.');
-            return;
-        }
+        //Dont need to validate as we get detials from Active Directory. AD Data is filtered on server first.
 
-        //Validate Email
-        if (!ValidateEmail($scope.adminUser.Email)) {
-            SetAdminErrorMessage('Invalid Email Detected.');
-            return;
-        }
+        ////Validate First & Last Name
+        //if ($scope.adminUser.FirstName === "" || $scope.adminUser.LastName === "") {
+        //    SetAdminErrorMessage('Invalid First/Last Name.');
+        //    return;
+        //}
+
+        ////Validate Email
+        //if (!ValidateEmail($scope.adminUser.Email)) {
+        //    SetAdminErrorMessage('Invalid Email Detected.');
+        //    return;
+        //}
 
         $.ajax({
             type: "POST",
@@ -43,11 +51,12 @@ function UsersController($scope, $http, $resource) {
             contentType: "application/json",
             success: function () {
                 alert('User Added Successfully!');
-                ReloadThisPage("users");
+                $scope.CreateNewUserObject();
+                $scope.admins = Admins.getAll({});
             },
             error: function (error) {
                 if (error.status == 409) {
-                    SetAdminErrorMessage('Administrator Already Exists!');
+                    SetAdminErrorMessage('Administrator already exists.');
                 }
                 else {
                     alert('Unable to Add Admin. Please Contact ITSD. ' + error.message);
@@ -106,16 +115,18 @@ function UsersController($scope, $http, $resource) {
                 contentType: "application/json",
                 success: function (data, status) {
                     alert('Admin Edited Successfully!');
-                    ReloadThisPage("users");
+                    $scope.admins = Admins.getAll({});
+                    $('#editAdminModal').modal('hide');
                 },
                 error: function (error) {
-                    EnableEditAdminButton();
                     alert('Unable to Edit Admin. Please Try Again or Contact ITSD. ' + error.message);
                 }
             });
         } catch (e) {
             EnableEditAdminButton();
         }
+
+        EnableEditAdminButton();
     }
 
     $scope.DeleteAdmin = function () {
@@ -123,7 +134,8 @@ function UsersController($scope, $http, $resource) {
             adminId: $scope.adminId
         },
         function (success) {
-            ReloadThisPage("users");
+            $scope.admins = Admins.getAll({});
+            $('#deleteAdminModal').modal('hide');
         },
         function (error) {
             alert('Unable to Delete Admin. Please Try Again or Contact ITSD. ' + error.message); //TODO:Log Error
@@ -156,14 +168,18 @@ function UsersController($scope, $http, $resource) {
         $('#activeDirecotryModal').modal('hide');
     }
 
-    $scope.adminUser = {
-        PID: '',
-        FirstName: '',
-        LastName: '',
-        Location: '',
-        Email: '',
-        PermissionLevel: 1
+    $scope.CreateNewUserObject = function () {
+        $scope.adminUser = {
+            PID: '',
+            FirstName: '',
+            LastName: '',
+            Location: '',
+            Email: '',
+            PermissionLevel: 1
+        }
     }
+
+    $scope.CreateNewUserObject();
 
     $scope.editAdminUser = {
         location: '',
@@ -204,16 +220,16 @@ function CreateUserAdminServices($resource) {
 function EnableEditAdminButton() {
     //Change the "new booking" button to stop multiple bookings
     $("#editAdminEditButton").prop('disabled', '');
-    $("#editAdminEditButton").html('Edit');
+    $("#editAdminEditButton").html('Accept Changes');
 }
 
 function SetAdminErrorMessage(message) {
     if (message === "") {
-        $('#adminErrorMessage').hide();
+        $('#adminUserErrorMessage').hide();
     }
     else {
-        $('#adminErrorMessage').text(message);
-        $('#adminErrorMessage').show();
+        $('#adminUserErrorMessage').text(message);
+        $('#adminUserErrorMessage').show();
     }
 }
 

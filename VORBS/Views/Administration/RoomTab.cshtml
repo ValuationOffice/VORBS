@@ -39,7 +39,7 @@
             </div>
             <div class="col-xs-3">
                 <label>&nbsp;</label>
-                <input id="newRoomAddButton" type="button" class="btn btn-primary" value="Add" ng-click="NewRoom()" />
+                <input id="newRoomAddButton" type="button" class="btn btn-primary" value="Add Room" ng-click="NewRoom()" />
             </div>
         </div>
         <p>
@@ -106,8 +106,8 @@
                     <p>Please exit this screen and create a block booking if room will be tempoary unavaliable.</p>
                 </div>
                 <div class="modal-footer">
-                    <button id="disableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="DisableRoom()">Disable</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button id="disableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="DisableRoom()">Disable Room</button>
                 </div>
             </div>
         </div>
@@ -124,8 +124,8 @@
                     <p>Are you sure you want to enable this meeting room?</p>
                 </div>
                 <div class="modal-footer">
-                    <button id="enableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="EnableRoom()">Enable</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button id="enableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="EnableRoom()">Enable Room</button>
                 </div>
             </div>
         </div>

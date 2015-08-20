@@ -213,11 +213,11 @@ function EnableDisableRoom(roomId, active) {
 function EnableModalButton(active) {
     if (active) {
         $("#enableBookingConfirmButton").prop('disabled', '');
-        $("#enableBookingConfirmButton").html('Enable');
+        $("#enableBookingConfirmButton").html('Enable Room');
     }
     else {
         $("#disableBookingConfirmButton").prop('disabled', '');
-        $("#disableBookingConfirmButton").html('Disable');
+        $("#disableBookingConfirmButton").html('Disable Room');
     }
 }
 

@@ -46,9 +46,9 @@ namespace VORBS.API
                         {
                             ID = lc.ID,
                             Department = lc.Department,
-                            LocationID = lc.ID,
+                            LocationID = x.ID,
                             Email = lc.Email,
-                            PhoneNumber = lc.PhoneNumber
+                            PhoneNumber = lc.PhoneNumber,
                         }; return lcDto;
                     }).ToList(),
                     Rooms = x.Rooms.Select(r =>
@@ -69,74 +69,6 @@ namespace VORBS.API
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get list of locations: ", ex);
-            }
-            return locationsDTO;
-        }
-
-        [HttpGet]
-        [Route("{searchLoaction}")]
-        public List<string> GetSmartRoomLoactions(string searchLoaction)
-        {
-            List<string> locationNames = new List<string>();
-
-            try
-            {
-                List<Location> locations = db.Locations.Where(x => x.Active == true && x.Rooms.Where(r => r.SmartRoom == true && r.LocationID == x.ID).Count() > 0).ToList();
-
-                if (locations.Exists(l => l.Name == searchLoaction))
-                {
-                    if (locations.Single(l => l.Name == searchLoaction).Rooms.Count() <= 1)
-                        locations.Remove(locations.Single(l => l.Name == searchLoaction));
-                }
-
-                foreach (var loc in locations)
-                {
-                    foreach (var room in loc.Rooms.Where(r => r.SmartRoom == true && r.Active))
-                        locationNames.Add(loc.Name);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to get list of smart locations", ex);
-            }
-            return locationNames;
-        }
-
-        [HttpGet]
-        [Route("{status:bool}")]
-        public List<LocationDTO> GetLocationsByStatus(bool status)
-        {
-            List<LocationDTO> locationsDTO = new List<LocationDTO>();
-
-            try
-            {
-                List<Location> locations = db.Locations.Where(x => x.Active == status).ToList()
-                                            .ToList();
-                locations.ForEach(x => locationsDTO.Add(new LocationDTO()
-                {
-                    ID = x.ID,
-                    Name = x.Name,
-                    Active = x.Active,
-                    //Only get smart rooms as we need them for SMART bookings.
-                    Rooms = x.Rooms.Where(y => y.SmartRoom == true && y.Active == true).Select(r => 
-                    {
-                        RoomDTO rDto = new RoomDTO()
-                        {
-                            ID = r.ID,
-                            RoomName = r.RoomName,
-                            ComputerCount = r.ComputerCount,
-                            PhoneCount = r.PhoneCount,
-                            SmartRoom = r.SmartRoom,
-                            SeatCount = r.SeatCount,
-                            Active = r.Active
-                        }; return rDto;
-                    }).ToList()
-                }));
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to get list of locations", ex);
             }
             return locationsDTO;
         }
@@ -171,7 +103,7 @@ namespace VORBS.API
                         {
                             Department = l.Department,
                             Email = l.Email,
-                            ID = l.ID,
+                            ID = location.ID,
                             LocationID = l.LocationID,
                             PhoneNumber = l.PhoneNumber
                         }; return lcDto;
@@ -184,6 +116,112 @@ namespace VORBS.API
                 _logger.ErrorException("Unable to get a location by id: " + id, ex);
                 return new LocationDTO();
             }
+        }
+
+        [HttpGet]
+        [Route("{searchLoaction}")]
+        public List<string> GetSmartRoomLoactions(string searchLoaction)
+        {
+            List<string> locationNames = new List<string>();
+
+            try
+            {
+                List<Location> locations = db.Locations.Where(x => x.Active == true && x.Rooms.Where(r => r.SmartRoom == true && r.LocationID == x.ID).Count() > 0).ToList();
+
+                if (locations.Exists(l => l.Name == searchLoaction))
+                {
+                    if (locations.Single(l => l.Name == searchLoaction).Rooms.Count() <= 1)
+                        locations.Remove(locations.Single(l => l.Name == searchLoaction));
+                }
+
+                foreach (var loc in locations)
+                {
+                    foreach (var room in loc.Rooms.Where(r => r.SmartRoom == true && r.Active))
+                        locationNames.Add(loc.Name);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get list of smart locations", ex);
+            }
+            return locationNames;
+        }
+
+        [HttpGet]
+        [Route("{status:bool}/{extraInfo:bool}")]
+        public List<LocationDTO> GetLocationsByStatus(bool status, bool extraInfo)
+        {
+            List<LocationDTO> locationsDTO = new List<LocationDTO>();
+
+            try
+            {
+                List<Location> locations = db.Locations.Where(x => x.Active == status).ToList()
+                                            .ToList();
+
+                if (extraInfo)
+                {
+                    locations.ForEach(x => locationsDTO.Add(new LocationDTO()
+                    {
+                        ID = x.ID,
+                        Name = x.Name,
+                        Active = x.Active,
+                        LocationCredentials = x.LocationCredentials.Select(lc =>
+                        {
+                            LocationCredentialsDTO lcDto = new LocationCredentialsDTO()
+                            {
+                                ID = lc.ID,
+                                Department = lc.Department,
+                                LocationID = x.ID,
+                                Email = lc.Email,
+                                PhoneNumber = lc.PhoneNumber,
+                            }; return lcDto;
+                        }).ToList(),
+                        Rooms = x.Rooms.Select(r =>
+                        {
+                            RoomDTO rDto = new RoomDTO()
+                            {
+                                ID = r.ID,
+                                RoomName = r.RoomName,
+                                ComputerCount = r.ComputerCount,
+                                PhoneCount = r.PhoneCount,
+                                SmartRoom = r.SmartRoom,
+                                SeatCount = r.SeatCount,
+                                Active = r.Active
+                            }; return rDto;
+                        }).ToList()
+                    }));
+                }
+                else
+                {
+                    locations.ForEach(x => locationsDTO.Add(new LocationDTO()
+                    {
+                        ID = x.ID,
+                        Name = x.Name,
+                        Active = x.Active,
+                        //Only get smart rooms as we need them for SMART bookings.
+                        Rooms = x.Rooms.Where(y => y.SmartRoom == true && y.Active == true).Select(r =>
+                        {
+                            RoomDTO rDto = new RoomDTO()
+                            {
+                                ID = r.ID,
+                                RoomName = r.RoomName,
+                                ComputerCount = r.ComputerCount,
+                                PhoneCount = r.PhoneCount,
+                                SmartRoom = r.SmartRoom,
+                                SeatCount = r.SeatCount,
+                                Active = r.Active
+                            }; return rDto;
+                        }).ToList()
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get list of locations", ex);
+            }
+
+            return locationsDTO;
         }
 
         [HttpPut]

@@ -27,13 +27,15 @@ function LocationsController($scope, $http, $resource) {
             });
         }
         if ($scope.selectedItem.type === "enabled") {
-            $scope.Locations = Locations.query({
-                status: true
+            $scope.Locations = LocationsByStatus.query({
+                status: true,
+                extraInfo: true
             });
         }
         if ($scope.selectedItem.type === "disabled") {
-            $scope.Locations = Locations.query({
-                status: false
+            $scope.Locations = LocationsByStatus.query({
+                status: false,
+                extraInfo: true
             });
         }
 
@@ -205,10 +207,10 @@ function LocationsController($scope, $http, $resource) {
             $scope.NewEditLocation.locationCredentials = credentials;
 
             LocationById.edit({ id: $scope.OriginalEditLocation.id }, $scope.NewEditLocation, function (success) {
-                $scope.Locations = Locations.query({});
+                $scope.GetLocationsByStatus();
 
                 $("#editLocationConfirm").prop('disabled', '');
-                $("#editLocationConfirm").html('Edit');
+                $("#editLocationConfirm").html('Accept Changes');
                 $("#editLocationModal").modal('hide');
 
                 $("#location-success-alert").alert();
@@ -219,13 +221,13 @@ function LocationsController($scope, $http, $resource) {
 
             }, function (error) {
                 $("#editLocationConfirm").prop('disabled', '');
-                $("#editLocationConfirm").html('Edit');
+                $("#editLocationConfirm").html('Accept Changes');
                 ClearEditLocationErrors();
                 AddEditLocationErrorMessage('Error occured when editting the location. Please try again or contact ITSD');
             });
         } else {
             $("#editLocationConfirm").prop('disabled', '');
-            $("#editLocationConfirm").html('Edit');
+            $("#editLocationConfirm").html('Accept Changes');
         }
 
     }
@@ -251,14 +253,14 @@ function LocationsController($scope, $http, $resource) {
                 if (active) {
                     $('#enableLocationModal').modal('hide');
                     $("#enableLocationConfirmButton").prop('disabled', '');
-                    $("#enableLocationConfirmButton").html('Enable');
+                    $("#enableLocationConfirmButton").html('Enable Location');
                 }
                 else {
                     $('#disableLocationModal').modal('hide');
                     $("#disableLocationConfirmButton").prop('disabled', '');
-                    $("#disableLocationConfirmButton").html('Disable');
+                    $("#disableLocationConfirmButton").html('Disable Location');
                 }
-                $scope.Locations = Locations.query({});
+                $scope.GetLocationsByStatus();
                 $("#location-success-alert").alert();
                 $("#location-success-alert p").text('Location Status has been updated.');
                 $("#location-success-alert").fadeTo(5000, 500).slideUp(500, function () {
@@ -270,12 +272,12 @@ function LocationsController($scope, $http, $resource) {
                 if (active) {
                     alert('Unable to enable location. Please contact ITSD. ' + error.responseJSON.message);
                     $("#enableLocationConfirmButton").prop('disabled', '');
-                    $("#enableLocationConfirmButton").html('Enable');
+                    $("#enableLocationConfirmButton").html('Enable Location');
                 }
                 else {
                     alert('Unable to disable location. Please contact ITSD. ' + error.responseJSON.message);
                     $("#disableLocationConfirmButton").prop('disabled', '');
-                    $("#disableLocationConfirmButton").html('Disable');
+                    $("#disableLocationConfirmButton").html('Disable Location');
                 }
             }
         });
@@ -285,11 +287,12 @@ function LocationsController($scope, $http, $resource) {
 
 function CreateLocationAdminServices($resource) {
 
-    Locations = $resource('/api/locations/:status', {
-    }, {
-        query: {
-            method: 'GET', isArray: true
-        }
+    Locations = $resource('/api/locations', {}, {
+        query: { method: 'GET', isArray: true }
+    });
+
+    LocationsByStatus = $resource('/api/locations/:status/:extraInfo', { status: 'status', extraInfo: 'extraInfo' }, {
+        query: { method: 'GET', isArray: true }
     });
 
     LocationById = $resource('/api/locations/:id', {}, {
@@ -309,14 +312,14 @@ function ValidateNewLocation(newLocationName, locations, emails) {
 
     // Validate Location Name
     if (newLocationName === undefined || newLocationName === '') {
-        SetLocationModalErrorMessage("Invalid Location Name.");
+        SetLocationModalErrorMessage("Invalid location name");
         valid = false;
     }
     else {
         // Check if Location Name already exists
         for (var i = 0; i < locations.length; i++) {
             if (newLocationName.toLowerCase() === locations[i].toLowerCase()) {
-                SetLocationModalErrorMessage("Location Name already exists!");
+                SetLocationModalErrorMessage("Location name already exists");
                 valid = false;
             }
         }
@@ -328,7 +331,7 @@ function ValidateNewLocation(newLocationName, locations, emails) {
             continue;
         }
         if (!ValidateEmail(emails[i])) {
-            SetLocationModalErrorMessage("Invalid Email Detected: " + emails[i]);
+            SetLocationModalErrorMessage("Invalid email detected: " + emails[i]);
             valid = false;
         }
     }

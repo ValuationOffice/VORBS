@@ -3,7 +3,7 @@
 function HelpController($scope, $http, $resource) {
     CreateHelpServices($resource);
 
-    $scope.locations = Locations.query({},
+    $scope.locations = Locations.query({ status: true, extraInfo: true },
         function (success) {
             $scope.currentLocation = $scope.locations[0];
         });
@@ -11,9 +11,10 @@ function HelpController($scope, $http, $resource) {
 }
 
 function CreateHelpServices($resource) {
-    Locations = $resource('/api/locations', {}, {
+    Locations = $resource('/api/locations/:status/:extraInfo', { status: 'active', extraInfo: 'extraInfo'}, {
         query: { method: 'GET', isArray: true }
     });
+
     Locations.prototype =
         {
             GetContactDetail: function (name) {

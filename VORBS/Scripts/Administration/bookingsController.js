@@ -29,7 +29,7 @@ function MyBookingsController($scope, $http, $resource) {
     $('#fullNameTextBox').typeahead({
         hint: false,
         highlight: true,
-        minLength: 1
+        minLength: 3
     },
     {
         name: 'owners',
@@ -90,7 +90,7 @@ function MyBookingsController($scope, $http, $resource) {
 
         //Validate Start Date
         if ($scope.booking.date === "") {
-            SetModalErrorMessage('Invalid Date.');
+            SetModalErrorMessage('Invalid date.');
             return;
         }
 
@@ -142,7 +142,7 @@ function MyBookingsController($scope, $http, $resource) {
                 function (success) {
                     if ($scope.availableRooms.length === 0) {
                         EnableAcceptBookingButton();
-                        SetModalErrorMessage('No Rooms Avaliable using the below Date/Time/Attendees.');
+                        SetModalErrorMessage('No rooms avaliable using the below Date/Time/Attendees.');
                     }
                     else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
                         SaveEditBooking($scope.bookingId, $scope.newBooking);
@@ -185,11 +185,13 @@ function MyBookingsController($scope, $http, $resource) {
                 bookingId: $scope.bookingId
             },
             function (success) {
-                ReloadThisPage("bookings");
+                $('#deleteModal').modal('hide');
+                $scope.SearchBooking();
+                EnableDeleteBookingButton();
             },
             function (error) {
+                alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.responseText);
                 EnableDeleteBookingButton();
-                alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.message);
             });
         } catch (e) {
             EnableDeleteBookingButton();
@@ -197,11 +199,16 @@ function MyBookingsController($scope, $http, $resource) {
     }
 
     $scope.SearchBooking = function () {
-        SetAdminErrorMessage('');
+        SetAdminBookingErrorMessage('');
 
         //Validate Full Name
         if ($('#fullNameTextBox').typeahead('val').trim() <= 0) {
-            SetAdminErrorMessage("Invalid Full Name");
+            SetAdminBookingErrorMessage("Invalid full name.");
+        }
+
+        //Validate Date
+        if ($('#startDatePicker').val() === "") {
+            SetAdminBookingErrorMessage("Invalid booking date.");
         }
 
         $scope.bookings = GetBookings.query({
@@ -210,7 +217,7 @@ function MyBookingsController($scope, $http, $resource) {
         },
         function (success) {
             if (success.length === 0) {
-                SetAdminErrorMessage('No Bookings for ' + $('#fullNameTextBox').typeahead('val') + ' on the ' + $scope.bookingFilter.startDate);
+                SetAdminBookingErrorMessage('No bookings for ' + $('#fullNameTextBox').typeahead('val') + ' on the ' + $scope.bookingFilter.startDate + '.');
             }
         });
     }
@@ -282,6 +289,16 @@ function CreateBookingServices($resource) {
     {
         getAll: { method: 'GET', isArray: true }
     });
+}
+
+function SetAdminBookingErrorMessage(message) {
+    if (message === "") {
+        $('#adminBookingErrorMessage').hide();
+    }
+    else {
+        $('#adminBookingErrorMessage').text(message);
+        $('#adminBookingErrorMessage').show();
+    }
 }
 
 function SubstringMatcher(strs) {
