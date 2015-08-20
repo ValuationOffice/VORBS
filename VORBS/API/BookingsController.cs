@@ -883,6 +883,11 @@ namespace VORBS.API
 
             try
             {
+                string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+
+                //Filter by users pay id
+                queryExpression += (currentPid == null || currentPid == "") ? "" : (queryExpression.Length > 0) ? " AND PID = \"" + currentPid + "\"" : "PID = \"" + currentPid + "\"";
+
                 //Standard pattern used all below, if the value is null to start, we wont filter on it if it isnt null, check if the string is empty already. If the string is not empty, start with the AND keyword as we are concatanating on otherwise start with your expression as it is the begging of the expression
                 queryExpression += (locationId == null || locationId == 0) ? "" : (queryExpression.Length > 0) ? " AND Room.LocationID = " + locationId : "Room.LocationID = " + locationId;
 
@@ -901,7 +906,7 @@ namespace VORBS.API
                     DateTime now = DateTime.Now;
                     string nowFormatted = "DateTime(" + now.Year + ", " + now.Month + ", " + now.Day + ", " + now.Hour + ", " + now.Minute + ", " + now.Second + ")";
                     //queryExpression += (startDate == null) ? "" : (queryExpression.Length > 0) ? " AND StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted + "" : " StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted;
-                    queryExpression += (queryExpression.Length > 0) ? " AND StartDate >= " + nowFormatted : "StartDate >= " + nowFormatted;
+                    queryExpression += (queryExpression.Length > 0) ? " AND EndDate >= " + nowFormatted : "EndDate >= " + nowFormatted;
                 }
 
                 queryExpression += (room == null) ? "" : (queryExpression.Length > 0) ? " AND Room.RoomName = \"" + room + "\"" : "Room.RoomName = \"" + room + "\"";
