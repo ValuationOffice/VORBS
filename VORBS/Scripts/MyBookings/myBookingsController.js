@@ -78,6 +78,7 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.newBooking.Projector = $scope.editBooking.projector;
             $scope.newBooking.RoomID = $scope.editBooking.room.id;
             $scope.newBooking.IsSmartMeeting = $scope.editBooking.isSmartMeeting;
+            $scope.newBooking.DSSAssist = $scope.editBooking.dssAssist;
 
             if ($scope.editBooking.externalAttendees !== null) {
                 //$scope.booking.externalAttendees = $scope.editBooking.externalNames.split(';');
@@ -98,22 +99,24 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.existingBooking.endTime = $scope.booking.endTime;
             $scope.existingBooking.date = $scope.booking.date;
 
+            if (!$scope.editBooking.room.smartRoom || !$scope.newBooking.IsSmartMeeting) {
+                $("#dssAssistChoice").css('display', 'none');
+                $("#dssAssistContWarning").css("display", "none");
+            } else {
+                var dssDetails = GetLocationCredentialsFromList("dss", $scope.editBooking.location.locationCredentials);
+                if (!dssDetails || dssDetails.email === "") {
+                    $("#dssAssistChoice").css('display', 'none');
+                    $("#dssAssistContWarning").css("display", "block");
+                } else {
+                    $("#dssAssistChoice").css('display', 'block');
+                    $("#dssAssistContWarning").css("display", "none");
+                }
+            }
 
-            //Uncomment this to enable DSS checks when we have DSS support for edit
-            //if (!$scope.editBooking.room.smartRoom) {
-            //    $("#dssAssistChoice").css('display', 'none');
-            //} else {
-            //    if (!GetLocationCredentialsFromList("dss", $scope.editBooking.room.location.locationCredentials)) {
-            //        $("#dssAssistChoice").css('display', 'none');
-            //        $("#dssAssistContWarning").css("display", "block");
-            //    } else {
-            //        $("#dssAssistChoice").css('display', 'block');
-            //        $("#dssAssistContWarning").css("display", "none");
-            //    }
-            //}
-
-            if (!GetLocationCredentialsFromList(securityCredentialsName, $scope.editBooking.location.locationCredentials)) {
+            var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, $scope.editBooking.location.locationCredentials);
+            if (!securityDetails || securityDetails.email === "") {
                 $("#externalAttendeesCont").css("display", "none");
+
                 var message = "This location does not have a dedicated security desk.";
                 var facilities = GetLocationCredentialsFromList(facilitiesCredentialsName, $scope.editBooking.location.locationCredentials);
                 if (facilities) {
@@ -125,8 +128,9 @@ function MyBookingsController($scope, $http, $resource) {
                 $("#externalAttendeesCont").css("display", "block");
                 $("#externalAttendeesContWarning").css("display", "none");
             }
-
-            if (!GetLocationCredentialsFromList(facilitiesCredentialsName, $scope.editBooking.location.locationCredentials)) {
+           
+            var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, $scope.editBooking.location.locationCredentials);
+            if (!facilitiesDetails || facilitiesDetails.email === "") {
                 $("#additionalEquipmentCont").css("display", "none");
                 $("#additionalEquipmentContWarning").css("display", "block");
             } else {

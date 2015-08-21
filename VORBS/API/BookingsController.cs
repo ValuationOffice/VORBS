@@ -270,6 +270,7 @@ namespace VORBS.API
                     }),
                     Flipchart = booking.Flipchart,
                     Projector = booking.Projector,
+                    DssAssist = booking.DssAssist,
                     PID = booking.PID,
                     IsSmartMeeting = booking.IsSmartMeeting,
                     Location = new LocationDTO()
@@ -610,7 +611,11 @@ namespace VORBS.API
                 editBooking.PID = existingBooking.PID;
 
                 string body = "";
+                string dssBody = "";
+
                 string facilitiesEmail = "";
+                string dssEmail = "";
+
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
                 _logger.Info("Booking sucessfully editted: " + editBooking.ID);
@@ -626,6 +631,23 @@ namespace VORBS.API
                     if (facilitiesEmail != null)
                     {
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", editBooking);
+                    }
+                }
+
+                if (editBooking.DssAssist && !existingBooking.DssAssist)
+                {
+                    dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+                    if (dssEmail != null)
+                    {
+                        try
+                        {
+                            editBooking.Room.Location = existingBooking.Room.Location;
+                            dssBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", editBooking);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + editBooking.ID, ex);
+                        }
                     }
                 }
 
@@ -656,12 +678,23 @@ namespace VORBS.API
                     _logger.ErrorException("Unable to send E-Mail to facilities for editting booking: " + editBooking.ID, ex);
                 }
 
+
+                try
+                {
+                    //Send DSS Email
+                    if (!string.IsNullOrEmpty(dssBody))
+                        Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("SMART room set up support on {0}", editBooking.StartDate.ToShortDateString()), dssBody);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send E-Mail to facilities for editting booking: " + editBooking.ID, ex);
+                }
+
                 Booking edittedBooking = db.Bookings.Single(b => b.ID == existingBooking.ID);
 
                 //Send Owner Email
                 try
                 {
-
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
                     string toEmail = AdQueries.GetUserByPid(editBooking.PID).EmailAddress;
 
