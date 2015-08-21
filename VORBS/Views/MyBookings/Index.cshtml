@@ -44,16 +44,16 @@
                 <thead>                    
                     <tr>
                         <th>&nbsp;</th>
-                        <th><a href="#" ng-click="orderByField='location.name'; reverseSort = !reverseSort">Location<span ng-show="orderByField == 'location.name'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='roomNameFormatted()'; reverseSort = !reverseSort">Room<span ng-show="orderByField == 'roomNameFormatted()'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='DateFormatted()'; reverseSort = !reverseSort">Date<span ng-show="orderByField == 'DateFormatted()'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='startTimeFormatted()'; reverseSort = !reverseSort">Time<span ng-show="orderByField == 'startTimeFormatted()'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='location'; reverseSort = !reverseSort">Location<span ng-show="orderByField == 'location'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='room'; reverseSort = !reverseSort">Room<span ng-show="orderByField == 'room'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='date'; reverseSort = !reverseSort">Date<span ng-show="orderByField == 'date'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='startTime'; reverseSort = !reverseSort">Time<span ng-show="orderByField == 'startTime'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
                         <th><a href="#" ng-click="orderByField='subject'; reverseSort = !reverseSort">Subject<span ng-show="orderByField == 'subject'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody ng-cloak>
-                    <tr ng-repeat="booking in bookings|orderBy:orderByField:reverseSort" class="MyBookingsBookingRow">
+                    <tr ng-repeat="booking in bookings|filterMyBookings:orderByField:reverseSort" class="MyBookingsBookingRow">
                         <td ng-if="booking.isSmartMeeting"><span class="glyphicon glyphicon-facetime-video" title="Is part of a smart booking"></span></td>
                         <td ng-if="!booking.isSmartMeeting">&nbsp;</td>
                         <td>{{ booking.location.name}}</td>
