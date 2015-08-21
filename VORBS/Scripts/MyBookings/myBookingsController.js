@@ -128,7 +128,7 @@ function MyBookingsController($scope, $http, $resource) {
                 $("#externalAttendeesCont").css("display", "block");
                 $("#externalAttendeesContWarning").css("display", "none");
             }
-           
+
             var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, $scope.editBooking.location.locationCredentials);
             if (!facilitiesDetails || facilitiesDetails.email === "") {
                 $("#additionalEquipmentCont").css("display", "none");
@@ -205,6 +205,13 @@ function MyBookingsController($scope, $http, $resource) {
                     }
                     else {
                         EnableAcceptBookingButton();
+                        if ($scope.availableRooms.length > 1) {
+                            $("#alternateRoomsCont").css("display", "block");
+                        }
+                        else {
+                            $("#alternateRoomsCont").css("display", "none");
+                        }
+
                         SetEditActiveTab('confirmEditBooking');
                         $scope.currentRoom = $scope.availableRooms[0];
                     }
@@ -311,7 +318,14 @@ function CreateServices($resource) {
     });
 
     Available.prototype = {
-        roomNameFormatted: function () { return this.roomName.replace('_', '.'); }
+        roomNameFormatted: function () { return this.roomName.replace('_', '.') },
+        smartRoomFormatted: function () {
+            if (this.smartRoom) {
+                return "Yes";
+            } else {
+                return "No";
+            }
+        }
     };
 
     Bookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },

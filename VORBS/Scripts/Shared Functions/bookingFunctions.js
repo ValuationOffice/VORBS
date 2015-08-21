@@ -173,7 +173,7 @@ function ValidateStartEndTime(start, end) {
         return "End time has to be between 9:00 & 17:30.";
     }
     else if (timeDiff < 0) {
-        return "Start time can't be ahead of end time.";
+        return "Start time can't be later than end time.";
     }
     else if (timeDiff === 0) {
         return "Identical times can't be used as a valid search.";

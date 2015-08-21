@@ -374,7 +374,7 @@ namespace VORBS.API
         protected internal Room GetAlternateSmartRoom(IEnumerable<int> bookingRoomIds, DateTime startDate, DateTime endDate, int locationId)
         {
             var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SmartRoom == true && x.Active == true && !bookingRoomIds.Contains(x.ID) &&
-                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
+                                    (x.Bookings.Where(b => startDate < b.StartDate && endDate > b.StartDate)).Count() == 0)
                                  .OrderByDescending(r => r.SeatCount);
 
             return availableRooms.FirstOrDefault();

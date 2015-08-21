@@ -602,7 +602,7 @@ function NewBookingController($scope, $http, $resource) {
         }
         else if (FormatDateTimeForURL($("#recEndDate").val(), null, false, true) <= FormatDateTimeForURL($("#recStartDate").text(), null, false, true)) {
             valid = false;
-            AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Start date cannot be later then end date.");
+            AddRecurrenceError("#newBookingRecurrenceModal #recEndDateCont", "Start date cannot be later than end date.");
         }
 
         switch (frequency) {

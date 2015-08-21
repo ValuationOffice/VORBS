@@ -16,15 +16,17 @@
             <td><span class="glyphicon glyphicon-earphone badge" title="Telephones"> {{currentRoom.phoneCount}}</span> Telephones</td>
         </tr>
         <tr>
-            <td><span class="glyphicon glyphicon-facetime-video badge" title="Is SMART room"> </span> {{currentRoom.smartRoom}}</td>
+            <td><span class="glyphicon glyphicon-facetime-video badge" title="Is SMART room"> </span> {{ currentRoom.smartRoomFormatted() }}</td>
         </tr>
     </table>
 
-    <hr />
+    <div id="alternateRoomsCont" style="display:none;">
+        <hr />
 
-    <p>Alternatively, please select a metting room from the dropdown:</p>
+        <p>Alternatively, please select a metting room from the dropdown:</p>
 
-    <select class="form-control" ng-options="room.roomNameFormatted() for room in availableRooms" ng-model="currentRoom"></select>
+        <select class="form-control" ng-options="room.roomNameFormatted() for room in availableRooms" ng-model="currentRoom"></select>
+    </div>
 </div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" onclick="SetEditActiveTab('editBooking')">Back</button>
