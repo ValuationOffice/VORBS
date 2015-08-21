@@ -320,7 +320,7 @@ namespace VORBS.API
                 //Only bookings on the certain days that we want to book for
                     .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate))
                 //Only bookings on the days that intersect our given time period
-                    .Where(z => startTime < EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second))
+                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second))
                     .ToList();
 
             clashedBookings = totalBookingsClashed;
