@@ -31,7 +31,6 @@ function MyBookingsController($scope, $http, $resource) {
     $scope.GetBookings = function () {
 
         var period = 7;
-        period = (5 - new moment().utc().days()) + 1;
 
         $scope.bookings = BookingsByPeriod.query({
             startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
