@@ -80,6 +80,9 @@ function MyBookingsController($scope, $http, $resource) {
             $scope.existingBooking.startTime = $scope.booking.startTime;
             $scope.existingBooking.endTime = $scope.booking.endTime;
             $scope.existingBooking.date = $scope.booking.date;
+
+            $scope.$apply();
+            $("#editModal #bookingDate").datepicker('update');
         }
       )
     }

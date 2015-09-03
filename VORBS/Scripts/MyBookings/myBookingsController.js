@@ -136,6 +136,8 @@ function MyBookingsController($scope, $http, $resource) {
                 $("#additionalEquipmentCont").css("display", "block");
                 $("#additionalEquipmentContWarning").css("display", "none");
             }
+            $scope.$apply();
+            $("#editModal #bookingDate").datepicker('update');
         }
       )
     }
