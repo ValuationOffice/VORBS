@@ -145,7 +145,7 @@ function MyBookingsController($scope, $http, $resource) {
                 function (success) {
                     if ($scope.availableRooms.length === 0) {
                         EnableAcceptBookingButton();
-                        SetModalErrorMessage('No rooms avaliable using the below Date/Time/Attendees.');
+                        SetModalErrorMessage('No rooms avaiLable using the below Date/Time/Attendees.');
                     }
                     else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
                         SaveEditBooking($scope.bookingId, $scope.newBooking);

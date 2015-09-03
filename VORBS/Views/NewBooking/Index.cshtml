@@ -80,7 +80,7 @@
                         <td ng-if="bookingFilter.location != null"> {{bookingFilter.location.name}}</td>
                     </tr>
                     <tr>
-                        <td><b>Other SMART Loactions</b></td>
+                        <td><b>Other SMART Locations</b></td>
                         <td ng-repeat="locName in newBooking.SmartLoactions track by $index">{{ locName }} <span class="btn glyphicon glyphicon-remove" ng-click="RemoveSmartLoaction(locName)"></span></td>
                     </tr>
                 </table>
