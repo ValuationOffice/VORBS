@@ -1,0 +1,30 @@
+﻿@model VORBS.Models.Booking
+@{
+    Layout = null;
+}
+
+<html>
+<body>
+    <h2>Support in setting up the SMART room at the following meeting room is no longer required:</h2>
+    <table cellspacing="0" cellpadding="10" border="1" width="600">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Location</th>
+                <th>Room</th>
+                <th>Date</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.Owner</td>
+                <td>@Model.Room.Location.Name</td>
+                <td>@Model.Room.RoomName</td>
+                <td>@Model.StartDate.ToShortDateString()</td>
+                <td>@Model.StartDate.ToShortTimeString()</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

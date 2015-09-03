@@ -1,9 +1,77 @@
-﻿@{
+﻿@model VORBS.Models.ViewModels.facilitiesEdittedBooking
+@{
     Layout = null;
 }
 
 <html>
-    <body>
-        <h1>Booking needs facilities help - Edit Room</h1>
-    </body>
+<body>
+    <h2>@Model.EdittedBooking.Owner has updated equipment to be provided for the following booking:</h2>
+    <p>
+        @if (Model.EquipmentAdded.Count() > 0)
+        {
+            <h2>Added:</h2>
+            <table cellspacing="0" cellpadding="10" border="1" width="600">
+                <tr>
+                    <th>User</th>
+                    <th>Location</th>
+                    <th>Room</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Subject</th>
+                    <th>Equipment</th>
+                </tr>
+                <tr>
+                    <td>@Model.EdittedBooking.Owner</td>
+
+                    <td>@Model.EdittedBooking.Room.Location.Name</td>
+                    <td>@Model.EdittedBooking.Room.RoomName</td>
+                    <td>@Model.EdittedBooking.StartDate.ToShortDateString()</td>
+                    <td>@Model.EdittedBooking.StartDate.ToShortTimeString()</td>                    
+                    <td>@Model.EdittedBooking.Subject</td>
+                    <td>
+                        <ul>
+                            @foreach (string equipment in Model.EquipmentAdded)
+                            {
+                                <li>@equipment</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+
+            </table>
+        }
+        @if (Model.EquipmentRemoved.Count() > 0)
+        {
+            <h2>Removed:</h2>
+            <table cellspacing="0" cellpadding="10" border="1" width="600">
+                <tr>
+                    <th>User</th>
+                    <th>Location</th>
+                    <th>Room</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Subject</th>
+                    <th>Equipment</th>
+                </tr>
+                <tr>
+                    <td>@Model.EdittedBooking.Owner</td>
+                    <td>@Model.EdittedBooking.Room.Location.Name</td>
+                    <td>@Model.EdittedBooking.Room.RoomName</td>
+                    <td>@Model.EdittedBooking.StartDate.ToShortDateString()</td>
+                    <td>@Model.EdittedBooking.StartDate.ToShortTimeString()</td>
+                    <td>@Model.EdittedBooking.Subject</td>
+                    <td>
+                        <ul>
+                            @foreach (string equipment in Model.EquipmentRemoved)
+                            {
+                                <li>@equipment</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+
+            </table>
+        }
+    </p>
+</body>
 </html>

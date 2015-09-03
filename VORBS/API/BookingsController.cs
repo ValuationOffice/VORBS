@@ -609,6 +609,7 @@ namespace VORBS.API
 
                 editBooking.Owner = existingBooking.Owner;
                 editBooking.PID = existingBooking.PID;
+                editBooking.Room = db.Rooms.SingleOrDefault(x => x.ID == editBooking.RoomID);
 
                 string body = "";
                 string dssBody = "";
@@ -630,7 +631,34 @@ namespace VORBS.API
                     facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
                     if (facilitiesEmail != null)
                     {
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", editBooking);
+                        
+                        List<string> addedEquipment = new List<string>();
+                        List<string> removedEquipment = new List<string>();
+                        if (editBooking.Projector != existingBooking.Projector)
+                        {
+                            //If it is present in edit booking, and above equality check is false, then we know the projector request is new
+                            if (editBooking.Projector)
+                                addedEquipment.Add("Projector");
+                            else
+                                removedEquipment.Add("Projector");
+                        }
+                        if (editBooking.Flipchart != existingBooking.Flipchart)
+                        {
+                            if (editBooking.Flipchart)
+                                addedEquipment.Add("Flip Chart");
+                            else
+                                removedEquipment.Add("Flip Chart");
+                        }
+                        try
+                        {
+                            
+                            Models.ViewModels.facilitiesEdittedBooking viewModel = new Models.ViewModels.facilitiesEdittedBooking() { EdittedBooking = editBooking, OriginalBooking = existingBooking, EquipmentAdded = addedEquipment, EquipmentRemoved = removedEquipment };
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", viewModel);
+                        }
+                        catch (Exception exn)
+                        {
+                            _logger.ErrorException("Unable to retrieve email markup for facilities for editted booking: " + editBooking.ID, exn);
+                        }                        
                     }
                 }
 
@@ -642,12 +670,29 @@ namespace VORBS.API
                         try
                         {
                             editBooking.Room.Location = existingBooking.Room.Location;
-                            dssBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", editBooking);
+                            dssBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSEdittedBooking.cshtml", editBooking);
                         }
                         catch (Exception ex)
                         {
-                            _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + editBooking.ID, ex);
+                            _logger.ErrorException("Unable to retrieve E-Mail markup for DSS for new booking: " + editBooking.ID, ex);
                         }
+                    }
+                }
+                string securityEmailBody = "";
+                string securityEmail = "";
+                if (!(new HashSet<string>(existingBooking.ExternalAttendees.Select(x => x.FullName)).SetEquals(editBooking.ExternalAttendees.Select(x => x.FullName))))
+                {
+
+                    try
+                    {
+                        securityEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
+                        IEnumerable<ExternalAttendees> removedAttendees = existingBooking.ExternalAttendees.Where(x => !editBooking.ExternalAttendees.Select(y => y.FullName).Contains(x.FullName));
+                        IEnumerable<ExternalAttendees> addedAttendees = editBooking.ExternalAttendees.Where(x => !existingBooking.ExternalAttendees.Select(y => y.FullName).Contains(x.FullName));
+                        securityEmailBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityEdittedBooking.cshtml", new Models.ViewModels.SecurityEdittedBooking() { EdittedBooking = editBooking, NewAttendees = addedAttendees, RemovedAttendees = removedAttendees });
+                    }
+                    catch (Exception exn)
+                    {
+                        _logger.ErrorException("Unable to retrieve security email markup for editting booking: " + editBooking.ID, exn);
                     }
                 }
 
@@ -669,9 +714,9 @@ namespace VORBS.API
 
                 try
                 {
-                    //Send Dso Email
+                    //Send facilities Email
                     if (!string.IsNullOrEmpty(body))
-                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Editted booking requires facilities assistance", body);
+                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, string.Format("(Updated) Meeting room equipment for booking on {0}", editBooking.StartDate.ToShortDateString()), body);
                 }
                 catch (Exception ex)
                 {
@@ -683,11 +728,21 @@ namespace VORBS.API
                 {
                     //Send DSS Email
                     if (!string.IsNullOrEmpty(dssBody))
-                        Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("SMART room set up support on {0}", editBooking.StartDate.ToShortDateString()), dssBody);
+                        Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("(Updated) SMART room set up support on {0}", editBooking.StartDate.ToShortDateString()), dssBody);
                 }
                 catch (Exception ex)
                 {
-                    _logger.ErrorException("Unable to send E-Mail to facilities for editting booking: " + editBooking.ID, ex);
+                    _logger.ErrorException("Unable to send E-Mail to DSS for editting booking: " + editBooking.ID, ex);
+                }
+
+                try
+                {
+                    if (!string.IsNullOrEmpty(securityEmailBody) && !string.IsNullOrEmpty(securityEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, securityEmail, "(Updated) External guests notification for " + editBooking.StartDate.ToShortDateString(), securityEmailBody);
+                }
+                catch (Exception exn)
+                {
+                    _logger.ErrorException("Unable to send E-Mail to security for editting booking: " + editBooking.ID, exn);
                 }
 
                 Booking edittedBooking = db.Bookings.Single(b => b.ID == existingBooking.ID);
@@ -716,6 +771,8 @@ namespace VORBS.API
                     _logger.ErrorException("Unable to send personal email for editting booking: " + editBooking.ID, ex);
                 }
 
+                //check if the attendees are different
+
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -732,6 +789,16 @@ namespace VORBS.API
             try
             {
                 Booking booking = db.Bookings.First(b => b.ID == bookingId);
+                Location bookingsLocation = db.Rooms.Where(x => x.ID == booking.RoomID).FirstOrDefault().Location;
+
+                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
+
+                //NOT NEEDED RIGHT NOW, BUT WILL SEND SECURITY E-MAILS WHEN NEEDED.
+                //string securityEmailBody = "";
+                //if (booking.ExternalAttendees.Count > 0)
+                //{
+                //    securityEmailBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityDeletedBooking.cshtml", booking);
+                //}
 
                 db.Bookings.Remove(booking);
                 db.SaveChanges();
@@ -745,7 +812,7 @@ namespace VORBS.API
                 booking.Room = locationRoom;
 
                 string body = "";
-                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
+
 
                 try
                 {
@@ -771,14 +838,14 @@ namespace VORBS.API
 
                 if (booking.Flipchart || booking.Projector)
                 {
-                    Location bookingsLocation = db.Rooms.Where(x => x.ID == booking.RoomID).FirstOrDefault().Location;
+
                     string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
                     if (facilitiesEmail != null)
                     {
                         try
                         {
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", booking);
-                            Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Deleted booking requires facilities assistance", body);
+                            Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, string.Format("(Updated) Meeting room equipment for booking on {0}", booking.StartDate.ToShortDateString()), body);
                         }
                         catch (Exception ex)
                         {
@@ -786,6 +853,38 @@ namespace VORBS.API
                         }
                     }
                 }
+
+                if (booking.DssAssist)
+                {
+                    string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+                    if (dssEmail != null)
+                    {
+                        try
+                        {
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSDeletedBooking.cshtml", booking);
+                            Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("(Updated) SMART room set up support on {0}", booking.StartDate.ToShortDateString()), body);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.ErrorException("Unable to send email to dss for deleting booking: " + bookingId, ex);
+                        }
+                    }
+                }
+
+                //NOT NEEDED RIGHT NOW, BUT WILL SEND SECURITY E-MAILS WHEN NEEDED.
+                //string securityEmailAddress = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
+                //if (!string.IsNullOrEmpty(securityEmailBody) && !string.IsNullOrEmpty(securityEmailAddress))
+                //{
+                //    try
+                //    {
+                //        Utils.EmailHelper.SendEmail(fromEmail, securityEmailAddress, "Meeting room booking cancellation", securityEmailBody);
+                //    }
+                //    catch (Exception exn)
+                //    {
+                //        _logger.ErrorException("Unable to send email to security for deleting booking: " + bookingId, exn);
+                //    }
+                //}
+
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -1222,6 +1321,11 @@ namespace VORBS.API
 
         protected internal bool BookingHasChanged(Booking editBooking, Booking existingBooking)
         {
+            if (existingBooking.ExternalAttendees == null)
+                existingBooking.ExternalAttendees = new List<ExternalAttendees>();
+            if (editBooking.ExternalAttendees == null)
+                editBooking.ExternalAttendees = new List<ExternalAttendees>();
+
             //Return true so we can handle the orginial error
             if (editBooking == null || existingBooking == null)
                 return true;
