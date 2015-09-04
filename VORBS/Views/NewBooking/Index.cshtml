@@ -80,7 +80,7 @@
                         <td ng-if="bookingFilter.location != null"> {{bookingFilter.location.name}}</td>
                     </tr>
                     <tr>
-                        <td><b>Other SMART Locations</b></td>
+                        <td><b>Other SMART Location(s)</b></td>
                         <td ng-repeat="locName in newBooking.SmartLoactions track by $index">{{ locName }} <span class="btn glyphicon glyphicon-remove" ng-click="RemoveSmartLoaction(locName)"></span></td>
                     </tr>
                 </table>
@@ -98,7 +98,7 @@
 
         <div id="newSearchResults" style="display: none;">
             <h3 id="bookingTitle">
-                Available Rooms in <span id="searchedLocation"></span> on <span id="searchedDate"></span>
+                Available <span ng-if="bookingFilter.smartRoom">SMART</span> Rooms in <span id="searchedLocation"></span> on <span id="searchedDate"></span>
                 @*<input id="viewAllButton" type="button" class="form-control" ng-click="SearchBookings(true)" value="View All+" />*@
             </h3>
 
