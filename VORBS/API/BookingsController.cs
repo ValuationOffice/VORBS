@@ -316,7 +316,7 @@ namespace VORBS.API
                 bool doMeetingsClash = false;
 
                 //Get the current user
-                if (string.IsNullOrWhiteSpace(newBooking.PID))
+                if (string.IsNullOrWhiteSpace(newBooking.PID) || string.IsNullOrWhiteSpace(newBooking.Owner))
                 {
                     var user = (AdQueries.IsOffline()) ? AdQueries.CreateFakeUser() : AdQueries.GetUserByCurrentUser(User.Identity.Name);
 
