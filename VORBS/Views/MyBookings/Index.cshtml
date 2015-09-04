@@ -8,6 +8,7 @@
         <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
         <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
         <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+        <link href="~/Content/Site.css" rel="stylesheet" />
 
         <h2>My bookings</h2>        
 
@@ -29,7 +30,7 @@
                 </div>
                 <div class="col-xs-2">
                     <label class="control-label">Smart Room</label>
-                    <input id="smartRoomCheckBox" type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
+                    <input id="smartRoomCheckBox" type="checkbox" class="smartRoomCB" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
                 </div>
 
                 <div class="col-xs-3">

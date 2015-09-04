@@ -62,7 +62,7 @@
 
                 <div class="form-group row">
                     <div class="col-xs-4" id="smartLocationSelect">
-                        <label class="control-label">Smart Location(s)</label>
+                        <label class="control-label">SMART Location(s)</label>
                         <select id="smartLoactionDropDown" class="form-control" ng-options="o as o for o in smartLoactions" ng-model="currentSmartLocation" ng-change="ValidateSelection()">
                             <option value="" selected disabled>Select a location...</option>
                         </select>
@@ -98,7 +98,7 @@
 
         <div id="newSearchResults" style="display: none;">
             <h3 id="bookingTitle">
-                Available <span ng-if="bookingFilter.smartRoom">SMART</span> Rooms in <span id="searchedLocation"></span> on <span id="searchedDate"></span>
+                Available SMART Rooms in <span id="searchedLocation"></span> on <span id="searchedDate"></span>
                 @*<input id="viewAllButton" type="button" class="form-control" ng-click="SearchBookings(true)" value="View All+" />*@
             </h3>
 
