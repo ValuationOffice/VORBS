@@ -122,9 +122,11 @@ function NewBookingController($scope, $http, $resource) {
             //}
 
             roomDetails = roomDetails + '<div class="calendarRoomDetails">';
-
-            roomDetails = roomDetails + '<span  class="glyphicon glyphicon-user calendarIcons" title="' + roomResults[i].seatCount + ' Attendees"></span>' + roomResults[i].seatCount;
-            roomDetails = roomDetails + '<span  class="glyphicon glyphicon-hdd calendarIcons" title="' + roomResults[i].computerCount + ' PC(s)"></span>';
+            if (roomResults[i].seatCount)
+                roomDetails = roomDetails + '<span  class="glyphicon glyphicon-user calendarIcons" title="' + roomResults[i].seatCount + ' Attendees"></span>' + roomResults[i].seatCount;
+            if (roomResults[i].computerCount)
+                roomDetails = roomDetails + '<span  class="glyphicon glyphicon-hdd calendarIcons" title="' + roomResults[i].computerCount + ' PC(s)"></span>';
+            if (roomResults[i].phoneCount)
             roomDetails = roomDetails + '<span  class="glyphicon glyphicon-earphone calendarIcons" title="' + roomResults[i].phoneCount + ' Phone(s)"></span>';
 
             if (roomResults[i].smartRoom === true) {
