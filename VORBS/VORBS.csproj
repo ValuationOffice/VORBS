@@ -209,6 +209,8 @@
     <Content Include="Content\fullcalendar\fullcalendar.min.css" />
     <Content Include="Content\fullcalendar\fullcalendar.print.css" />
     <Content Include="Content\images\calendar.ico" />
+    <Content Include="Content\images\EmailTemplates\govuklogo.png" />
+    <Content Include="Content\images\EmailTemplates\voalogo.png" />
     <Content Include="Content\images\loading.gif" />
     <Content Include="Content\images\voaLogo.png" />
     <Content Include="Content\jquery-uiBootstrap\jquery.bootstrap-touchspin.css" />
@@ -1124,6 +1126,7 @@
     <Content Include="Views\EmailTemplates\SecurityEdittedBooking.cshtml" />
     <Content Include="Views\EmailTemplates\DSSEdittedBooking.cshtml" />
     <Content Include="Views\EmailTemplates\DSSDeletedBooking.cshtml" />
+    <Content Include="Views\Shared\_EmailLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

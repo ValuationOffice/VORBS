@@ -47,6 +47,13 @@ namespace VORBS.Utils
             message.To.Add(new MailAddress(toAddress));
             message.Subject = subject;
             message.Body = body;
+
+            AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
+
+            htmlView.LinkedResources.Add(new LinkedResource(HttpContext.Current.Server.MapPath("~/Content/images/EmailTemplates/govuklogo.png")) { ContentId = "govuklogo" });
+            htmlView.LinkedResources.Add(new LinkedResource(HttpContext.Current.Server.MapPath("~/Content/images/EmailTemplates/voalogo.png")) { ContentId = "voalogo" });
+
+            message.AlternateViews.Add(htmlView);
             message.IsBodyHtml = true;
 
             mailClient.Send(message);
