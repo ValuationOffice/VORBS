@@ -304,7 +304,7 @@ function NewBookingController($scope, $http, $resource) {
         for (var i = 0; i < $scope.locations.length; i++) {
             for (var k = 0; k < $scope.locations[i].rooms.length; k++) {
                 if ($scope.locations[i].rooms[k].smartRoom && $scope.locations[i].rooms[k].active) {
-                    $scope.smartLoactions.push($scope.locations[i].name + ' (' + $scope.locations[i].rooms[k].roomName + ')');
+                    $scope.smartLoactions.push($scope.locations[i].name);
                 }
             }
         }
