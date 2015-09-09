@@ -316,15 +316,17 @@ namespace VORBS.API
 
             var totalBookingsClashed = db.Bookings
                 //Bookings only for this room
-                    .Where(x => x.RoomID == room.ID)
+                    .Where(x => x.RoomID == room.ID) 
                 //Only bookings on the certain days that we want to book for
-                    .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate))
+                    .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate)) 
                 //Only bookings on the days that intersect our given time period
-                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second))
-                    .ToList();
+                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) 
+                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime <= EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))                
+                .ToList(); // bug fix
 
-            clashedBookings = totalBookingsClashed;
+            clashedBookings = totalBookingsClashed; // WORKING
             return totalBookingsClashed.Count > 0;
+
         }
 
         protected internal bool DoMeetingsClashRecurringly(List<Room> rooms, TimeSpan startTime, TimeSpan endTime, List<DateTime> dates, out List<Booking> allClashedBookings)
