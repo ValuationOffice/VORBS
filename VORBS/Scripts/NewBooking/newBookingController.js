@@ -25,7 +25,7 @@ function NewBookingController($scope, $http, $resource) {
     }
 
     $scope.SearchBookings = function (viewAll) {
-
+        IsSmartRoomChecked();
         $("#bookingTable").html('');
         $("#bookingTable").html('<div class="loadingContainer"><img src="/Content/images/loading.gif" /></div>');
 
@@ -957,6 +957,12 @@ function IncrementCurrentTime(addMins) {
     }
 
     return moment(start).add("minutes", addMins).format("H:mm");
+}
+
+function IsSmartRoomChecked() {    
+    var message = "";
+    message = (document.getElementById('smartRoomCheckBox').checked) ? "SMART" :  "";
+    document.getElementById('isSmartRoom').innerText = message;
 }
 
 var advancedSearchActive = false;
