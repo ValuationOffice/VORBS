@@ -580,7 +580,6 @@ textarea {
 }
 
 .smartRoomCB {
-      /*display: block;*/
       width: 34px;
       height: 34px;
       font-size: 14px;
@@ -588,4 +587,10 @@ textarea {
       color: #555555;
       background-color: #ffffff;
       background-image: none;
+}
+
+.divider{
+    width:22px;
+    height:auto;
+    display:inline-block;
 }
