@@ -895,53 +895,97 @@ namespace VORBS.API
             }
         }
 
-        [Route("{owner}/{start:DateTime}")]
+        [Route("search")] 
         [HttpGet]
-        public List<BookingDTO> GetBookingByOwner(string owner, DateTime start)
-        {
-            List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+        public List<BookingDTO> GetBookingByOwner(DateTime? start, string owner, string room, int? location = 0) 
+        {             
+            //Building up a string of Lambda C# string (Using Linq.Dynamic) so we can on the fly change the where clause based on the concatanation
+            string queryExpression = "";
+
             try
             {
-                List<Booking> bookings = db.Bookings
-                    .Where(x => DbFunctions.TruncateTime(x.StartDate) == start.Date && x.Owner == owner).ToList()
-                    .OrderBy(x => x.StartDate)
-                    .ToList();
+              //Filter by owner
+                queryExpression += (owner == null || owner.Equals("")) ? "" : (queryExpression.Length > 0) ? " AND OWNER = \"" + owner + "\"" : "OWNER = \"" + owner + "\"";
 
-                bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                //Standard pattern used all below, if the value is null to start, we wont filter on it if it isnt null, check if the string is empty already. If the string is not empty, start with the AND keyword as we are concatanating on otherwise start with your expression as it is the begging of the expression
+                queryExpression += (location == null || location == 0) ? "" : (queryExpression.Length > 0) ? " AND Room.LocationID = " + location : "Room.LocationID = " + location;
+                
+                // Filter by room
+
+                if (!string.IsNullOrEmpty(room))
                 {
-                    ID = x.ID,
-                    EndDate = x.EndDate,
-                    StartDate = x.StartDate,
-                    Subject = x.Subject,
-                    Owner = x.Owner,
-                    ExternalAttendees = x.ExternalAttendees.Select(y =>
-                    {
-                        return new ExternalAttendeesDTO()
-                        {
-                            ID = y.ID,
-                            BookingID = y.BookingID,
-                            FullName = y.FullName,
-                            CompanyName = y.CompanyName,
-                            PassRequired = y.PassRequired
-                        };
-                    }),
-                    IsSmartMeeting = x.IsSmartMeeting,
-                    Location = new LocationDTO()
-                    {
-                        ID = x.Room.Location.ID,
-                        Name = x.Room.Location.Name,
-                        LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
-                    },
-                    Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
-                }));
+                    int roomID = 0;
+                    roomID = db.Bookings.Where(x => x.Room.RoomName == room).Select(x => x.RoomID).ToList()[0];
+                    queryExpression += (queryExpression.Length > 0) ? " AND Room.ID = " + roomID : "Room.ID = " + roomID;
+                }
 
-                return bookingsDTO;
+                if (start != null)
+                {
+                    //Need to get 00:00 and 23:59 times for the day as this allows us to get any booking during the day. We cant use .toshortdatestring etc inside a linq expression, even when not using dynamic linq
+                    DateTime startDate00Hours = DateTime.Parse(DateTime.Parse(start.ToString()).ToShortDateString());
+                    //Need to do a format string which looks like " DateTime(YEAR, MONTH, DAY, HOUR, MINUTE) " so that we can parse it in the expression and let Linq interperite it as a datetime creation
+                    string startDate00HoursFormatted = "DateTime(" + startDate00Hours.Year + ", " + startDate00Hours.Month + ", " + startDate00Hours.Day + ", " + startDate00Hours.Hour + ", " + startDate00Hours.Minute + ", " + startDate00Hours.Second + ")";
+                    DateTime startDate2359Hours = DateTime.Parse(DateTime.Parse(start.ToString()).ToShortDateString()).AddHours(23).AddMinutes(59).AddSeconds(59);
+                    string startDate2359HoursFormatted = "DateTime(" + startDate2359Hours.Year + ", " + startDate2359Hours.Month + ", " + startDate2359Hours.Day + ", " + startDate2359Hours.Hour + ", " + startDate2359Hours.Minute + ", " + startDate2359Hours.Second + ")";
+                    queryExpression += (start == null) ? "" : (queryExpression.Length > 0) ? " AND StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted + "" : " StartDate >= " + startDate00HoursFormatted + " AND EndDate <= " + startDate2359HoursFormatted;
+                }
+                
             }
-            catch (Exception ex)
+            catch (Exception exn)
             {
-                _logger.ErrorException("Unable to get list of bookings for owner: " + owner, ex);
+                queryExpression = "";
+                _logger.ErrorException("Unable to create query expression for filter in bookings", exn);
             }
-            return bookingsDTO;
+
+
+            //If expression is empty, dont try and filter on it .. where() does not work.
+            if (queryExpression.Contains("=")) 
+            {
+                try
+                {
+                    //Filter on the expression we built as if it was written in C# POCO
+                    var bookings = db.Bookings.Where(queryExpression).ToList();
+
+                    List<BookingDTO> bookingsDTO = new List<BookingDTO>();
+                    bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
+                    {
+                        ID = x.ID,
+                        EndDate = x.EndDate,
+                        StartDate = x.StartDate,
+                        Subject = x.Subject,
+                        Owner = x.Owner,
+                        IsSmartMeeting = x.IsSmartMeeting,
+                        ExternalAttendees = x.ExternalAttendees.Select(y =>
+                        {
+                            return new ExternalAttendeesDTO()
+                            {
+                                ID = y.ID,
+                                BookingID = y.BookingID,
+                                FullName = y.FullName,
+                                CompanyName = y.CompanyName,
+                                PassRequired = y.PassRequired
+                            };
+                        }),
+                        Location = new LocationDTO()
+                        {
+                            ID = x.Room.Location.ID,
+                            Name = x.Room.Location.Name,
+                            LocationCredentials = x.Room.Location.LocationCredentials.ToList().Select(l => { return new LocationCredentialsDTO() { Department = l.Department, Email = l.Email, ID = l.ID, LocationID = l.LocationID, PhoneNumber = l.PhoneNumber }; }).ToList()
+                        },
+                        Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
+                    }));
+
+                    return bookingsDTO;
+                }
+                catch (Exception exn)
+                {
+                    _logger.ErrorException("Unable to filter bookings based on query expression", exn);
+                }
+
+            }
+                    
+            //If we didnt filter on anything, then return nothing
+            return new List<BookingDTO>();
         }
 
         [HttpGet]

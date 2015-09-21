@@ -4,6 +4,7 @@ function MyBookingsController($scope, $http, $resource) {
 
     CreateBookingServices($resource);
 
+    $scope.locations = Locations.query({ status: true, extraInfo: false });
     $scope.owners = Owner.getAll({});
 
     $scope.bookingId = 0;
@@ -204,23 +205,21 @@ function MyBookingsController($scope, $http, $resource) {
     $scope.SearchBooking = function () {
         SetAdminBookingErrorMessage('');
 
-        //Validate Full Name
-        if ($('#fullNameTextBox').typeahead('val').trim() <= 0) {
-            SetAdminBookingErrorMessage("Invalid full name.");
-        }
-
-        //Validate Date
-        if ($('#startDatePicker').val() === "") {
-            SetAdminBookingErrorMessage("Invalid booking date.");
+        //Validate input fields
+        if ($('#fullNameTextBox').typeahead('val').trim() <= 0 && $scope.bookingFilter.room == "" && $scope.bookingFilter.location == "" && $scope.bookingFilter.startDate == "") {
+            SetAdminBookingErrorMessage("Select at least one value");
+            return;
         }
 
         $scope.bookings = GetBookings.query({
+            location: $scope.bookingFilter.location.id,
+            room: $scope.bookingFilter.room,
             owner: $('#fullNameTextBox').typeahead('val'),
             start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY', true, true)
         },
         function (success) {
             if (success.length === 0) {
-                SetAdminBookingErrorMessage('No bookings for ' + $('#fullNameTextBox').typeahead('val') + ' on the ' + $scope.bookingFilter.startDate + '.');
+                SetAdminBookingErrorMessage('No bookings found.');
             }
         });
     }
@@ -253,12 +252,20 @@ function MyBookingsController($scope, $http, $resource) {
     }
 
     $scope.bookingFilter = {
+        location: '',
+        room: '',
         fullName: '',
         startDate: new moment().utc().format('DD-MM-YYYY')
     }
-}
+    }
 
 function CreateBookingServices($resource) {
+    Locations = $resource('/api/locations/:status/:extraInfo', {
+        status: 'active', extraInfo: 'extraInfo'
+    }, {
+        query: { method: 'GET', isArray: true }
+    });
+
     Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom/:existingBookingId', {
         location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom', existingBookingId: 'existingBookingId'
     },
@@ -270,7 +277,9 @@ function CreateBookingServices($resource) {
         roomNameFormatted: function () { return this.roomName.replace('_', '.'); }
     };
 
-    GetBookings = $resource('/api/bookings/:owner/:start', { owner: 'owner', start: 'start' },
+
+    GetBookings = $resource('/api/bookings/search', {}, 
+
     {
         query: { method: 'GET', isArray: true }
     });
