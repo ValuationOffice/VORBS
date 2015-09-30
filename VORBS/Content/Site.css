@@ -594,3 +594,5 @@ textarea {
     height:auto;
     display:inline-block;
 }
+
+#confirmModal { overflow-y:scroll }
