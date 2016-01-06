@@ -14,14 +14,14 @@
 </head>
 <body>
 
-    <div class="alert alert-dismissible alert-info " style="width: 250px; position: fixed; right: 0; top :0;z-index:10000;">
+    @*<div class="alert alert-dismissible alert-info " style="width: 250px; position: fixed; right: 0; top :0;z-index:10000;">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         <h4 style="text-align: center;">Debug</h4>
         <strong>User:</strong> @User.Identity.Name<br />
         <strong>Version:</strong> @ViewBag.CurrentVersion <br />
-    </div>
+    </div>*@
     <div class="navbar-bottom-bar navbar-fixed-top">
         &nbsp
     </div>
@@ -58,6 +58,12 @@
                         <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Help" ? "active" : "")">@Html.ActionLink("Help", "Index", "Help")</li>
                     }
                 </ul>
+            </div>
+            <div class="phase-banner-beta">
+                <p>
+                    <strong class="phase-tag">BETA</strong>
+                    <span>This is a new service.</span>
+                </p>
             </div>
         </div>
     </div>

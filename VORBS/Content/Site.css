@@ -26,10 +26,10 @@ textarea {
     max-width: 280px;
 }
 
-/* THIS IS A TEMPORARY ADDITION AS BOOTSTRAP APPEARS TO BE PRODUCING CHECKBOX/RADIO MARGINS INCORRECTLY   */
+    /* THIS IS A TEMPORARY ADDITION AS BOOTSTRAP APPEARS TO BE PRODUCING CHECKBOX/RADIO MARGINS INCORRECTLY   */
     input[type='radio'], input[type='checkbox'] {
         margin-top: 0;
-}
+    }
 
 
 #logo_text {
@@ -47,7 +47,7 @@ textarea {
     font-size: small;
 }
 
-#adminOverwriteMessagePopup textarea{
+#adminOverwriteMessagePopup textarea {
     /*width: 100%;   */
     max-width: 100%;
 }
@@ -195,18 +195,18 @@ textarea {
 }
 
 
-#externalAttendeesTable{
-    margin: 10px 0 0 10px; 
+#externalAttendeesTable {
+    margin: 10px 0 0 10px;
 }
 
-#externalAttendeesTable tr{
-    border: none;
-}
+    #externalAttendeesTable tr {
+        border: none;
+    }
 
-#externalAttendeesTable tr th{
-    width: 150px;     
-    font-size: 14px;   
-}
+        #externalAttendeesTable tr th {
+            width: 150px;
+            font-size: 14px;
+        }
 
 /*#attendeesInputFilter {
     margin-right:-30px;
@@ -368,14 +368,14 @@ textarea {
 }
 
 .filterButton {
-        background-color: #21846E;
-        color: white;
-        font-weight: bold;
-        border-bottom: solid;
-        border-bottom-width: 2px;
-        border-bottom-color: black;
-        width: 75%;
-    }
+    background-color: #21846E;
+    color: white;
+    font-weight: bold;
+    border-bottom: solid;
+    border-bottom-width: 2px;
+    border-bottom-color: black;
+    width: 75%;
+}
 
 #viewAllRoomsLink {
     float: right;
@@ -575,24 +575,41 @@ textarea {
     border-radius: 0;
 }
 
-#smartRoomHelpText{
-    width:50%;
+#smartRoomHelpText {
+    width: 50%;
 }
 
 .smartRoomCB {
-      width: 34px;
-      height: 34px;
-      font-size: 14px;
-      line-height: 1.42857143;
-      color: #555555;
-      background-color: #ffffff;
-      background-image: none;
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555555;
+    background-color: #ffffff;
+    background-image: none;
 }
 
-.divider{
-    width:22px;
-    height:auto;
-    display:inline-block;
+.divider {
+    width: 22px;
+    height: auto;
+    display: inline-block;
 }
 
-#confirmModal { overflow-y:scroll }
+#confirmModal {
+    overflow-y: scroll;
+}
+
+.phase-banner-beta .phase-tag {
+    font-size: 16px;
+    line-height: 1.25;
+    vertical-align: baseline;
+    margin: 0 0 0 0;
+    padding: 0 5px 0;
+    font-family: "nta", Arial, sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #f47738;
+}
