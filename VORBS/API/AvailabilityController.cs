@@ -292,7 +292,7 @@ namespace VORBS.API
                 //Meetings in the same room
                 .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == db.Rooms.FirstOrDefault(r => r.ID == x.RoomID).LocationID)
                 //Where meeting clashes
-                .Where(b => originalBooking.StartDate < b.StartDate && originalBooking.EndDate > b.StartDate)
+                .Where(b => originalBooking.StartDate <= b.StartDate && originalBooking.EndDate >= b.StartDate)
                 .ToList();
 
             clashedBooking = clashedBookings.FirstOrDefault();

@@ -1296,22 +1296,30 @@ namespace VORBS.API
 
             foreach (var smartLoc in newBooking.SmartLoactions)
             {
-                Room smartRoom = aC.GetAlternateSmartRoom(smartRoomIds, newBooking.StartDate, newBooking.EndDate, db.Locations.Single(l => l.Name == smartLoc).ID);
+                int smartLocId = 0;
+                int.TryParse(smartLoc, out smartLocId);
 
-                if (smartRoom == null || bookingsToCreate.Select(x => x.Room).Contains(smartRoom))
+                Room smartLocData = db.Rooms.Where(x => x.ID == smartLocId).Select(x => x).ToList().FirstOrDefault();
+
+                Booking doesClash;
+                Room roomToBook = null;
+                if (aC.DoesMeetingClash(new Booking() { StartDate = newBooking.StartDate, EndDate = newBooking.EndDate, RoomID = smartLocData.ID }, out doesClash))
+                {
+                    roomToBook = aC.GetAlternateSmartRoom(smartRoomIds, newBooking.StartDate, newBooking.EndDate, db.Locations.Single(l => l.Name == smartLocData.Location.Name).ID);
+                }
+                else
+                {
+                    roomToBook = smartLocData;
+                }
+
+                if (roomToBook == null || bookingsToCreate.Select(x => x.Room).Contains(roomToBook))
                 {
                     clashedBs.Add(new Booking()
                     {
                         StartDate = newBooking.StartDate,
                         Owner = newBooking.Owner,
                         IsSmartMeeting = true,
-                        Room = new Room()
-                        {
-                            Location = new Location()
-                            {
-                                Name = smartLoc
-                            }
-                        }
+                        Room = smartLocData
                     });
                 }
                 else
@@ -1325,15 +1333,15 @@ namespace VORBS.API
                         Owner = newBooking.Owner,
                         PID = newBooking.PID,
                         Projector = newBooking.Projector,
-                        RoomID = smartRoom.ID,
-                        Room = smartRoom,
+                        RoomID = roomToBook.ID,
+                        Room = roomToBook,
                         Subject = newBooking.Subject,
                         StartDate = newBooking.StartDate,
                         EndDate = newBooking.EndDate,
                         IsSmartMeeting = true
                     });
 
-                    smartRoomIds.Add(smartRoom.ID);
+                    smartRoomIds.Add(roomToBook.ID);
                 }
             }
 

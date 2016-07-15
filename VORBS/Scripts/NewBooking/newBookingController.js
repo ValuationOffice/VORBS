@@ -304,7 +304,10 @@ function NewBookingController($scope, $http, $resource) {
         for (var i = 0; i < $scope.locations.length; i++) {
             for (var k = 0; k < $scope.locations[i].rooms.length; k++) {
                 if ($scope.locations[i].rooms[k].smartRoom && $scope.locations[i].rooms[k].active) {
-                    $scope.smartLoactions.push($scope.locations[i].name);
+                    $scope.smartLoactions.push({
+                        displayName : $scope.locations[i].name + ' - ' +$scope.locations[i].rooms[k].roomName,
+                        id: $scope.locations[i].rooms[k].id
+                    });
                 }
             }
         }
@@ -318,6 +321,14 @@ function NewBookingController($scope, $http, $resource) {
         }
         else {
             $scope.smartLoactions = $scope.RemoveLoaction($scope.bookingFilter.location.name, $scope.smartLoactions);
+        }
+    }
+
+    $scope.GetLocationById = function(id){
+        for (var i = 0; i < $scope.smartLoactions.length; i++) {
+            if ($scope.smartLoactions[i].id === id) {
+                return $scope.smartLoactions[i];
+            }
         }
     }
 
