@@ -181,7 +181,7 @@ function MyBookingsController($scope, $http, $resource) {
     $scope.DeleteBooking = function () {
         //Change the "delete booking" button to stop multiple bookings
         $("#deleteBookingConfirmButton").prop('disabled', 'disabled');
-        $("#deleteBookingConfirmButton").html('Deleteing Booking. Please wait..');
+        $("#deleteBookingConfirmButton").html('Deleting booking. Please wait..');
 
         try {
             Booking.remove(
@@ -194,7 +194,7 @@ function MyBookingsController($scope, $http, $resource) {
                 EnableDeleteBookingButton();
             },
             function (error) {
-                alert('Unable to Delete Booking. Please Try Again or Contact ITSD. ' + error.responseText);
+                alert('Unable to delete the booking. Please try again or contact ITSD. ' + error.responseText);
                 EnableDeleteBookingButton();
             });
         } catch (e) {

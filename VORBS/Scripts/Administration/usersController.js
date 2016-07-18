@@ -80,7 +80,7 @@ function UsersController($scope, $http, $resource) {
             }
         }
         else {
-            alert('Unable to retrieve admin. Admin may have already been deleted.');
+            alert('Unable to retrieve admin data. Admin may have already been deleted.');
             $('#editAdminModal').modal('hide');
         }
     }
@@ -119,7 +119,7 @@ function UsersController($scope, $http, $resource) {
                     $('#editAdminModal').modal('hide');
                 },
                 error: function (error) {
-                    alert('Unable to Edit Admin. Please Try Again or Contact ITSD. ' + error.message);
+                    alert('Unable to edit the admin. Please try again or contact ITSD. ' + error.message);
                 }
             });
         } catch (e) {
@@ -138,7 +138,7 @@ function UsersController($scope, $http, $resource) {
             $('#deleteAdminModal').modal('hide');
         },
         function (error) {
-            alert('Unable to Delete Admin. Please Try Again or Contact ITSD. ' + error.message); //TODO:Log Error
+            alert('Unable to delete the admin. Please try again or contact ITSD. ' + error.message); //TODO:Log Error
         })
     };
 
