@@ -326,10 +326,27 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.GetLocationById = function(id){
         for (var i = 0; i < $scope.smartLoactions.length; i++) {
-            if ($scope.smartLoactions[i].id === id) {
+            if ($scope.smartLoactions[i].id == id) {
                 return $scope.smartLoactions[i];
             }
         }
+    }
+
+    $scope.GetFormattedSmartOptionTitle = function (roomId) {
+        var roomData;
+        for (var i = 0; i < $scope.locations.length; i++) {
+            for (var r = 0; r < $scope.locations[i].rooms.length; r++) {
+                if ($scope.locations[i].rooms[r].id == roomId) {
+                    roomData = $scope.locations[i].rooms[r];
+                }
+            }
+        }
+
+        var formattedString = "";
+        formattedString += roomData.seatCount + ' Seats, ';
+        formattedString += roomData.computerCount + ' PC(s), ';
+        formattedString += roomData.phoneCount + ' Phone(s)'
+        return formattedString;
     }
 
     $scope.ShowSmartLoactions = function () {

@@ -64,8 +64,9 @@
                 <div class="form-group row">
                     <div class="col-xs-4" id="smartLocationSelect">
                         <label class="control-label">SMART Location(s)</label>
-                        <select id="smartLoactionDropDown" class="form-control" ng-options="o.id as o.displayName for o in smartLoactions" ng-model="currentSmartLocation" ng-change="ValidateSelection()">
+                        <select id="smartLoactionDropDown" class="form-control" @*ng-options="o.id as o.displayName for o in smartLoactions"*@ ng-model="currentSmartLocation" ng-change="ValidateSelection()">
                             <option value="" selected disabled>Select a location...</option>
+                            <option ng-repeat="loc in smartLoactions track by $index" value="{{ loc.id }}" title="{{ GetFormattedSmartOptionTitle(loc.id) }}">{{ loc.displayName }}</option>
                         </select>
                     </div>
 
