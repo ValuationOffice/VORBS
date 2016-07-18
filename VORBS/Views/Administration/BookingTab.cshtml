@@ -48,6 +48,7 @@
                     <th>Date</th>
                     <th>Time</th>
                     <th>Subject</th>
+                    <th>Owner</th>
                     <th></th>
                 </tr>
             </thead>
@@ -57,6 +58,7 @@
                 <td>{{ booking.DateFormatted() }}</td>
                 <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                 <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
+                <td>{{ booking.owner }}</td>
                 <td><span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon glyphicon-edit" title="Edit Booking"></span></td>
                 <td><span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon glyphicon-trash" title="Delete Booking"></span></td>
             </tr>
