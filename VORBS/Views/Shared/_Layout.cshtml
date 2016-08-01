@@ -13,66 +13,52 @@
     @Scripts.Render("~/bundles/bootstrap")
 </head>
 <body>
-
-    @*<div class="alert alert-dismissible alert-info " style="width: 250px; position: fixed; right: 0; top :0;z-index:10000;">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        <h4 style="text-align: center;">Debug</h4>
-        <strong>User:</strong> @User.Identity.Name<br />
-        <strong>Version:</strong> @ViewBag.CurrentVersion <br />
-    </div>*@
-    <div class="navbar-bottom-bar navbar-fixed-top">
-        &nbsp
-    </div>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <div id="logo_text">
-                    <div id="logoBanner">
-                        <img id="bannerImage" src="~/Content/images/voaLogo.png" />
-                        <h1>Valuation Office Agency</h1>
-                    </div>
+    <header role="banner" id="global-header" class="with-proposition">
+        <div class="header-wrapper">
+            <div class="header-global">
+                <div class="header-logo">
+                    <a href="/" title="Home" id="logo" class="content">
+                        <img src="~/Content/images/gov.uk_logotype_crown_invert_trans.png" width="35" height="31" alt="">&nbsp; VORBS
+                    </a>
                 </div>
-
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @*@Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
-                <!-- logo -->
-
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "NewBooking" ? "active" : "")">@Html.ActionLink("New Booking", "Index", "NewBooking")</li>
-                    <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "MyBookings" ? "active" : "")">@Html.ActionLink("My Bookings", "Index", "MyBookings")</li>
+            <div class="header-proposition">
+                <div class="content">
+                    <a href="#proposition-links" class="js-header-toggle menu">Menu</a>
+                    <nav id="proposition-menu">
+                        <ul id="proposition-links">
+                            <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "NewBooking" ? "active" : "")">@Html.ActionLink("New Booking", "Index", "NewBooking")</li>
+                            <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "MyBookings" ? "active" : "")">@Html.ActionLink("My Bookings", "Index", "MyBookings")</li>
 
-                    @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
-                    {
-                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Admin", "Index", "Administration")</li>
-                    }
-                    else
-                    {
-                        <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Help" ? "active" : "")">@Html.ActionLink("Help", "Index", "Help")</li>
-                    }
-                </ul>
-            </div>
-            <div class="phase-banner-beta">
-                <p>
-                    <strong class="phase-tag">BETA</strong>
-                    <span>This is a new service.</span>
-                </p>
+                            @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
+                            {
+                                <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Administration" ? "active" : "")">@Html.ActionLink("Admin", "Index", "Administration")</li>
+                            }
+                            else
+                            {
+                                <li class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Help" ? "active" : "")">@Html.ActionLink("Help", "Index", "Help")</li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-    </div>
+    </header>
+    <div id="global-header-bar"></div>
+    <main id="content" role="main">
+        <div class="phase-banner-beta">
+            <p>
+                <strong class="phase-tag">BETA</strong>
+                <span>This is a new service – your <a href="#">feedback</a> will help us to improve it.</span>
+            </p>
+        </div>
 
-
+        <div class="grid-row">
+            <div class="column-full-width">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
     @RenderSection("scripts", required: false)
 </body>
 </html>

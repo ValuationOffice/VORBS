@@ -98,7 +98,6 @@ namespace VORBS.Utils
 
         public static bool IsOffline()
         {
-            return false;
             return (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK") ? true : false;
         }
 

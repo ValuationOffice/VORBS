@@ -24,8 +24,11 @@ namespace VORBS
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
-                      "~/Content/site.css"));
+                      "~/Content/bootstrap.css"
+                      , "~/Content/govuk.css"
+                      , "~/Content/elements-page.css"
+                      //,"~/Content/site.css"
+                      ));
         }
     }
 }

@@ -18,67 +18,52 @@
                     <div class="modal-body">
                         <form role="form">
                             <div class="alert alert-danger" id="bookingModalErrorMessage" style="display: none;"></div>
-                            <div class="form-group row">
-                                <div class="col-xs-3">
+                            <div class="form-inline" row>
+                                <div class="input-group col-xs-3">
                                     <label class="control-label">Date</label>
                                     <input id="bookingDate" class="form-control datepicker" ng-model="booking.date" />
                                 </div>
-                                <div class="col-xs-3">
+                                <div class="input-group col-xs-3">
                                     <label class="control-label">Start</label>
                                     <input id="bookingStartTime" class="form-control timepicker" ng-model="booking.startTime" />
                                 </div>
-                                <div class="col-xs-3">
+                                <div class="input-group col-xs-3">
                                     <label class="control-label">End</label>
                                     <input id="bookingEndTime" class="form-control timepicker" ng-model="booking.endTime" />
                                 </div>
-                                <div class="col-xs-3">
+                                <div class="input-group col-xs-2">
                                     <label class="control-label">Attendees</label>
-                                    <input type="number" id="attendees" class="form-control numberControl touchSpinControl" ng-model="booking.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                                    <div>
+                                        <input type="number" id="attendees" class="form-control numberControl touchSpinControl" ng-model="booking.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                                    </div>
                                 </div>
-                                <div class="col-xs-6">
+                                <div class="input-group col-xs-6">
                                     <label class="control-label">Subject</label>
                                     <input maxlength="140" class="form-control" ng-model="newBooking.Subject">
                                 </div>
                             </div>
-                            <hr />
-                            <div id="externalAttendeesCont">
-                                <label class="control-label">External Attendees</label>
-                                <div class="form-group row">
-                                    <div class="col-xs-4">
-                                        <label style="font-weight: normal !important;">Full Name</label>
+                            <div class="form-inline" row>
+                                <hr />
+                                <h3 class="heading-small">External Attendees</h3>
+                                <div id="externalAttendeesCont">
+                                    <div class="input-group col-xs-4">
+                                        <label class="control-label">Full Name</label>
                                         <input class="form-control" id="externalFullNameTextBox" ng-model="externalFullNameTextBox" />
                                     </div>
-                                    <div class="col-xs-4">
-                                        <label style="font-weight: normal !important;">Company Name</label>
+                                    <div class="input-group col-xs-4">
+                                        <label class="control-label">Company Name</label>
                                         <input class="form-control" id="externalCompanyNameTextBox" ng-model="externalCompanyNameTextBox" />
                                     </div>
-                                    <div class="col-xs-3">
-                                        <label style="font-weight: normal !important;">Pass Required</label>
+                                    <div class="input-group col-xs-3">
+                                        <label class="control-label">Pass Required</label>
                                         <input class="form-control" type="checkbox" id="externalPassRequired" ng-model="externalPassRequired" />
                                     </div>
-                                    <div class="col-xs-2">
-                                        <label style="font-weight: normal !important;">&nbsp;</label><br/>
+                                    <div class="input-group col-xs-2">
+                                        <label class="control-label">&nbsp;</label><br />
                                         <button type="button" class="btn btn-primary" ng-disabled="externalFullNameTextBox.length == 0 || externalCompanyNameTextBox.length == 0" ng-click="AddExternalAttendee()">Add</button>
                                     </div>
-                                    @*<div class="col-xs-5">
-                                            <label>First Name</label>
-                                            <input class="form-control" id="externalFirstNameTextBox" ng-model="editBookingExternalFirstName" />
-                                        </div>
-                                        <div class="col-xs-5">
-                                            <label>Last Name</label>
-                                            <input class="form-control" id="externalLastNameTextBox" ng-model="editBookingExternalLastName"/>
-                                        </div>
-                                        <div class="col-xs-2">
-                                            <label>&nbsp;</label>
-                                            <input id="addExternal" type="button" class="form-control btn btn-primary" ng-disabled="editBookingExternalFirstName.length == 0 || editBookingExternalLastName.length == 0" ng-click="AddExternalAttendee()" value="Add" />
-                                        </div>*@
-                                </div>
-
-                                <div class="form-group row">
-                                    <div>
-                                        <label style="margin-left: 10px;">
-                                            Attendees
-                                        </label>
+                                    <div ng-show="booking.externalAttendees.length > 0">
+                                        <h3 class="heading-small">Attendees</h3>
                                         <table id="externalAttendeesTable">
                                             <tr>
                                                 <th>Name</th>
@@ -92,40 +77,41 @@
                                                 <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee($index)"></span></td>
                                             </tr>
                                         </table>
-                                        @*<table>
-                                                <tr ng-repeat="externalName in booking.ExternalNames">
-                                                    <td>{{ externalName }}</td>
-                                                    <td><span class="btn glyphicon glyphicon-remove" ng-click="RemoveExternalAttendee(externalName)"></span></td>
-                                                </tr>
-                                            </table>*@
                                     </div>
                                 </div>
-                                <hr />
+                                <div class="alert alert-warning" style="display: none;" id="externalAttendeesContWarning"></div>
                             </div>
-                            <div class="alert alert-warning" style="display: none;" id="externalAttendeesContWarning"></div>
-
-                            <div id="additionalEquipmentCont">
-                                <div class="form-group row">
-                                    <div class="col-xs-5">
-                                        <label class="control-label">Additional Equipment</label><br />
+                            <div class="form-inline" row>
+                                <hr />
+                                <h3 class="heading-small">Additional Equipment</h3>
+                                <div id="additionalEquipmentCont">
+                                    <div class="input-group col-xs-4">
                                         <input type="checkbox" value="FlipChart" ng-model="newBooking.FlipChart" /> Flipchart<br />
                                         <input type="checkbox" value="Projector" ng-model="newBooking.Projector" /> Projector
                                     </div>
                                 </div>
+                                <div class="alert alert-warning" style="display: none;" id="additionalEquipmentContWarning">This location does not have a dedicated Local Facilities Officer. Setting up of the meeting room is the responsibility of the user.</div>
                             </div>
-                            <div class="alert alert-warning" style="display: none;" id="additionalEquipmentContWarning">This location does not have a dedicated Local Facilities Officer. Setting up of the meeting room is the responsibility of the user.</div>
-
-                            <div class="form-group" id="dssAssistChoice">
-                                <div class="input-group ">
-                                    <input type="checkbox" value="DSSAssist" ng-model="newBooking.DSSAssist" /> Request DSS Assistance<br />
+                            <div class="form-inline" row>
+                                <div id="dssAssistChoice">
+                                    <hr />
+                                    <h3 class="heading-small">DSS Assist</h3>
+                                    <div class="input-group col-xs-6">
+                                        <input type="checkbox" value="DSSAssist" ng-model="newBooking.DSSAssist" /> Request DSS Assistance<br />
+                                    </div>
                                 </div>
                             </div>
-                            <div class="alert alert-warning" style="display: none;" id="dssAssistContWarning">This location does not have a dedicated DSS officer, please contact ITSD for support on setting up SMART room meetings.</div>
+                            <div style="display: block;" id="dssAssistContWarning">
+                                <hr />
+                                <div class="alert alert-warning">
+                                    This location does not have a dedicated DSS officer, please contact ITSD for support on setting up SMART room meetings.
+                                </div>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button id="acceptBookingConfirmButton" type="button" ng-click="CheckEditBooking()" class="btn btn-primary">Accept Changes</button>
+                        <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                        <button id="acceptBookingConfirmButton" type="button" ng-click="CheckEditBooking()" class="button">Accept Changes</button>
                     </div>
                 </div>
                 <div class="tab-pane" id="confirmEditBooking">

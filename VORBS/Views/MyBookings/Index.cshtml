@@ -8,42 +8,44 @@
         <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
         <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
         <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
-        <link href="~/Content/Site.css" rel="stylesheet" />
 
-        <h2>My bookings</h2>        
+        <h1 class="heading-large">
+            My Bookings
+        </h1>
 
         <form role="form" id="searchFilter">
-            <div class="form-group row">
-                <div class="col-xs-4" id="searchLocation">
-                    <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="">
-                        <option value="" selected disabled>Select a location...</option>
-                    </select>
-                </div>
-                <div class="col-xs-2" id="room">
-                    <label class="col-sm-2 control-label">Room</label>
-                    <input id="room" class="form-control" ng-model="bookingFilter.room" />
-                </div>
-                <div class="col-xs-2" id="date">
-                    <label class="col-sm-2 control-label">Date</label>
-                    <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" />
-                </div>
-                <div class="col-xs-2">
-                    <label class="control-label">Smart Room</label>
-                    <div class="divider"></div>
-                    <input id="smartRoomCheckBox" type="checkbox" class="smartRoomCB" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
-                </div>
-
-                <div class="col-xs-3">
-                    <label class="control-label">&nbsp</label>
-                    <input id="searchButton" type="button" class="form-control filterButton" ng-click="SearchBookings()" value="Filter" />
+            <div class="form-inline" row>
+                <div class="form-group">
+                    <div class="input-group col-xs-4" id="searchLocation">
+                        <label class="control-label">Location</label>
+                        <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="">
+                            <option value="" selected disabled>Select a location...</option>
+                        </select>
+                    </div>
+                    <div class="input-group col-xs-3" id="room">
+                        <label class="control-label">Room</label>
+                        <input id="room" class="form-control" ng-model="bookingFilter.room" />
+                    </div>
+                    <div class="input-group col-xs-3" id="date">
+                        <label class="control-label">Date</label>
+                        <input id="startDatePicker" class="form-control datepicker" ng-model="bookingFilter.startDate" />
+                    </div>
+                    <div class="input-group col-xs-3" id="smart">
+                        <label class="control-label">Smart Room</label>
+                        <div class="divider"></div>
+                        <input id="smartRoomCheckBox" type="checkbox" class="form-control" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
+                    </div>
+                    <div class="input-group col-xs-2" id="search">
+                        <label class="control-label">&nbsp;</label>
+                        <input id="searchButton" type="button" class="button button-start" ng-click="SearchBookings()" value="Filter" />
+                    </div>
                 </div>
             </div>
         </form>
 
-        <div id="myBookingsTable">            
+        <div id="myBookingsTable">
             <table class="table table-striped">
-                <thead>                    
+                <thead>
                     <tr>
                         <th>&nbsp;</th>
                         <th><a href="#" ng-click="orderByField='location'; reverseSort = !reverseSort">Location<span ng-show="orderByField == 'location'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
@@ -64,8 +66,8 @@
                         <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
                         <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
                         <td>
-                            <span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon" title="Edit Booking"><a>Edit</a></span>
-                            <span data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="btn glyphicon" title="Delete Booking"><a>Delete</a></span>
+                            <button data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="button button--table">Edit</button>
+                            <button data-toggle="modal" data-target="#deleteModal" ng-click="SetBookingId(booking.id)" class="button button-alert">Delete</button>
                         </td>
                     </tr>
                 </tbody>
@@ -84,8 +86,8 @@
                         <p>Are you sure you want to delete this meeting?</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                        <button id="deleteBookingConfirmButton" type="button" class="btn btn-primary" ng-click="DeleteBooking()">Delete Booking</button>
+                        <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                        <button id="deleteBookingConfirmButton" type="button" class="button" ng-click="DeleteBooking()">Delete Booking</button>
                     </div>
                 </div>
             </div>
