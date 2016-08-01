@@ -7,106 +7,115 @@
         <link href="~/Content/BootStrapTimePicker/bootstrap-timepicker.css" rel="stylesheet" />
         <link href="~/Content/BootStrapDatePicker/datepicker.css" rel="stylesheet" />
         <link href="~/Content/fullcalendar/fullcalendar.min.css" rel="stylesheet" />
-        <link href="~/Content/Site.css" rel="stylesheet" />
 
         <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+        <h1 class="heading-medium">
+            New Booking
+        </h1>
+        <div class="panel panel-border-wide vertical-bottom-space-large">
+            <p>Use the filters provided below to check if your meeting room is available by using the required location, date, time and number of attendees required for your meeting.</p>
+        </div>
 
-        <h2>Book your meeting room</h2>
-        <p>Use the filters provided below to check if your meeting room is available by using the required location, date, time and number of attendees required for your meeting.</p>
         <hr />
-        <a href="#" id="viewAllRoomsLink" ng-click="SearchBookings(true)">View All Rooms</a>
+        @*<a href="#" id="viewAllRoomsLink" ng-click="SearchBookings(true)">View All Rooms</a>*@
         <form role="form" id="searchFilter">
-            <div class="form-group row">
-                <div class="col-xs-4" id="searchLocation">
-                    <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="SearchBookings(false)">
-                        <option value="" selected disabled>Select a location...</option>
-                    </select>
+            <div class="form-inline" row>
+                <div class="alert alert-danger" id="searchFilterErrorCont" style="display: none;">
+                    <ul id="searchFilterErrorList"></ul>
                 </div>
-                <div class="col-xs-2" id="date">
-                    <label class="col-sm-2 control-label">Date</label>
-                    <input id="startDatePicker" class="form-control datepicker" ng-change="SearchBookings()" ng-model="bookingFilter.startDate" />
-                </div>
-                <div class="col-xs-2">
-                    <label class="control-label">Smart Room</label>
-                    <div class="divider"></div>
-                    <input id="smartRoomCheckBox" type="checkbox" class="smartRoomCB" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
-                </div>
-
-                <div id="advancedSearch" style="display:none;">
-                    <div class="col-xs-2" id="startTime">
-                        <label class="control-label">Start</label>
-                        <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" />
-                    </div>
-                    <div class="col-xs-2" id="endTime">
-                        <label class="control-label">End</label>
-                        <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" />
-                    </div>
-                    <div class="col-xs-2" id="attendeesInputFilter">
-                        <label class="control-label">Attendees</label>
-                        <input type="number" id="attendeesControl" class="form-control numberControl touchSpinControl" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
-                    </div>
-                </div>
-
-                <div class="col-xs-3">
-                    <label class="control-label">&nbsp</label>
-                    <input id="searchButton" type="button" class="form-control filterButton" ng-click="SearchBookings(false)" value="Search" />
-                    <p><a href="#" id="toggleAdvancedSearchLink" onclick="ToggleAdvancedSearch();">Advanced Search</a></p>
-                </div>
-
-            </div>
-
-            <div id="smartRoomLocations" style="display: none;">
-                <p>
-                    <div class="alert alert-info" id="smartRoomHelpText">Please select the other SMART Room Location(s) using the 'Add' button below.</div>
-                </p>
-
-                <div class="form-group row">
-                    <div class="col-xs-4" id="smartLocationSelect">
-                        <label class="control-label">SMART Location(s)</label>
-                        <select id="smartLoactionDropDown" class="form-control" @*ng-options="o.id as o.displayName for o in smartLoactions"*@ ng-model="currentSmartLocation" ng-change="ValidateSelection()">
+                <div class="form-group">
+                    <div class="input-group col-xs-4" id="searchLocation">
+                        <label class="control-label">Location</label>
+                        <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="SearchBookings(false)">
                             <option value="" selected disabled>Select a location...</option>
-                            <option ng-repeat="loc in smartLoactions track by $index" value="{{ loc.id }}" title="{{ GetFormattedSmartOptionTitle(loc.id) }}">{{ loc.displayName }}</option>
                         </select>
                     </div>
-
-                    <div class="col-xs-3">
-                        <label class="control-label">&nbsp</label>
-                        <input id="addSmartLoactionButton" type="button" class="form-control filterButton" ng-click="AddSmartLoaction()" value="Add" />
+                    <div class="input-group col-xs-3" id="date">
+                        <label class="control-label">Date</label>
+                        <input id="startDatePicker" class="form-control datepicker" ng-change="SearchBookings()" ng-model="bookingFilter.startDate" />
+                    </div>
+                    <div class="input-group col-xs-3" id="smart">
+                        <label class="control-label">Smart Room</label>
+                        <div class="divider"></div>
+                        <input id="smartRoomCheckBox" type="checkbox" class="smartRoomCB form-control" ng-model="bookingFilter.smartRoom" ng-change="ShowSmartLoactions()" />
+                    </div>
+                    <div id="advancedSearch" class="input-group col-xs-7" style="display: none">
+                        <div class="input-group col-xs-4" id="startTime">
+                            <label class="control-label">Start</label>
+                            <input id="startTimePicker" class="form-control timepicker" ng-model="bookingFilter.startTime" />
+                        </div>
+                        <div class="input-group col-xs-4" id="endTime">
+                            <label class="control-label">End</label>
+                            <input id="endTimePicker" class="form-control timepicker" ng-model="bookingFilter.endTime" />
+                        </div>
+                        <div class="input-group col-xs-2" id="attendeesInputFilter">
+                            <label class="control-label">Attendees</label>
+                            <div>
+                                <input type="number" id="attendeesControl" class="form-control numberControl touchSpinControl" ng-model="bookingFilter.numberOfAttendees" ng-pattern="/^[0-9]+$/" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group col-xs-4">
+                        <label class="control-label">&nbsp;</label>
+                        <div class="divider"></div><br />
+                        <input id="searchButton" type="button" class="button button-start" ng-click="SearchBookings(false)" value="Search" />
+                        <p><a href="#" id="toggleAdvancedSearchLink" onclick="ToggleAdvancedSearch();">Advanced Search</a></p>
                     </div>
                 </div>
+            </div>
 
-                <table id="smartLoactionsTable">
-                    <tr>
-                        <td><b>Primary SMART Location &nbsp;</b></td>
-                        <td ng-if="bookingFilter.location != null"> {{bookingFilter.location.name}}</td>
-                    </tr>
-                    <tr>
-                        <td><b>Other SMART Location(s)</b></td>
-                        <td ng-repeat="locId in newBooking.SmartLoactions track by $index">{{ GetLocationById(locId).displayName }} <span class="btn glyphicon glyphicon-remove" ng-click="RemoveSmartLoaction(locId)"></span></td>
-                    </tr>
-                </table>
+            <div id="smartRoomLocations" style="display: none;" class="form-inline" row>
+                <div class="form-group">
+                    <div class="panel panel-border-wide vertical-bottom-space-large">
+                        <p>Please select the other SMART Room Location(s) using the 'Add' button below.</p>
+                    </div>
+                    <div class="input-group col-xs-5" id="smartLocationSelect">
+                        <label class="control-label">SMART Location(s)</label>
+                        <select id="smartLoactionDropDown" class="form-control" ng-options="o.id as o.displayName for o in smartLoactions" ng-model="currentSmartLocation" ng-change="ValidateSelection()">
+                            <option value="" selected disabled>Select a location...</option>
+                        </select>
+                    </div>
+                    <div class="input-group col-xs-4">
+                        <label class="control-label">&nbsp;</label>
+                        <div></div>
+                        <input id="addSmartLoactionButton" type="button" class="button" ng-click="AddSmartLoaction()" value="Add" />
+                    </div>
+
+                    <table id="smartLoactionsTable">
+                        <thead>
+                            <tr>
+                                <th>Primary SMART Location</th>
+                                <th>Other SMART Location(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td ng-if="bookingFilter.location != null"> {{bookingFilter.location.name}}</td>
+                                <td>
+                                    <ol>
+                                        <li ng-repeat="locId in newBooking.SmartLoactions track by $index">
+                                            {{ GetLocationById(locId).displayName }}
+                                            <span class="btn glyphicon glyphicon-remove" ng-click="RemoveSmartLoaction(locId)"></span>
+                                        </li>
+                                    </ol>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </form>
 
-        <p>
-            <div class="alert alert-danger" id="searchFilterErrorCont" style="display: none;">
-                <ul id="searchFilterErrorList"></ul>
-            </div>
-        </p>
-
-
-        <hr />
-
         <div id="newSearchResults" style="display: none;">
-
-            <h3 id="bookingTitle">
+            <h3 class="heading-medium">
                 Available <span id="isSmartRoom"></span> Rooms in <span id="searchedLocation"></span> on <span id="searchedDate"></span>
             </h3>
 
             <span id="errorMessage"></span>
 
-            <div class="alert alert-info">Please use the meeting rooms responsibly. Only book rooms that are suitable for your meeting size.</div>
+            <div class="panel panel-border-wide vertical-bottom-space-large">
+                <p>Please use the meeting rooms responsibly. Only book rooms that are suitable for your meeting size.</p>
+            </div>
 
             <div id="bookingTable">
 

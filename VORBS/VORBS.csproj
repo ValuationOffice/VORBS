@@ -26,6 +26,7 @@
     <SccProvider>SAK</SccProvider>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -206,6 +207,7 @@
     <Content Include="Content\BootStrapTimePicker\bootstrap-responsive.css" />
     <Content Include="Content\BootStrapTimePicker\bootstrap-timepicker.css" />
     <Content Include="Content\BootStrapTimePicker\bootstrap-timepicker.min.css" />
+    <Content Include="Content\custom.css" />
     <Content Include="Content\elements-page.css" />
     <Content Include="Content\fonts.css" />
     <Content Include="Content\fullcalendar\fullcalendar.min.css" />

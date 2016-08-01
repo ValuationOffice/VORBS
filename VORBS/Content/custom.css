@@ -1,0 +1,83 @@
+﻿/********** CALENDAR STYLES **********/
+
+#calendarContainer {
+    margin-top: 20px;
+}
+
+#calendar {
+    width: 800px;
+}
+
+.fc-event {
+    border-radius: 0;
+}
+
+.form-control-date {
+}
+
+.fc-widget-content table {
+    background-color: white;
+}
+
+.locationIcons {
+    margin: 5px;
+}
+
+.activeIcons {
+    color: green;
+}
+
+.inactiveIcons {
+    color: red;
+}
+
+.dailyCalendar tbody {
+    cursor: pointer;
+    content: 'ss';
+}
+
+.dailyCalendarContainer {
+    height: 590px;
+    width: 150px;
+    display: inline-block;
+}
+
+#bookingTable {
+    width: 100%;
+    height: 438px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+    #bookingTable .calendarRoomName {
+        background-color: black;
+        text-align: center;
+        width: 104px;
+        float: right;
+        font-size: large;
+        color: white;
+    }
+
+    #bookingTable .calendarRoomDetails {
+        background-color: white;
+        width: 104px;
+        float: right;
+        text-align: center;
+        border-left: solid 1px;
+        border-right: solid 1px;
+        border-color: lightgray;
+    }
+
+    #bookingTable .calendarIcons {
+        margin-left: 3px;
+        margin-right: 3px;
+    }
+
+    #bookingTable .fc-toolbar {
+        margin-bottom: 0;
+    }
+
+    #searchFilter #advancedSearch .input-group{
+        margin-right: 6px;
+    }
