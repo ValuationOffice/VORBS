@@ -1,4 +1,4 @@
-﻿<div class="modal fade" id="newBookingRecurrenceModal" role="dialog" aria-hidden="true">
+﻿<div id="newBookingRecurrenceModal" class="modal fade" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -6,148 +6,122 @@
                 <h4 class="modal-title">Recurrence</h4>
             </div>
             <div class="modal-body">
-                <p>
-                    <div class="alert alert-danger" id="recurrenceErrorCont" style="display: none;">
-                        <ul id="recurrenceErrorList"></ul>
+                <div style="width: 100%;height:250px;">
+                    <p>
+                        <div class="alert alert-danger" id="recurrenceErrorCont" style="display: none;">
+                            <ul id="recurrenceErrorList"></ul>
+                        </div>
+                    </p>
+                    <!-- period selection-->
+                    <div id="recFrequencyCont" style="border-right-width: 2px;border-right-style:solid;width:100px;float:left;">
+                        <p><input type="radio" id="dailyFrequency" ng-model="newBooking.Recurrence.Frequency" value="daily" /> Daily</p>
+                        <p><input type="radio" id="weeklyFrequency" ng-model="newBooking.Recurrence.Frequency" value="weekly" /> Weekly</p>
+                        <p><input type="radio" id="monthlyFrequency" ng-model="newBooking.Recurrence.Frequency" value="monthly" /> Monthly</p>
                     </div>
-                </p>
-                <form role="form" id="newBookingRecurrence">
-                    <div class="alert alert-danger" id="recurrenceModalErrorMessage" style="display: none;"></div>
-
-                    @*<div class="form-group row">
-                            <div class="col-xs-4" id="recStartTimeCont">
-                                <label class="control-label">Start Time</label>
-                                <input class="form-control" disabled="disabled" type="text" id="recStartTime" ng-model="booking.StartTime" />
+                    <div id="recSettings">
+                        <!-- daily recurrence options period-->
+                        <div id="recDailySettings" class="recSettingsPanel" style="display: block;">
+                            <div id="recDailySentanceRow1" class="form-group">
+                                <span class="col-xs-11">This booking will recur every</span>
+                                <div id="recDailyCountCont" class="col-xs-3">
+                                    <input id="recDailyDayCount" type="text" class="form-control touchSpinControl" ng-model="newBooking.Recurrence.DailyDayCount" />
+                                </div>
+                                <span>day(s)</span>
                             </div>
-                            <div class="col-xs-4" id="recEndTimeCont">
-                                <label class="control-label">End Time</label>
-                                <input class="form-control" disabled="disabled" type="text" id="recEndTime" ng-model="booking.EndTime" />
+                            <div id="recDailySentanceRow2" class="form-group">
+                                <span class="col-xs-12">Effective from <label id="recStartDate">{{bookingFilter.startDate}}</label> until</span>
+                                <span class="" id="recEndDateCont">
+                                    <input class="form-control datepicker" type="text" id="recEndDate" title="End Date" ng-model="newBooking.Recurrence.EndDate" style="width:115px" />
+                                </span>
                             </div>
-                            <div class="col-xs-4" id="recStartDateCont">
-                                <label class="control-label">Start Date</label>
-                                <input class="form-control datepicker" disabled="disabled" type="text" id="recStartDate" ng-model="bookingFilter.startDate" />
-                            </div>
-                            <div class="col-xs-4" id="recEndDateCont">
-                                <label class="control-label">End Date</label>
-                                <input class="form-control datepicker" type="text" id="recEndDate" ng-model="newBooking.Recurrence.EndDate" />
+                            <div id="recDailySentanceRow3" class="form-group">
+                                <span class="col-xs-12">from <b>{{booking.StartTime}}</b> to <b>{{booking.EndTime}}</b></span>
                             </div>
                         </div>
 
-                        <hr />*@
-
-                    <div class="form-group row">
-
-                        <div class="col-xs-4" id="recFrequencyCont" style="border-right-width: 2px;border-right-style:solid;">
-                            <p><input type="radio" id="dailyFrequency" ng-model="newBooking.Recurrence.Frequency" value="daily" /> Daily</p>
-                            <p><input type="radio" id="weeklyFrequency" ng-model="newBooking.Recurrence.Frequency" value="weekly" /> Weekly</p>
-                            <p><input type="radio" id="monthlyFrequency" ng-model="newBooking.Recurrence.Frequency" value="monthly" /> Monthly</p>
+                        <!-- weekly recurrence options period-->
+                        <div id="recWeeklySettings" class="recSettingsPanel" style="display: none">
+                            <div id="recWeeklySentanceRow1" class="form-group">
+                                <span class="col-xs-11">This booking will recur every</span>
+                                <div class="col-xs-3" id="recWeeklyWeekCountCont">
+                                    <input id="recWeeklyWeekCount" type="text" class="form-control touchSpinControl" ng-model="newBooking.Recurrence.WeeklyWeekCount" />
+                                </div>
+                                <span>week(s)</span>
+                            </div>
+                            <div id="recWeeklySentanceRow2" class="form-group">
+                                <span class="col-xs-1">on</span>
+                                <div class="col-xs-12">
+                                    <select id="recWeeklyWeekDay" class="form-control" ng-model="newBooking.Recurrence.WeeklyDay">
+                                        <option value="1">Monday</option>
+                                        <option value="2">Tuesday</option>
+                                        <option value="3">Wednesday</option>
+                                        <option value="4">Thursday</option>
+                                        <option value="5">Friday</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="recWeeklySentanceRow3" class="form-group">
+                                <span class="col-xs-10">effective <label id="recStartDate">{{bookingFilter.startDate}}</label> until</span>
+                                <span id="recEndDateCont">
+                                    <input class="form-control datepicker" title="End Date" type="text" id="recEndDate" ng-model="newBooking.Recurrence.EndDate" style="width:115px" />
+                                </span>
+                            </div>
+                            <div id="recWeeklySentanceRow4" class="form-group" style="margin-left: 10px;">
+                                <span>from <b>{{booking.StartTime}}</b> to <b>{{booking.EndTime}}</b></span>
+                            </div>
                         </div>
 
-                        <div class="col-xs-14" id="recSettings">
-
-                            <div id="recDailySettings" class="recSettingsPanel">
-                                <div id="recDailySentanceRow1" class="form-group row">
-                                    <span class="col-xs-8">This booking will recur every</span>
-                                    <div class="col-xs-3" id="recDailyCountCont">
-                                        <input id="recDailyDayCount" type="text" class="form-control touchSpinControl" ng-model="newBooking.Recurrence.DailyDayCount" />
-                                    </div>
-                                    <span class="col-xs-3">day(s)</span>
-                                </div>
-
-                                <div id="recDailySentanceRow2" class="form-group row">
-                                    <span class="col-xs-9">days(s) effective <label id="recStartDate">{{bookingFilter.startDate}}</label> until</span>
-                                    <span class="col-xs-5" id="recEndDateCont">
-                                        <input class="form-control datepicker" type="text" id="recEndDate" title="End Date" ng-model="newBooking.Recurrence.EndDate" />
-                                    </span>
-                                </div>
-
-                                <div id="recDailySentanceRow3" class="row">
-                                    <span class="col-xs-8">from <b>{{booking.StartTime}}</b> to <b>{{booking.EndTime}}</b></span>
+                        <!-- monthly recurrence options period -->
+                        <div id="recMonthlySettings" class="recSettingsPanel" style="display: none">
+                            <div id="recMonthlySentanceRow1" class="form-group">
+                                <span class="col-xs-11">This booking will recur every</span>
+                                <div id="recMonthlyMonthDayCountCont">
+                                    <select id="recMonthlyMonthDayCount" class="form-control" ng-model="newBooking.Recurrence.MonthlyMonthDayCount" style="width: 100px;">
+                                        <option value="1">First</option>
+                                        <option value="2">Second</option>
+                                        <option value="3">Third</option>
+                                        <option value="4">Fourth</option>
+                                        <option value="0">Last</option>
+                                    </select>
                                 </div>
                             </div>
 
-                            <div id="recWeeklySettings" class="recSettingsPanel" style="display: none">
-
-                                <div id="recWeeklySentanceRow1" class="form-group row">
-                                    <span class="col-xs-8">This booking will recur every</span>
-                                    <div class="col-xs-3" id="recWeeklyWeekCountCont">
-                                        <input id="recWeeklyWeekCount" type="text" class="form-control touchSpinControl" ng-model="newBooking.Recurrence.WeeklyWeekCount" />
-                                    </div>
-                                    <span class="col-xs-3">week(s)</span>
+                            <div id="recMonthlySentanceRow2" class="form-group form-inline">
+                                <div class="col-xs-10">
+                                    <select id="recMonthlyMonthDay" class="form-control" ng-model="newBooking.Recurrence.MonthlyMonthDay" style="width: 150px;">
+                                        <option value="1">Monday</option>
+                                        <option value="2">Tuesday</option>
+                                        <option value="3">Wednesday</option>
+                                        <option value="4">Thursday</option>
+                                        <option value="5">Friday</option>
+                                    </select>
+                                    of every
                                 </div>
-
-                                <div id="recWeeklySentanceRow2" class="form-group row">
-                                    <span class="col-xs-1">on</span>
-                                    <div class="col-xs-6">
-                                        <select id="recWeeklyWeekDay" class="form-control" ng-model="newBooking.Recurrence.WeeklyDay">
-                                            <option value="1">Monday</option>
-                                            <option value="2">Tuesday</option>
-                                            <option value="3">Wednesday</option>
-                                            <option value="4">Thursday</option>
-                                            <option value="5">Friday</option>
-                                        </select>
-                                    </div>
-                                    <span class="col-xs-7">effective <label id="recStartDate">{{bookingFilter.startDate}}</label></span>
-                                </div>
-
-                                <div id="recWeeklySentanceRow3" class="row">
-                                    <span class="col-xs-2">until</span>
-                                    <span class="col-xs-5" id="recEndDateCont">
-                                        <input class="form-control datepicker" title="End Date" type="text" id="recEndDate" ng-model="newBooking.Recurrence.EndDate" />
-                                    </span>
-                                    <span class="col-xs-6">from <b>{{booking.StartTime}}</b> to <b>{{booking.EndTime}}</b></span>
-                                </div>
+                                <span id="recMonthlyMonthCountCont" class="col-xs-3">
+                                    <input id="recMonthlyMonthCount" type="text" class="form-control touchSpinControl" ng-model="newBooking.Recurrence.MonthlyMonthCount" />
+                                </span>
+                                month(s)
                             </div>
 
-                            <div id="recMonthlySettings" class="recSettingsPanel" style="display: none">
-
-                                <div id="recMonthlySentanceRow1" class="form-group row">
-                                    <span class="col-xs-8">This booking will recur every</span>
-                                    <div class="col-xs-5" style="padding-left: 0;" id="recMonthlyMonthDayCountCont">
-                                        <select id="recMonthlyMonthDayCount" class="form-control" ng-model="newBooking.Recurrence.MonthlyMonthDayCount">
-                                            <option value="1">First</option>
-                                            <option value="2">Second</option>
-                                            <option value="3">Third</option>
-                                            <option value="4">Fourth</option>
-                                            <option value="0">Last</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div id="recMonthlySentanceRow2" class="form-group row">
-                                    <div class="col-xs-6" id="recMonthlyMonthDayCont">
-                                        <select id="recMonthlyMonthDay" class="form-control" ng-model="newBooking.Recurrence.MonthlyMonthDay">
-                                            <option value="1">Monday</option>
-                                            <option value="2">Tuesday</option>
-                                            <option value="3">Wednesday</option>
-                                            <option value="4">Thursday</option>
-                                            <option value="5">Friday</option>
-                                        </select>
-                                    </div>
-                                    <span class="col-xs-3">of every</span>
-                                    <span class="col-xs-3" id="recMonthlyMonthCountCont">
-                                        <input id="recMonthlyMonthCount" type="text" class="form-control touchSpinControl" ng-model="newBooking.Recurrence.MonthlyMonthCount" />
-                                    </span>
-                                    <span class="col-xs-3">month(s)</span>
-                                </div>
-
-                                <div id="recMonthlySentanceRow3" class="row">
-                                    <span class="col-xs-7">effective <label id="recStartDate">{{bookingFilter.startDate}}</label> until</span>
-                                    <span class="col-xs-5" id="recEndDateCont">
-                                        <input class="form-control datepicker" title="End Date" type="text" id="recEndDate" ng-model="newBooking.Recurrence.EndDate" />
-                                    </span>
-                                    <span class="col-xs-6">from <b>{{booking.StartTime}}</b> to <b>{{booking.EndTime}}</b></span>
-                                </div>
+                            <div id="recMonthlySentanceRow3" class="form-group">
+                                <span class="col-xs-12">Effective from <label id="recStartDate">{{bookingFilter.startDate}}</label> until</span>
+                                <span class="" id="recEndDateCont">
+                                    <input class="form-control datepicker" type="text" id="recEndDate" title="End Date" ng-model="newBooking.Recurrence.EndDate" style="width:115px" />
+                                </span>
+                            </div>
+                            <div id="recMonthlySentanceRow4" class="form-group">
+                                <span class="col-xs-12">from <b>{{booking.StartTime}}</b> to <b>{{booking.EndTime}}</b></span>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="button button-secondary" data-dismiss="modal" ng-click="CloseRecurrenceScreen();">Close</button>
+                    <button type="button" class="button button" ng-click="CreateRecurrence();">Confirm Recurrence</button>
+                    <button type="button" class="button-secondary" ng-disabled="!newBooking.Recurrence.IsRecurring" ng-click="ResetRecurrenceStatus();">Cancel Recurrence</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="CloseRecurrenceScreen();">Close</button>
-                <button type="button" class="btn btn-primary" ng-click="CreateRecurrence();">Confirm Recurrence</button>
-                <button type="button" ng-disabled="!newBooking.Recurrence.IsRecurring" class="btn btn-primary" ng-click="ResetRecurrenceStatus();">Cancel Recurrence</button>
-            </div>
+
         </div>
     </div>
 </div>

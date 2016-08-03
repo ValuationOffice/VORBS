@@ -81,3 +81,14 @@
     #searchFilter #advancedSearch .input-group{
         margin-right: 6px;
     }
+
+
+    .recSettingsPanel{
+        float:left;
+        width: 450px;
+    }
+
+
+    #recurringBreakDown{
+        padding-top: 15px;
+    }
