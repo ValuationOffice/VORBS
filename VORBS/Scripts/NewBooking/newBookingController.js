@@ -186,8 +186,10 @@ function NewBookingController($scope, $http, $resource) {
                     }, function (success) {
                         if (!room.smartRoom || !$scope.bookingFilter.smartRoom) {
                             $("#dssAssistChoice").css('display', 'none');
+                            $("#dssAssistChoiceContainer").css('display', 'none');
                             $("#dssAssistContWarning").css("display", "none");
                         } else {
+                            $("#dssAssistChoiceContainer").css('display', 'block');
                             var dssDetails = GetLocationCredentialsFromList(dssCredentialsName, room.location.locationCredentials);
                             if (!dssDetails || dssDetails.email === "") {
                                 $("#dssAssistChoice").css('display', 'none');
