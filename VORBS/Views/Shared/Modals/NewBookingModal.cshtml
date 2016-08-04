@@ -154,12 +154,12 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="cancelBookingClash" ng-click="CancelBookingClash();" title="Cancel the current recurrnce">Cancel Recurrence</button>
-                <button type="button" class="btn btn-primary" id="skipBookingClash" ng-click="SkipBookingClash();" title="Dont book the meetings that clash with the above bookings.">Skip Clashed</button>
-                <button type="button" class="btn btn-primary" id="alternateBookingClash" ng-click="AlternateBookingClash();" title="Application will pick alternative appropriate rooms">Auto Pick</button>
+                <button type="button" class="button button-secondary" id="cancelBookingClash" ng-click="CancelBookingClash();" title="Cancel the current recurrnce">Cancel Recurrence</button>
+                <button type="button" class="button" id="skipBookingClash" ng-click="SkipBookingClash();" title="Dont book the meetings that clash with the above bookings.">Skip</button>
+                <button type="button" class="button" id="alternateBookingClash" ng-click="AlternateBookingClash();" title="Application will pick alternative appropriate rooms">Auto Pick</button>
                 @if (VorbsAuthorise.IsUserAuthorised(User.Identity.Name, 1))
                 {
-                    <button type="button" class="btn btn-primary" id="adminOverwriteClash" title="Overwrite will replace the bookings above, with your new bookings." data-toggle="modal" data-target="#adminOverwriteMessagePopup">Overwrite</button>
+                    <button type="button" class="button" id="adminOverwriteClash" title="Overwrite will replace the bookings above, with your new bookings." data-toggle="modal" data-target="#adminOverwriteMessagePopup">Overwrite</button>
                 }
             </div>
         </div>
