@@ -7,12 +7,15 @@
                 <h4 class="modal-title" id="myModalLabel">Add User</h4>
             </div>
             <div class="modal-body">
+                <div class="panel panel-border-wide vertical-bottom-space-large">
+                    <p>Please select a user</p>
+                </div>
                 <label>Surname:</label>
                 <input id="surnameTextBox" ng-model="emailVal" ng-change="GetAdNames()" class="form-control" />
                 <!--TODO-->
                 <hr />
                 <div class="userInfo">
-                    <table id="activeDirectoryTable" class="table table-striped table-hover userInfoTable">
+                    <table id="activeDirectoryTable" class="table table-hover userInfoTable">
                         <thead>
                             <tr>
                                 <th>First Name</th>
@@ -20,7 +23,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="adAdmin in adAdminUsers" ng-click="AddAdEmail(adAdmin)">
+                            <tr ng-repeat="adAdmin in adAdminUsers" ng-click="AddAdEmail(adAdmin)" style="cursor: pointer;">
                                 <td>{{ adAdmin.firstName }}</td>
                                 <td>{{ adAdmin.lastName }}</td>
                             </tr>
@@ -29,7 +32,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="button button-secondary" data-dismiss="modal">Close</button>
                 @*<button type="button" class="btn btn-primary">Confirm</button>*@
             </div>
         </div>
