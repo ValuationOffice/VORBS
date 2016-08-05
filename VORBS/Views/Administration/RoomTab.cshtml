@@ -1,52 +1,68 @@
 ﻿<div id="roomControllerDiv" ng-controller="RoomsController">
 
-    <h4>Room Management</h4>
-    <p>Add, Edit or Delete Rooms below.</p>
+    <h4 class="heading-small">Room Management</h4>
+    <div class="panel panel-border-wide vertical-bottom-space-large">
+        <p>Add, Edit or Delete Rooms below.</p>
+    </div>
+
 
     <div class="alert alert-success" id="room-success-alert">
         <p></p>
     </div>
 
     <form role="form" id="newRoom">
-        <div class="form-group row">
-            <div class="col-xs-3">
-                <label class="control-label ">Location</label>
-                <select class="form-control" ng-options="location.name for location in Locations" ng-model="currentLocation"></select>
+        <div class="form-inline" style="height: 100px;">
+            <div class="form-group">
+                <div class="input-group col-xs-2">
+                    <label class="control-label ">Location</label>
+                    <select class="form-control" ng-options="location.name for location in Locations" ng-model="currentLocation"></select>
+                </div>
+                <div class="input-group col-xs-3" id="roomName">
+                    <label class="control-label">Room Name</label>
+                    <input id="roomNameInput" class="form-control" placeholder="Room Name" ng-model="newRoom.RoomName" />
+                </div>
+                <div class="input-group col-xs-2" id="roomComputer">
+                    <label class="control-label">Computer(s)</label>
+                    <div>
+                        <input type="number" class="form-control touchSpinControlZero numberControl" id="computerCountControl" ng-model="newRoom.ComputerCount" ng-pattern="/^[0-9]+$/" />
+                    </div>
+                </div>
+                <div class="input-group col-xs-2" id="roomPhone">
+                    <label class="control-label">Phone(s)</label>
+                    <div>
+                        <input type="number" class="form-control touchSpinControlZero numberControl" id="phoneCountControl" ng-model="newRoom.PhoneCount" ng-pattern="/^[0-9]+$/" />
+                    </div>
+                </div>
+                <div class="input-group col-xs-2" id="roomSeatCount">
+                    <label class="control-label">Seat(s)</label>
+                    <div>
+                        <input type="number" class="form-control touchSpinControlZero numberControl" id="seatCountControl" ng-model="newRoom.SeatCount" ng-pattern="/^[0-9]+$/" />
+                    </div>
+                </div>
+                <div class="input-group" id="roomSmart">
+                    <label class="control-label">Smart Room</label>
+                    <div>
+                        <input type="checkbox" ng-model="newRoom.SmartRoom" />
+                    </div>
+                </div>
+                <div class="input-group" id="roomActive">
+                    <label class="control-label">Active</label>
+                    <div>
+                        <input type="checkbox" ng-model="newRoom.Active" />
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>&nbsp;</label>
+                    <div class="divider"></div>
+                    <input id="newRoomAddButton" type="button" class="button" value="Add Room" ng-click="NewRoom()" />
+                </div>
             </div>
-            <div class="col-xs-3" id="roomName">
-                <label class="control-label">Room Name</label>
-                <input id="roomNameInput" class="form-control" placeholder="Room Name" ng-model="newRoom.RoomName" />
-            </div>
-            <div class="col-xs-2" id="roomComputer">
-                <label class="control-label">Computer(s)</label>
-                <input type="number" class="form-control touchSpinControlZero numberControl" id="computerCountControl" ng-model="newRoom.ComputerCount" ng-pattern="/^[0-9]+$/" />
-            </div>
-            <div class="col-xs-2" id="roomPhone">
-                <label class="control-label">Phone(s)</label>
-                <input type="number" class="form-control touchSpinControlZero numberControl" id="phoneCountControl" ng-model="newRoom.PhoneCount" ng-pattern="/^[0-9]+$/" />
-            </div>
-            <div class="col-xs-2" id="roomSeatCount">
-                <label class="control-label">Seat(s)</label>
-                <input type="number" class="form-control touchSpinControlZero numberControl" id="seatCountControl" ng-model="newRoom.SeatCount" ng-pattern="/^[0-9]+$/" />
-            </div>
-            <div class="col-xs-2" id="roomSmart">
-                <label class="control-label">Smart Room</label>
-                <input type="checkbox" ng-model="newRoom.SmartRoom" class="form-control" />
-            </div>
-            <div class="col-xs-2" id="roomActive">
-                <label class="control-label">Active</label>
-                <input type="checkbox" ng-model="newRoom.Active" class="form-control" />
-            </div>
-            <div class="col-xs-3">
-                <label>&nbsp;</label>
-                <input id="newRoomAddButton" type="button" class="btn btn-primary" value="Add Room" ng-click="NewRoom()" />
-            </div>
+            <p>
+                <div class="alert alert-danger" id="addRoomErrorCont" style="display: none;">
+                    <ul id="addRoomErrorList"></ul>
+                </div>
+            </p>
         </div>
-        <p>
-            <div class="alert alert-danger" id="addRoomErrorCont" style="display: none;">
-                <ul id="addRoomErrorList"></ul>
-            </div>
-        </p>
     </form>
 
     <hr />
@@ -101,13 +117,17 @@
                     <h4 class="modal-title" id="myModalLabel">Disable Room</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to disable this meeting room?</p>
-                    <p><b>All future bookings for this room will be <span style="color:red;">DELETED</span>. Email notifications will be sent to affected users.</b></p>
-                    <p>Please exit this screen and create a block booking if room will be tempoary unavaliable.</p>
+                    <div class="alert alert-danger" role="alert">
+                        <p>Are you sure you want to disable this meeting room?</p>
+                    </div>
+                    <div class="panel panel-border-wide vertical-bottom-space-large">
+                        <p><b>All future bookings for this room will be <span style="color:red;">DELETED</span>. Email notifications will be sent to affected users.</b></p>
+                        <p>Please exit this screen and create a block booking if room will be tempoary unavaliable.</p>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button id="disableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="DisableRoom()">Disable Room</button>
+                    <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="disableBookingConfirmButton" type="button" class="button" ng-click="DisableRoom()">Disable Room</button>
                 </div>
             </div>
         </div>
@@ -124,8 +144,8 @@
                     <p>Are you sure you want to enable this meeting room?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button id="enableBookingConfirmButton" type="button" class="btn btn-primary" ng-click="EnableRoom()">Enable Room</button>
+                    <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="enableBookingConfirmButton" type="button" class="button" ng-click="EnableRoom()">Enable Room</button>
                 </div>
             </div>
         </div>
