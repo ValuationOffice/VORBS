@@ -1,6 +1,7 @@
 ﻿<div id="locationsControllerDiv" ng-controller="LocationsController">
 
-    <h4>Location Management</h4>
+    <h1 class="heading-small">Location Management</h1>
+    <button data-toggle="modal" data-target="#newLocationModal" class="button">Add Location</button>
     <hr />
     <div class="alert alert-success" id="location-success-alert">
         <p></p>
@@ -8,7 +9,6 @@
     <div class="form-inline" id="locationFilterOptions">
         <label class="control-label">Filter By:</label>
         <select class="form-control" ng-model="selectedItem.type" ng-change="GetLocationsByStatus()" ng-options="status.value as status.name for status in locationStatuses"></select>
-        <button data-toggle="modal" data-target="#newLocationModal" class="btn btn-primary">Add Location</button>
     </div>
 
     <div id="adminLocationsTable">
@@ -26,11 +26,11 @@
                 <tr ng-repeat="location in Locations">
                     <td>{{ location.name }}</td>
                     <td>{{ location.rooms.length }}</td>
-                    <td ng-show="{{location.active}}"><span class="glyphicon glyphicon-ok-circle locationIcons activeIcons" title="Active Location"></span></td>
-                    <td ng-show="{{ location.active != true }}"><span class="glyphicon glyphicon-remove-circle locationIcons inactiveIcons" title="Inactive Location"></span></td>
-                    <td><span data-toggle="modal" ng-click="SetNewEditLocation(location.id);" data-target="#editLocationModal" class="btn glyphicon glyphicon-edit locationIcons" title="Edit Location"></span></td>
-                    <td ng-show="{{ location.active }}"><span data-toggle="modal" data-target="#disableLocationModal" ng-click="SetLocation(location)" title="Disable Location" class="btn glyphicon glyphicon-remove-sign" title="Disable Location"></span></td>
-                    <td ng-show="{{ location.active != true }}"><span data-toggle="modal" data-target="#enableLocationModal" ng-click="SetLocation(location)" title="Enable Location" class="btn glyphicon glyphicon-ok-sign" title="Enable Location"></span></td>
+                    <td ng-show="{{location.active}}"><span class="glyphicon glyphicon-ok-circle activeIcons" title="Active Location"></span></td>
+                    <td ng-show="{{ location.active != true }}"><span class="glyphicon glyphicon-remove-circle inactiveIcons" title="Inactive Location"></span></td>
+                    <td><span data-toggle="modal" ng-click="SetNewEditLocation(location.id);" data-target="#editLocationModal" class="glyphicon glyphicon-edit" style="cursor: pointer;" title="Edit Location"></span></td>
+                    <td ng-show="{{ location.active }}"><span data-toggle="modal" data-target="#disableLocationModal" ng-click="SetLocation(location)" title="Disable Location" style="cursor: pointer;" class="glyphicon glyphicon-remove-sign"></span></td>
+                    <td ng-show="{{ location.active != true }}"><span data-toggle="modal" data-target="#enableLocationModal" ng-click="SetLocation(location)" title="Enable Location" style="cursor: pointer;" class="glyphicon glyphicon-ok-sign"></span></td>
                 </tr>
             </tbody>
         </table>
@@ -44,13 +44,17 @@
                     <h4 class="modal-title" id="myModalLabel">Disable Location</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to disable this location?</p>
-                    <p><b>All future bookings for rooms in this location will be <span style="color:red;">DELETED</span>. Email notifications will be sent to affected users.</b></p>
-                    <p>Please exit this screen and create a block booking if location will be tempoary unavaliable.</p>
+                    <div class="alert alert-danger" role="alert">
+                        <p>Are you sure you want to disable this location?</p>
+                    </div>
+                    <div class="panel panel-border-wide vertical-bottom-space-large">
+                        <p><b>All future bookings for rooms in this location will be <span style="color:red;">DELETED</span>. Email notifications will be sent to affected users.</b></p>
+                        <p>Please exit this screen and create a block booking if location will be tempoary unavaliable.</p>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button id="disableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="DisableLocation()">Disable Location</button>
+                    <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="disableLocationConfirmButton" type="button" class="button" ng-click="DisableLocation()">Disable Location</button>
                 </div>
             </div>
         </div>
@@ -67,8 +71,8 @@
                     <p>Are you sure you want to enable this location?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button id="enableLocationConfirmButton" type="button" class="btn btn-primary" ng-click="EnableLocation()">Enable Location</button>
+                    <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                    <button id="enableLocationConfirmButton" type="button" class="button" ng-click="EnableLocation()">Enable Location</button>
                 </div>
             </div>
         </div>

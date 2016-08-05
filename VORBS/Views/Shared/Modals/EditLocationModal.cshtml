@@ -4,7 +4,6 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">Edit Location</h4>
-                <h5></h5>
             </div>
             <div class="modal-body">
                 <p>
@@ -12,21 +11,20 @@
                         <ul id="editLocationErrorList"></ul>
                     </div>
                 </p>
-
                 <form role="form" id="editLocation">
-                    <div class="form-group row">
-                        <div class="col-xs-6" id="locationNameCont">
+                    <div class="form-group">
+                        <div class="input-group col-xs-6" id="locationNameCont">
                             <label class="control-label">Location Name</label>
                             <input id="locationName" class="form-control" ng-model="NewEditLocation.name" />
                         </div>
                     </div>
                     <div class="form-group form-inline">
                         <div class="panel-group" id="locationCredentials">
-
+                            <!-- Facilities details panel-->
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <span class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#facilitiesPanel">
+                                    <h4 class="heading-small panel-title" style="cursor: pointer;" data-toggle="collapse" data-parent="#accordion" href="#facilitiesPanel">
+                                        <span class="accordion-toggle collapsed">
                                             <a>Facilities Details</a>
                                         </span>
                                     </h4>
@@ -34,22 +32,22 @@
                                 <div class="panel-collapse collapse" id="facilitiesPanel">
                                     <div class="panel-body" id="facilitiesDetailsCont">
                                         <div class="form-group" id="facilitiesDetailEmailCont">
-                                            <label class="control-label">Email:</label>
+                                            <label class="control-label col-xs-6">Email:</label>
                                             <input id="facilitiesEmail" class="form-control" value="{{NewEditLocation.GetLocationCredentials('facilities').email}}" />
                                         </div>
 
                                         <div class="form-group" id="facilitiesDetailPhoneCont">
-                                            <label class="control-label">Phone Number:</label>
+                                            <label class="control-label col-xs-6">Phone Number:</label>
                                             <input id="facilitiesPhone" class="form-control phoneNoControl" maxlength="11" value="{{NewEditLocation.GetLocationCredentials('facilities').phoneNumber}}" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
+                            <!-- Security details panel -->
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <span class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#securityPanel">
+                                    <h4 class="heading-small panel-title" style="cursor: pointer;" data-toggle="collapse" data-parent="#accordion" href="#securityPanel">
+                                        <span class="accordion-toggle collapsed">
                                             <a>Security Details</a>
                                         </span>
                                     </h4>
@@ -57,21 +55,21 @@
                                 <div class="panel-collapse collapse" id="securityPanel">
                                     <div class="panel-body" id="securityDetailsCont">
                                         <div class="form-group" id="securityDetailEmailCont">
-                                            <label class="control-label">Email:</label>
+                                            <label class="control-label col-xs-6">Email:</label>
                                             <input id="securityEmail" class="form-control" value="{{NewEditLocation.GetLocationCredentials('security').email}}" />
                                         </div>
                                         <div class="form-group" id="securityDetailPhoneCont">
-                                            <label class="control-label">Phone Number:</label>
+                                            <label class="control-label col-xs-6">Phone Number:</label>
                                             <input id="securityPhone" maxlength="11" class="form-control phoneNoControl" value="{{NewEditLocation.GetLocationCredentials('security').phoneNumber}}" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
+                            <!-- DSS details panel -->
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <h4 class="panel-title">
-                                        <span class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#dssPanel">
+                                    <h4 class="heading-small panel-title" data-toggle="collapse" data-parent="#accordion" href="#dssPanel" style="cursor: pointer;">
+                                        <span class="accordion-toggle collapsed">
                                             <a>DSS Details</a>
                                         </span>
                                     </h4>
@@ -79,11 +77,11 @@
                                 <div class="panel-collapse collapse" id="dssPanel">
                                     <div class="panel-body" id="dssDetailsCont">
                                         <div class="form-group" id="dssDetailEmailCont">
-                                            <label class="control-label">Email:</label>
+                                            <label class="control-label col-xs-6">Email:</label>
                                             <input id="dssEmail" class="form-control" value="{{NewEditLocation.GetLocationCredentials('dss').email}}" />
                                         </div>
                                         <div class="form-group" id="dssDetailPhoneCont">
-                                            <label class="control-label">Phone Number:</label>
+                                            <label class="control-label col-xs-6">Phone Number:</label>
                                             <input id="dssPhone" maxlength="11" class="form-control phoneNoControl" value="{{NewEditLocation.GetLocationCredentials('dss').phoneNumber}}" />
                                         </div>
                                     </div>
@@ -94,8 +92,8 @@
                     </div>
                 </form>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="button" id="editLocationConfirm" class="btn btn-primary" ng-click="EditLocation();">Accept Changes</button>
+                    <button type="button" class="button button-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" id="editLocationConfirm" class="button" ng-click="EditLocation();">Accept Changes</button>
                 </div>
             </div>
         </div>
