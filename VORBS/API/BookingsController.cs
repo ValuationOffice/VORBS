@@ -445,7 +445,7 @@ namespace VORBS.API
                 db.Bookings.AddRange(bookingsToCreate);
                 db.ExternalAttendees.AddRange(newBooking.ExternalAttendees);
 
-                db.SaveChanges(bookingsToCreate, true);
+                db.SaveChanges(bookingsToCreate, false);
 
                 if (deletedBookings.Count > 0)
                 {
@@ -705,7 +705,7 @@ namespace VORBS.API
                     db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
                 }
 
-                db.SaveChanges();
+                db.SaveChanges(editBooking, false);
 
                 _logger.Info("Booking sucessfully editted: " + editBooking.ID);
 
@@ -774,6 +774,11 @@ namespace VORBS.API
                 //check if the attendees are different
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (BookingConflictException ex)
+            {
+                _logger.FatalException("Unable to save new booking: " + editBooking.Owner + "/" + editBooking.StartDate, ex);
+                return Request.CreateResponse(HttpStatusCode.NotAcceptable, ex.Message);
             }
             catch (Exception ex)
             {
