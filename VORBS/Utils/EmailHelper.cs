@@ -21,7 +21,7 @@ namespace VORBS.Utils
         /// <param name="toAddress">E-Mail address of who will be recieving the email</param>
         /// <param name="subject">Subject line for E-Mail</param>
         /// <param name="body">Body of E-Mail (html-enabled)</param>
-        public static void SendEmail(string fromAddress, string onBehalfOf, string toAddress, string subject, string body)
+        public static void SendEmail(string fromAddress, string onBehalfOf, string toAddress, string subject, string body, bool bcc = true)
         {
             string exchangeDomain = ConfigurationManager.AppSettings["exchangeDomain"];
             string userName = ConfigurationManager.AppSettings["emailUserName"];
@@ -48,6 +48,12 @@ namespace VORBS.Utils
             message.Subject = subject;
             message.Body = body;
 
+            if (bcc)
+            {
+                string bccEmail = ConfigurationManager.AppSettings["bccEmail"];
+                message.Bcc.Add(new MailAddress(bccEmail));
+            }
+
             AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
 
             htmlView.LinkedResources.Add(new LinkedResource(HttpContext.Current.Server.MapPath("~/Content/images/EmailTemplates/govuklogo.png")) { ContentId = "govuklogo" });
@@ -66,9 +72,9 @@ namespace VORBS.Utils
         /// <param name="toAddress">E-Mail address of who will be recieving the email</param>
         /// <param name="subject">Subject line for E-Mail</param>
         /// <param name="body">Body of E-Mail (html-enabled)</param>
-        public static void SendEmail(string fromAddress, string toAddress, string subject, string body)
+        public static void SendEmail(string fromAddress, string toAddress, string subject, string body, bool bcc = true)
         {
-            SendEmail(fromAddress, null, toAddress, subject, body);
+            SendEmail(fromAddress, null, toAddress, subject, body, bcc);
         }
 
         /// <summary>
