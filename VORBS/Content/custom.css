@@ -92,3 +92,7 @@
     #recurringBreakDown{
         padding-top: 15px;
     }
+
+    #proposition-menu .active {
+        text-decoration: underline;
+    }
