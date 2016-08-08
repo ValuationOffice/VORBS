@@ -30,7 +30,14 @@ namespace VORBS.DAL
             {
                 using (var scope = TransactionUtils.CreateTransactionScope())
                 {
-                    if (new AvailabilityController().DoesMeetingClash(booking, out clashedBooking))
+                    AvailabilityController aC = new AvailabilityController();
+
+                    bool invalid = aC.DoesMeetingClash(booking, out clashedBooking);
+                    //Checks if the booking that clashed is the current booking being saved, this allows us to edit bookings.
+                    if (invalid && booking.ID != 0)
+                        invalid = !(booking.ID == clashedBooking.ID);
+
+                    if (invalid)
                         throw new BookingConflictException("Simultaneous booking conflict, please try again.");
 
                     objectsWritten = base.SaveChanges();
@@ -69,7 +76,13 @@ namespace VORBS.DAL
                 {
                     foreach (var b in bookings)
                     {
-                        if (aC.DoesMeetingClash(b, out clashedBooking))
+
+                        bool invalid = aC.DoesMeetingClash(b, out clashedBooking);
+                        //Checks if the booking that clashed is the current booking being saved, this allows us to edit bookings.
+                        if (invalid && b.ID != 0)
+                            invalid = !(b.ID == clashedBooking.ID);
+
+                        if (invalid)
                             throw new BookingConflictException("Simultaneous booking conflict, please try again.");
                     }
 
