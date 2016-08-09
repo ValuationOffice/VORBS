@@ -13,8 +13,8 @@
                 <th>User</th>
                 <th>Location</th>
                 <th>Room</th>
-                <th>Date</th>
-                <th>Time</th>
+                <th>Start</th>
+                <th>End</th>
                 <th>Subject</th>
                 <th>Equipment</th>
             </tr>
@@ -22,8 +22,8 @@
                 <td>@Model.Owner</td>
                 <td>@Model.Room.Location.Name</td>
                 <td>@Model.Room.RoomName</td>
-                <td>@Model.StartDate.ToShortDateString()</td>
-                <td>@Model.StartDate.ToShortTimeString()</td>
+                <td>@Model.StartDate.ToShortDateString() - @Model.StartDate.ToShortTimeString()</td>
+                <td>@Model.EndDate.ToShortDateString() - @Model.EndDate.ToShortTimeString()</td>
                 <td>@Model.Subject</td>
                 <td>
                     <ul>
