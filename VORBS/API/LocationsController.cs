@@ -269,7 +269,7 @@ namespace VORBS.API
                     db.Locations.Add(newLocation);
                     db.SaveChanges();
 
-                    _logger.Info("New location sucessfully added: " + newLocation.Name + "/" + newLocation.ID);
+                    _logger.Info("New location successfully added: " + newLocation.Name + "/" + newLocation.ID);
 
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 }

@@ -470,7 +470,7 @@ namespace VORBS.API
 
                 newBooking.Room = bookingRoom;
 
-                _logger.Info("Booking sucessfully created: " + newBooking.ID);
+                _logger.Info("Booking successfully created: " + newBooking.ID);
 
                 if (AdQueries.IsOffline())
                     return new HttpResponseMessage(HttpStatusCode.OK);
@@ -619,7 +619,7 @@ namespace VORBS.API
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
-                _logger.Info("Booking sucessfully editted: " + editBooking.ID);
+                _logger.Info("Booking successfully editted: " + editBooking.ID);
 
                 //Send DSO Email
                 //SendDSOEmail(dsoEmailMessage);
@@ -707,7 +707,7 @@ namespace VORBS.API
 
                 db.SaveChanges(editBooking, false);
 
-                _logger.Info("Booking sucessfully editted: " + editBooking.ID);
+                _logger.Info("Booking successfully editted: " + editBooking.ID);
 
                 if (AdQueries.IsOffline())
                     return new HttpResponseMessage(HttpStatusCode.OK);
@@ -808,7 +808,7 @@ namespace VORBS.API
                 db.Bookings.Remove(booking);
                 db.SaveChanges();
 
-                _logger.Info("Booking sucessfully cancelled: " + bookingId);
+                _logger.Info("Booking successfully cancelled: " + bookingId);
 
                 if (AdQueries.IsOffline())
                     return new HttpResponseMessage(HttpStatusCode.OK);

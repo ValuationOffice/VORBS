@@ -224,7 +224,7 @@ namespace VORBS.API
                 db.Entry(existingRoom).CurrentValues.SetValues(editRoom);
                 db.SaveChanges();
 
-                _logger.Info("Room sucessfully Edited: " + editRoom.ID);
+                _logger.Info("Room successfully Edited: " + editRoom.ID);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }

@@ -95,7 +95,7 @@ function SaveEditBooking(existingId, editBooking) {
                     EnableEditBookingButton();
                 }
                 else {
-                    alert('Booking Updated Sucessfully.');
+                    alert('Booking Updated Successfully.');
                     ReloadThisPage("bookings");
                 }
 

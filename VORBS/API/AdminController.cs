@@ -91,7 +91,7 @@ namespace VORBS.API
                 db.Admins.Add(admin);
                 db.SaveChanges();
 
-                _logger.Info("Admin sucessfully added: " + admin.PID);
+                _logger.Info("Admin successfully added: " + admin.PID);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -120,7 +120,7 @@ namespace VORBS.API
 
                 db.SaveChanges();
 
-                _logger.Info("Admin sucessfully Edited: " + editAdmin.PID);
+                _logger.Info("Admin successfully Edited: " + editAdmin.PID);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -140,7 +140,7 @@ namespace VORBS.API
                 db.Admins.Remove(db.Admins.Single(a => a.ID == adminId));
                 db.SaveChanges();
 
-                _logger.Info("Admin sucessfully deleted: " + adminId);
+                _logger.Info("Admin successfully deleted: " + adminId);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
