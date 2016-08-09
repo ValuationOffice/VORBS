@@ -238,7 +238,9 @@ function MyBookingsController($scope, $http, $resource) {
         $scope.newBooking.RoomID = $scope.currentRoom.id;
         SaveEditBooking($scope.bookingId, $scope.newBooking);
 
-        EnableConfirmBookingButton();
+        //Disabled as the page refresh after save render the page with button enabled. By activating it here, there is a brief period where the user can select
+        //the button twice, and give a false positive for a secondary failure of the same save
+        //EnableConfirmBookingButton();
     }
 
     $scope.DeleteBooking = function () {
