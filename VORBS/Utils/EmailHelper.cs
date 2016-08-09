@@ -51,7 +51,8 @@ namespace VORBS.Utils
             if (bcc)
             {
                 string bccEmail = ConfigurationManager.AppSettings["bccEmail"];
-                message.Bcc.Add(new MailAddress(bccEmail));
+                if (bccEmail != "")
+                    message.Bcc.Add(new MailAddress(bccEmail));
             }
 
             AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
