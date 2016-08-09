@@ -35,6 +35,10 @@
                         {
                             <li>Flipchart</li>
                         }
+                        @if (!Model.Booking.Projector && !Model.Booking.Flipchart)
+                        {
+                            <li>None</li>
+                        }
                     </ul>
                 </td>
             </tr>

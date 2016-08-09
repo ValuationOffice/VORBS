@@ -34,6 +34,10 @@
                             {
                                 <li>@equipment</li>
                             }
+                            @if (Model.EquipmentAdded.Count() == 0)
+                            {
+                                <li>None</li>
+                            }
                         </ul>
                     </td>
                 </tr>
@@ -65,6 +69,10 @@
                             @foreach (string equipment in Model.EquipmentRemoved)
                             {
                                 <li>@equipment</li>
+                            }
+                            @if (Model.EquipmentRemoved.Count() == 0)
+                            {
+                                <li>None</li>
                             }
                         </ul>
                     </td>

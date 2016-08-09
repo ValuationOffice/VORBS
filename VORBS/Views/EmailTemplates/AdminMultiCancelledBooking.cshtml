@@ -37,6 +37,10 @@
                             {
                                 <li>Flipchart</li>
                             }
+                            @if (!item.Projector && !item.Flipchart)
+                            {
+                                <li>None</li>
+                            }
                         </ul>
                     </td>
                 </tr>
