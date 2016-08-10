@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.DirectoryServices.AccountManagement;
 using System.IO;
 using System.Linq;
@@ -98,7 +99,15 @@ namespace VORBS.Utils
 
         public static bool IsOffline()
         {
-            return (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK") ? true : false;
+            string offline = ConfigurationManager.AppSettings["offline-mode"];
+            if (!string.IsNullOrEmpty(offline))
+            {
+                bool isOff = bool.Parse(offline);
+                return isOff;
+            }
+            return false;
+            //Added the logic above to manage offline-state using config because depending on env variables for what ever reason is not 100% working in live. Live servers for you...
+            // return (Environment.UserDomainName != "VOAITDEV" && Environment.UserDomainName != "VOA_GPN_GOV_UK") ? true : false;
         }
 
         public static UserPrincipal CreateFakeUser()
