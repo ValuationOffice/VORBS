@@ -534,8 +534,8 @@ function NewBookingController($scope, $http, $resource) {
 
     $scope.bookingFilter = {
         startDate: new moment().utc().format('DD-MM-YYYY'),
-        startTime: '',
-        endTime: '',
+        startTime: new Date().getHours() + ': 00',
+        endTime: (new Date().getHours() + 1) + ': 00',
         location: $scope.currentLocation,
         smartRoom: false,
         numberOfAttendees: 1
