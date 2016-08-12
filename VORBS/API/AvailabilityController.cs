@@ -292,7 +292,7 @@ namespace VORBS.API
                 //Meetings in the same room
                 .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == db.Rooms.FirstOrDefault(r => r.ID == x.RoomID).LocationID)
                 //Where meeting clashes
-                .Where(b => originalBooking.StartDate <= b.StartDate && originalBooking.EndDate >= b.StartDate)
+                .Where(b => (originalBooking.StartDate <= b.StartDate && originalBooking.EndDate > b.StartDate) || (originalBooking.StartDate >= b.StartDate && originalBooking.StartDate < b.EndDate)) 
                 .ToList();
 
             clashedBooking = clashedBookings.FirstOrDefault();
@@ -320,8 +320,8 @@ namespace VORBS.API
                 //Only bookings on the certain days that we want to book for
                     .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate)) 
                 //Only bookings on the days that intersect our given time period
-                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) 
-                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime <= EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))                
+                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) 
+                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))                
                 .ToList(); // bug fix
 
             clashedBookings = totalBookingsClashed; // WORKING
