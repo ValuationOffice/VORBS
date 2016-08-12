@@ -96,3 +96,9 @@
     #proposition-menu .active {
         text-decoration: underline;
     }
+
+    /*  This fixes the issue with the popup not scrolling after a second popup has been closed. */
+   .modal { 
+       overflow: auto !important; 
+
+   }
