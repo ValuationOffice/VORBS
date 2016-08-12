@@ -21,8 +21,8 @@
                 <td>@Model.Owner</td>
                 <td>@Model.Room.Location.Name</td>
                 <td>@Model.Room.RoomName</td>
-                <td>@Model.StartDate.ToShortDateString() - @Model.StartDate.ToShortTimeString()</td>
-                <td>@Model.EndDate.ToShortDateString() - @Model.EndDate.ToShortTimeString()</td>
+                <td>@Model.StartDate.ToShortDateString() @Model.StartDate.ToShortTimeString()</td>
+                <td>@Model.EndDate.ToShortDateString() @Model.EndDate.ToShortTimeString()</td>
             </tr>
         </tbody>
     </table>
