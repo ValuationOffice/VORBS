@@ -169,6 +169,7 @@
     <Compile Include="Models\ViewModels\NewRecurringBookingWithMessage.cs" />
     <Compile Include="Models\ViewModels\SecurityEdittedBooking.cs" />
     <Compile Include="Security\Authorisation.cs" />
+    <Compile Include="Services\BookingService.cs" />
     <Compile Include="Utils\AdQueries.cs" />
     <Compile Include="API\AvailabilityController.cs" />
     <Compile Include="API\BookingsController.cs" />
