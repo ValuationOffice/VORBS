@@ -166,11 +166,11 @@ function ValidateStartEndTime(start, end) {
     else if (endDate.minutes() !== 0 && endDate.minutes() !== 30) {
         return "End time must be 30 minute interval."
     }
-    else if (startDate.hours() < 9 || startDate.hours() >= 18) {
-        return "Start time has to be between 9:00 & 17:30.";
-    }
-    else if (endDate.hours() < 9 || endDate.hours() >= 18) {
-        return "End time has to be between 9:00 & 17:30.";
+    else if ((new moment().hour(7).minute(30) > startDate) || (new moment().hour(18).minute(00) < startDate)) {
+        return "Start time has to be between 7:30 & 18:00.";
+    }    
+    else if ((new moment().hour(8).minute(00) > endDate) || (new moment().hour(18).minute(30) < endDate)) {
+        return "End time has to be between 8:00 & 18:30.";
     }
     else if (timeDiff < 0) {
         return "Start time can't be later than end time.";
