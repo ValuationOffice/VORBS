@@ -16,13 +16,16 @@ namespace VORBS.API
     public class RoomsController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db = new VORBSContext();
+        private VORBSContext db;
 
-        public RoomsController()
+        public RoomsController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
+            db = context;
         }
 
+        public RoomsController() : this(new VORBSContext()) { }
+        
 
         [HttpGet]
         [Route("")]

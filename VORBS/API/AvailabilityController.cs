@@ -16,12 +16,16 @@ namespace VORBS.API
     public class AvailabilityController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db = new VORBSContext();
+        private VORBSContext db;
 
-        public AvailabilityController()
+        public AvailabilityController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
+            db = context;
         }
+
+        public AvailabilityController() : this(new VORBSContext()) { }
+        
 
         [HttpGet]
         [Route("{location}/{start:DateTime}/{smartRoom:bool}")]

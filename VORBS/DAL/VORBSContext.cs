@@ -15,12 +15,12 @@ namespace VORBS.DAL
     {
         public VORBSContext() : base("VORBSContext") { }
 
-        public DbSet<Location> Locations { get; set; }
-        public DbSet<Room> Rooms { get; set; }
-        public DbSet<Booking> Bookings { get; set; }
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<LocationCredentials> LocationCredentials { get; set; }
-        public DbSet<ExternalAttendees> ExternalAttendees { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<Room> Rooms { get; set; }
+        public virtual DbSet<Booking> Bookings { get; set; }
+        public virtual DbSet<Admin> Admins { get; set; }
+        public virtual DbSet<LocationCredentials> LocationCredentials { get; set; }
+        public virtual DbSet<ExternalAttendees> ExternalAttendees { get; set; }
 
         public virtual int SaveChanges(Booking booking, bool dontCheckClash)
         {

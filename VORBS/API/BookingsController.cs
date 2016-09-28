@@ -25,11 +25,14 @@ namespace VORBS.API
     public class BookingsController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db = new VORBSContext();
+        private VORBSContext db;
 
-        public BookingsController()
+        public BookingsController() : this(new VORBSContext()) { }
+
+        public BookingsController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
+            db = new VORBSContext();
         }
 
         [Route("{location}/{start:DateTime}/{end:DateTime}/")]

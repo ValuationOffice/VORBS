@@ -15,12 +15,16 @@ namespace VORBS.API
     public class UsersController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db = new VORBSContext();
+        private VORBSContext db;
 
-        public UsersController()
+        public UsersController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
+            db = context;
         }
+
+        public UsersController() : this(new VORBSContext()) { }
+        
 
         [Route("{allUsers:bool}")]
         [HttpGet]

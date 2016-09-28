@@ -14,12 +14,16 @@ namespace VORBS.API
     public class AdminController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db = new VORBSContext();
+        private VORBSContext db;
 
-        public AdminController()
+        public AdminController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
+            db = context;
         }
+
+        public AdminController() : this(new VORBSContext()) { }
+        
 
         [HttpGet]
         [Route("{allAdmins}")]
