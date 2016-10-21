@@ -12,9 +12,12 @@ namespace VORBS.Services
     public class BookingService
     {
         private VORBSContext db;
+
+        private NLog.Logger _logger;
         public BookingService(VORBSContext context)
         {
             db = context;
+            _logger = NLog.LogManager.GetCurrentClassLogger();
         }
 
         public List<Booking> GetByDateAndLocation(DateTime startDate, DateTime endDate, Location location)
@@ -22,6 +25,22 @@ namespace VORBS.Services
             List<Booking> bookings = db.Bookings
                     .Where(x => x.StartDate >= startDate && x.EndDate <= endDate && x.Room.Location.ID == location.ID)
                     .ToList();
+            return bookings;
+        }
+
+        public List<Booking> GetByDateAndPid(DateTime startDate, string pid)
+        {
+            List<Booking> bookings = db.Bookings
+                .Where(x => x.StartDate >= startDate && x.PID == pid)
+                .ToList();
+            return bookings;
+        }
+
+        public List<Booking> GetByDateAndOwner(DateTime startDate, string owner)
+        {
+            List<Booking> bookings = db.Bookings
+                .Where(x => x.StartDate >= startDate && x.Owner == owner)
+                .ToList();
             return bookings;
         }
 
@@ -41,7 +60,7 @@ namespace VORBS.Services
             return bookings;
         }
 
-        public List<Booking> GetByPartialDateRoomLocationSmartAndOwner(DateTime? startDate, DateTime? endDate, string owner, bool? smartRoom,  Room room, Location location)
+        public List<Booking> GetByPartialDateRoomLocationSmartAndOwner(DateTime? startDate, DateTime? endDate, string owner, bool? smartRoom, Room room, Location location)
         {
             //Building up a string of Lambda C# string (Using Linq.Dynamic) so we can on the fly change the where clause based on the concatanation
             string queryExpression = "";
@@ -79,7 +98,7 @@ namespace VORBS.Services
             {
                 queryExpression += (!smartRoom.Value) ? "" : (queryExpression.Length > 0) ? " AND IsSmartMeeting = " + smartRoom.Value : "IsSmartMeeting = " + smartRoom.Value;
             }
-            
+
 
             var bookings = db.Bookings.Where(queryExpression).ToList();
             return bookings;
@@ -167,25 +186,32 @@ namespace VORBS.Services
 
         public Booking UpdateExistingBooking(Booking existingBooking, Booking editBooking)
         {
-            if (!HasBookingChanged(editBooking, existingBooking))
-                throw new NoBookingChangesFoundException();
-
-            editBooking.ID = existingBooking.ID;
-            editBooking.Owner = existingBooking.Owner;
-            editBooking.PID = existingBooking.PID;
-            editBooking.Room = db.Rooms.SingleOrDefault(x => x.ID == editBooking.RoomID);
-
-            db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
-            db.ExternalAttendees.RemoveRange(db.ExternalAttendees.Where(x => x.BookingID == editBooking.ID));
-
-            if (editBooking.ExternalAttendees != null)
+            try
             {
-                editBooking.ExternalAttendees.ToList().ForEach(x => x.BookingID = editBooking.ID);
-                db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
+                if (!HasBookingChanged(editBooking, existingBooking))
+                    throw new NoBookingChangesFoundException();
+
+                editBooking.ID = existingBooking.ID;
+                editBooking.Owner = existingBooking.Owner;
+                editBooking.PID = existingBooking.PID;
+                editBooking.Room = db.Rooms.SingleOrDefault(x => x.ID == editBooking.RoomID);
+
+                db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
+                db.ExternalAttendees.RemoveRange(db.ExternalAttendees.Where(x => x.BookingID == editBooking.ID));
+
+                if (editBooking.ExternalAttendees != null)
+                {
+                    editBooking.ExternalAttendees.ToList().ForEach(x => x.BookingID = editBooking.ID);
+                    db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
+                }
+
+                db.SaveChanges(editBooking, false);
             }
-
-            db.SaveChanges(editBooking, false);
-
+            catch (Exception e)
+            {
+                _logger.Error($"Unable to edit existing booking: ID {existingBooking.ID}. An error occured: {e.Message}");
+                return null;
+            }
             return GetById(editBooking.ID);
         }
 
@@ -199,13 +225,14 @@ namespace VORBS.Services
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                _logger.Error($"Unable to delete booking: ID {Id}. An error occured: {e.Message}");
                 return false;
             }
         }
 
-        
+
 
         protected internal bool HasBookingChanged(Booking editBooking, Booking existingBooking)
         {
@@ -286,7 +313,7 @@ namespace VORBS.Services
             return bookingsToCreate;
         }
 
-        List<Booking> GetAvailableSmartRoomBookings(Booking newBooking, out List<Booking> clashedBookings)
+        public List<Booking> GetAvailableSmartRoomBookings(Booking newBooking, out List<Booking> clashedBookings)
         {
             List<Booking> bookingsToCreate = new List<Booking>();
             List<Booking> clashedBs = new List<Booking>();
