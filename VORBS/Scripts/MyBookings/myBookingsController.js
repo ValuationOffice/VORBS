@@ -185,8 +185,11 @@ function MyBookingsController($scope, $http, $resource) {
             }
 
             //Validate if Date/Time/Attendees has changed
-            if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
-                ($scope.booking.startTime === $scope.existingBooking.startTime) && ($scope.booking.endTime === $scope.existingBooking.endTime)) {
+            var attendeesChanged = $scope.booking.numberOfAttendees != $scope.existingBooking.numberOfAttendees;
+            var dateChanged = $scope.booking.date != $scope.existingBooking.date;
+            var timespanChanged = moment($scope.booking.startTime, "hh:mm") < moment($scope.existingBooking.startTime, "hh:mm") || moment($scope.booking.endTime, "hh:mm") > moment($scope.existingBooking.endTime, "hh:mm");
+
+            if (!attendeesChanged && !dateChanged && !timespanChanged) {
                 SaveEditBooking($scope.bookingId, $scope.newBooking);
             }
             else {
@@ -199,9 +202,13 @@ function MyBookingsController($scope, $http, $resource) {
                     existingBookingId: $scope.bookingId
                 },
                 function (success) {
+
                     if ($scope.availableRooms.length === 0) {
                         EnableAcceptBookingButton();
                         SetModalErrorMessage('No Rooms Available using the below Date/Time/Attendees.');
+                    }
+                    else if ($scope.availableRooms.length === 1 && $scope.availableRooms[0].roomName == $scope.newBooking.Room.RoomName) {
+                        SaveEditBooking($scope.bookingId, $scope.newBooking);
                     }
                     else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
                         SaveEditBooking($scope.bookingId, $scope.newBooking);

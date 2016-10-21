@@ -9,6 +9,7 @@ using VORBS.DAL;
 using VORBS.Models.DTOs;
 using VORBS.Utils;
 using System.Data.Entity.Core.Objects;
+using VORBS.Services;
 
 namespace VORBS.API
 {
@@ -17,15 +18,17 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
+        private BookingService _bookingService;
 
         public AvailabilityController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
+            _bookingService = new BookingService(db);
         }
 
         public AvailabilityController() : this(new VORBSContext()) { }
-        
+
 
         [HttpGet]
         [Route("{location}/{start:DateTime}/{smartRoom:bool}")]
@@ -95,8 +98,8 @@ namespace VORBS.API
                 var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= 5).ToList();
                 var availableRooms = db.Rooms.Where(x =>
                     x.Location.Name == location
-                    //&& x.SeatCount >= 5
-                    //&& (x.Bookings.Where(b => b.StartDate < end && start < b.EndDate)).Count() == 0
+                //&& x.SeatCount >= 5
+                //&& (x.Bookings.Where(b => b.StartDate < end && start < b.EndDate)).Count() == 0
                 ).ToList();
 
                 roomData.AddRange(availableRooms);
@@ -148,7 +151,7 @@ namespace VORBS.API
                 var availableRooms = db.Rooms.Where(x =>
                     x.Location.Name == location
                     && x.SeatCount >= numberOfPeople
-                    //&& (x.Bookings.Where(b => start < b.EndDate)).Count() == 0
+                //&& (x.Bookings.Where(b => start < b.EndDate)).Count() == 0
                 ).ToList();
 
                 roomData.AddRange(availableRooms);
@@ -248,11 +251,25 @@ namespace VORBS.API
 
             try
             {
-                var availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople && x.Active == true && x.SmartRoom == smartRoom &&
+
+                List<Room> availableRooms = new List<Room>();
+
+                Booking existingBooking = _bookingService.GetById(existingBookignId);
+
+                List<Booking> clashedBookings;
+                existingBooking.StartDate = start;
+                existingBooking.EndDate = end;
+                bool meetingClash = DoesMeetingClash(existingBooking, out clashedBookings);
+                if (meetingClash && clashedBookings.Count == 1 && clashedBookings[0].ID == existingBooking.ID)
+                    availableRooms.Add(existingBooking.Room);
+
+                else
+                {
+                    availableRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople && x.Active == true && x.SmartRoom == smartRoom &&
                                                (x.Bookings.Where(b => start < b.EndDate && end > b.StartDate && b.ID != existingBookignId).Count() == 0)) //Do any bookings overlap
                                 .OrderBy(r => r.SeatCount)
                                 .ToList();
-
+                }
                 roomData.AddRange(availableRooms);
 
                 roomData.ForEach(x => rooms.Add(new RoomDTO()
@@ -290,16 +307,15 @@ namespace VORBS.API
         /// <param name="originalBooking">Bookings to check for clashes</param>
         /// <param name="clashedBooking">OUT Booking that possibly clashes with the booking</param>
         /// <returns>Boolean based on whether there was a clash.</returns>
-        protected internal bool DoesMeetingClash(Booking originalBooking, out Booking clashedBooking)
+        protected internal bool DoesMeetingClash(Booking originalBooking, out List<Booking> clashedBookings)
         {
-            var clashedBookings = db.Bookings
+            clashedBookings = db.Bookings
                 //Meetings in the same room
                 .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == db.Rooms.FirstOrDefault(r => r.ID == x.RoomID).LocationID)
                 //Where meeting clashes
-                .Where(b => (originalBooking.StartDate <= b.StartDate && originalBooking.EndDate > b.StartDate) || (originalBooking.StartDate >= b.StartDate && originalBooking.StartDate < b.EndDate)) 
+                .Where(b => (originalBooking.StartDate <= b.StartDate && originalBooking.EndDate > b.StartDate) || (originalBooking.StartDate >= b.StartDate && originalBooking.StartDate < b.EndDate))
                 .ToList();
 
-            clashedBooking = clashedBookings.FirstOrDefault();
             return clashedBookings.Count > 0;
 
         }
@@ -319,13 +335,13 @@ namespace VORBS.API
             //var datesOnly = dates.Select(x => x.Date);
 
             var totalBookingsClashed = db.Bookings
-                //Bookings only for this room
-                    .Where(x => x.RoomID == room.ID) 
-                //Only bookings on the certain days that we want to book for
-                    .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate)) 
-                //Only bookings on the days that intersect our given time period
-                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) 
-                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))                
+                    //Bookings only for this room
+                    .Where(x => x.RoomID == room.ID)
+                    //Only bookings on the certain days that we want to book for
+                    .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate))
+                    //Only bookings on the days that intersect our given time period
+                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second)
+                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))
                 .ToList(); // bug fix
 
             clashedBookings = totalBookingsClashed; // WORKING

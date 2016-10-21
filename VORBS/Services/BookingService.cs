@@ -331,7 +331,7 @@ namespace VORBS.Services
 
                 Room smartLocData = db.Rooms.Where(x => x.ID == smartLocId).Select(x => x).ToList().FirstOrDefault();
 
-                Booking doesClash;
+                List<Booking> doesClash;
                 Room roomToBook = null;
                 if (aC.DoesMeetingClash(new Booking() { StartDate = newBooking.StartDate, EndDate = newBooking.EndDate, RoomID = smartLocData.ID }, out doesClash))
                 {

@@ -24,7 +24,7 @@ namespace VORBS.DAL
 
         public virtual int SaveChanges(Booking booking, bool dontCheckClash)
         {
-            Booking clashedBooking;
+            List<Booking> clashedBookings;
             int objectsWritten = 0;
             if (!dontCheckClash)
             {
@@ -32,10 +32,13 @@ namespace VORBS.DAL
                 {
                     AvailabilityController aC = new AvailabilityController();
 
-                    bool invalid = aC.DoesMeetingClash(booking, out clashedBooking);
+                    bool invalid = aC.DoesMeetingClash(booking, out clashedBookings);
                     //Checks if the booking that clashed is the current booking being saved, this allows us to edit bookings.
-                    if (invalid && booking.ID != 0)
-                        invalid = !(booking.ID == clashedBooking.ID);
+                    if (clashedBookings.Count == 1)
+                    {
+                        if (invalid && booking.ID != 0)
+                            invalid = !(booking.ID == clashedBookings[0].ID);
+                    }
 
                     if (invalid)
                         throw new BookingConflictException("Simultaneous booking conflict, please try again.");
@@ -68,7 +71,7 @@ namespace VORBS.DAL
             if (!dontCheckClash)
             {
                 AvailabilityController aC = new AvailabilityController();
-                Booking clashedBooking;
+                List<Booking> clashedBookings;
 
 
 
@@ -77,10 +80,13 @@ namespace VORBS.DAL
                     foreach (var b in bookings)
                     {
 
-                        bool invalid = aC.DoesMeetingClash(b, out clashedBooking);
+                        bool invalid = aC.DoesMeetingClash(b, out clashedBookings);
                         //Checks if the booking that clashed is the current booking being saved, this allows us to edit bookings.
-                        if (invalid && b.ID != 0)
-                            invalid = !(b.ID == clashedBooking.ID);
+                        if (clashedBookings.Count == 1)
+                        {
+                            if (invalid && b.ID != 0)
+                                invalid = !(b.ID == clashedBookings[0].ID);
+                        }
 
                         if (invalid)
                             throw new BookingConflictException("Simultaneous booking conflict, please try again.");
