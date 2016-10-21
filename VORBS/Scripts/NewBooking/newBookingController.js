@@ -433,9 +433,9 @@ function NewBookingController($scope, $http, $resource) {
 
             //Validate that new time does not clash
             var newEvent = {
-                start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, null, true),
-                end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, null, true)
-            };
+                start: new moment($scope.bookingFilter.startDate + ' ' + $scope.booking.StartTime, "DD-MM-YYYY hh:mm"),
+                end: new moment($scope.bookingFilter.startDate + ' ' + $scope.booking.EndTime, "DD-MM-YYYY hh:mm"),
+            }
 
             if (isMeetingOverlapping(newEvent, $("#" + $scope.newBooking.Room.RoomName.replace('.', '_') + "_calendar").fullCalendar('clientEvents'))) {
                 SetModalErrorMessage('New meeting clashes with existing booking. Please choose a new time!');
