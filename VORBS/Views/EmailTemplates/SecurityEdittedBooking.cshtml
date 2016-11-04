@@ -21,7 +21,7 @@
                     <tr>
                         <td>@attendee.FullName</td>
                         <td>@attendee.CompanyName</td>
-                        <td>@attendee.PassRequired</td>
+                        <td>@(attendee.PassRequired ? "Yes":"No")</td>
                     </tr>
                 }
             </table>
@@ -40,7 +40,7 @@
                     <tr>
                         <td>@attendee.FullName</td>
                         <td>@attendee.CompanyName</td>
-                        <td>@attendee.PassRequired</td>
+                        <td>@(attendee.PassRequired ? "Yes":"No")</td>
                     </tr>
                 }
             </table>

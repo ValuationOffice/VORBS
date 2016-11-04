@@ -5,6 +5,9 @@
 
 <html>
 <body>
+
+    <h1>Please give this information to the relevant buildings security personnel prior to the meeting taking place.</h1>
+
     <h2>@Model.Owner has scheduled a meeting with the following external guests on @Model.StartDate.ToShortDateString() at @Model.StartDate.ToShortTimeString():</h2>
     <p>
         <table cellspacing="0" cellpadding="10" border="1" width="600">
@@ -18,17 +21,11 @@
                 <tr>
                     <td>@attendee.FullName</td>
                     <td>@attendee.CompanyName</td>
-                    <td>@(attendee.PassRequired ? "Yes":"No")</td>
+                    @*<td>@{if (attendee.PassRequired == true) { "Yes" } else { "No" }</td>*@
+                    <td>@(attendee.PassRequired ? "Yes" : "No")</td>
                 </tr>
             }
         </table>
-        @*<ul>
-            @foreach (var attendee in Model.ExternalAttendees)
-            {
-                <li>@attendee</li>
-            }
-        </ul>*@
-
     </p>
 </body>
 </html>

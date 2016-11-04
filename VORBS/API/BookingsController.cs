@@ -565,6 +565,20 @@ namespace VORBS.API
                             _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
                         }
                     }
+                    else
+                    {
+                        try
+                        {
+                            string body = "";
+                            string toEmail = AdQueries.GetUserByPid(newBooking.PID).EmailAddress;
+                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBookingBookersCopy.cshtml", newBooking);
+                            Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests security information for {0}", newBooking.StartDate.ToShortDateString()), body);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
+                        }
+                    }
                 }
 
                 if (newBooking.DssAssist)

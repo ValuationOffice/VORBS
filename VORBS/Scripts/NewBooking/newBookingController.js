@@ -201,7 +201,9 @@ function NewBookingController($scope, $http, $resource) {
                         }
 
                         var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials);
-                        if (!securityDetails || securityDetails.email === "") {
+                        //if (!securityDetails || securityDetails.email === "") {
+                        //Overrided existing security department check, as users need to be available to add guests but will be sent an email personally to inform security.
+                        if (false) {
                             $("#externalAttendeesCont").css("display", "none");
 
                             var message = "This location does not have a dedicated security desk.";
