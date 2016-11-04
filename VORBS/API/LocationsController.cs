@@ -44,6 +44,7 @@ namespace VORBS.API
                     ID = x.ID,
                     Name = x.Name,
                     Active = x.Active,
+                    AdditionalInformation = x.AdditionalInformation,
                     LocationCredentials = x.LocationCredentials.Select(lc =>
                     {
                         LocationCredentialsDTO lcDto = new LocationCredentialsDTO()
@@ -89,6 +90,7 @@ namespace VORBS.API
                     Active = location.Active,
                     ID = location.ID,
                     Name = location.Name,
+                    AdditionalInformation = location.AdditionalInformation,
                     Rooms = location.Rooms.Select(r =>
                     {
                         RoomDTO rDto = new RoomDTO()
@@ -170,6 +172,7 @@ namespace VORBS.API
                         ID = x.ID,
                         Name = x.Name,
                         Active = x.Active,
+                        AdditionalInformation = x.AdditionalInformation,
                         LocationCredentials = x.LocationCredentials.Select(lc =>
                         {
                             LocationCredentialsDTO lcDto = new LocationCredentialsDTO()

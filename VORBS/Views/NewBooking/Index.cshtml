@@ -118,6 +118,13 @@
                 <p>The rooms below are ordered by attendee size from smallest to largest.</p>
             </div>
 
+            <div class="panel panel-border-wide vertical-bottom-space-large" ng-show="bookingFilter.location.additionalInformation">
+                <p>
+                    Information regarding {{ bookingFilter.location.name }}:
+                    <pre>{{ bookingFilter.location.additionalInformation }}</pre>
+                </p>
+            </div>
+            
             <div id="bookingTable">
 
             </div>

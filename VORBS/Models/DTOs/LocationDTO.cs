@@ -15,5 +15,7 @@ namespace VORBS.Models.DTOs
         public IEnumerable<LocationCredentialsDTO> LocationCredentials { get; set; }
 
         public bool Active { get; set; }
+
+        public string AdditionalInformation { get; set; }
     }
 }

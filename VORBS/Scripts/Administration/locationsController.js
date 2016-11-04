@@ -70,6 +70,7 @@ function LocationsController($scope, $http, $resource) {
 
     $('#newLocationModal').on('hidden.bs.modal', function () {
         $scope.newLocation.Name = '',
+        $scope.newLocation.additionalInformation = '',
         $scope.newLocation.Active = false,
         $scope.newLocation.LocationCredentials = [],
         $scope.$digest()

@@ -3,7 +3,7 @@
 function NewBookingController($scope, $http, $resource) {
     CreateServices($resource);
 
-    $scope.locations = Locations.query({ status: true, extraInfo: false });
+    $scope.locations = Locations.query({ status: true, extraInfo: true });
     $scope.clashedBookings = [];
 
     $scope.externalFullNameTextBox = '';

@@ -18,5 +18,7 @@ namespace VORBS.Models
 
         public virtual ICollection<LocationCredentials> LocationCredentials { get; set; }
 
+        public string AdditionalInformation { get; set; }
+
     }
 }
