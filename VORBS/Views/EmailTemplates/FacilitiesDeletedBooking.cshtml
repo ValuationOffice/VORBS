@@ -1,12 +1,12 @@
-﻿@model VORBS.Models.Booking
+﻿@model List<VORBS.Models.Booking>
 @{
     Layout = "~/Views/Shared/_EmailLayout.cshtml";
 }
 
 <html>
 <body>
-    <h2>@Model.Owner has updated equipment to be provided for the following booking:</h2>
-    <p>
+    <h2>@Model.First().Owner has updated equipment to be provided for the following booking(s):</h2>
+    <p> 
         <h2>Removed:</h2>
         <table cellspacing="0" cellpadding="10" border="1" width="600">
             <tr>
@@ -18,30 +18,36 @@
                 <th>Subject</th>
                 <th>Equipment</th>
             </tr>
-            <tr>
-                <td>@Model.Owner</td>
-                <td>@Model.Room.Location.Name</td>
-                <td>@Model.Room.RoomName</td>
-                <td>@Model.StartDate.ToShortDateString() @Model.StartDate.ToShortTimeString()</td>
-                <td>@Model.EndDate.ToShortDateString() @Model.EndDate.ToShortTimeString()</td>
-                <td>@Model.Subject</td>
-                <td>
-                    <ul>
-                        @if (Model.Flipchart)
-                        {
-                            <li>Flipchart</li>    
-                        }
-                        @if (Model.Projector)
-                        {
-                            <li>Projector</li>
-                        }
-                        @if (!Model.Projector && !Model.Flipchart)
-                        {
-                            <li>None</li>
-                        }
-                    </ul>
-                </td>
-            </tr>
+            @{
+                foreach (VORBS.Models.Booking booking in Model)
+                {
+                    <tr>
+                        <td>@booking.Owner</td>
+                        <td>@booking.Room.Location.Name</td>
+                        <td>@booking.Room.RoomName</td>
+                        <td>@booking.StartDate.ToShortDateString() @booking.StartDate.ToShortTimeString()</td>
+                        <td>@booking.EndDate.ToShortDateString() @booking.EndDate.ToShortTimeString()</td>
+                        <td>@booking.Subject</td>
+                        <td>
+                            <ul>
+                                @if (booking.Flipchart)
+                                {
+                                    <li>Flipchart</li>
+                                }
+                                @if (booking.Projector)
+                                {
+                                    <li>Projector</li>
+                                }
+                                @if (!booking.Projector && !booking.Flipchart)
+                                {
+                                    <li>None</li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+            }
+            
         </table>
     </p>
 </body>

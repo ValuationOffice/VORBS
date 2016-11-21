@@ -165,7 +165,7 @@
     <Compile Include="Models\ExternalAttendees.cs" />
     <Compile Include="Models\LocationCredentials.cs" />
     <Compile Include="Models\ViewModels\AdminMultiCancelledBookingWithMessage.cs" />
-    <Compile Include="Models\ViewModels\facilitiesEdittedBooking.cs" />
+    <Compile Include="Models\ViewModels\FacilitiesEdittedBooking.cs" />
     <Compile Include="Models\ViewModels\NewRecurringBookingWithMessage.cs" />
     <Compile Include="Models\ViewModels\SecurityEdittedBooking.cs" />
     <Compile Include="Security\Authorisation.cs" />
@@ -1137,6 +1137,7 @@
     <Content Include="Views\EmailTemplates\DSSEdittedBooking.cshtml" />
     <Content Include="Views\EmailTemplates\DSSDeletedBooking.cshtml" />
     <Content Include="Views\Shared\_EmailLayout.cshtml" />
+    <Content Include="Views\EmailTemplates\SecurityNewBookingBookersCopy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

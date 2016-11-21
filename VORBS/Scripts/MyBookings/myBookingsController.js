@@ -46,6 +46,9 @@ function MyBookingsController($scope, $http, $resource) {
 
     $scope.SetBookingId = function (id) {
         $scope.bookingId = id;
+        $scope.currentBookingToModify = Booking.query({
+            bookingId: id
+        });
     }
 
     $scope.AddExternalAttendee = function () {
@@ -252,6 +255,15 @@ function MyBookingsController($scope, $http, $resource) {
         //EnableConfirmBookingButton();
     }
 
+
+    $scope.modifyBookingOptions = resetModifyBookingOptions();
+
+    function resetModifyBookingOptions() {
+        return {
+            deleteAllInRecurrence: false
+        };
+    }
+
     $scope.DeleteBooking = function () {
         //Change the "delete booking" button to stop multiple bookings
         $("#deleteBookingConfirmButton").prop('disabled', 'disabled');
@@ -260,7 +272,8 @@ function MyBookingsController($scope, $http, $resource) {
         try {
             Booking.remove(
             {
-                bookingId: $scope.bookingId
+                bookingId: $scope.bookingId,
+                recurrence: $scope.modifyBookingOptions.deleteAllInRecurrence
             },
             function (success) {
                 $("#deleteModal").modal('hide');
@@ -276,6 +289,11 @@ function MyBookingsController($scope, $http, $resource) {
             EnableDeleteBookingButton();
         }
     }
+
+    $('#deleteModal').on('hidden.bs.modal', function () {
+        $scope.modifyBookingOptions = resetModifyBookingOptions();
+        $scope.$digest()
+    })
 
     $scope.FormatPassRequired = function (required) {
         if (required) {

@@ -28,6 +28,7 @@ namespace VORBS.Models
 
         public bool DssAssist { get; set; }
         public bool IsSmartMeeting { get; set; }
+        public int? RecurrenceId { get; set; }
 
         [NotMapped]
         public DTOs.RecurrenceDTO Recurrence { get; set; }

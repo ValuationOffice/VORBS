@@ -1,51 +1,101 @@
-﻿@model VORBS.Models.ViewModels.SecurityEdittedBooking
+﻿@model List<VORBS.Models.ViewModels.SecurityEdittedBooking>
 @{
     Layout = "~/Views/Shared/_EmailLayout.cshtml";
 }
 
 <html>
 <body>
-    <h2>@Model.EdittedBooking.Owner has updated the list of external guests for meeting on @Model.EdittedBooking.StartDate.ToShortDateString() at @Model.EdittedBooking.StartDate.ToShortTimeString():</h2>
+    <h2>@Model.First().EdittedBooking.Owner has updated the list of external guests for meeting(s)</h2>
     <p>
-        @if (Model.NewAttendees.Count() > 0)
+        @if (Model.Select(x=> x.NewAttendees.Count() > 0).Count() > 0)
         {
             <h2>Added:</h2>
             <table cellspacing="0" cellpadding="10" border="1" width="600">
                 <tr>
-                    <th>Name</th>
-                    <th>Company</th>
-                    <th>Pass Required</th>
+                    <th>Start Date</th>
+                    <th>Start Time</th>
+                    <th>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Company</th>
+                                    <th>Pass Required</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </th>
                 </tr>
-                @foreach (var attendee in Model.NewAttendees)
-                {
-                    <tr>
-                        <td>@attendee.FullName</td>
-                        <td>@attendee.CompanyName</td>
-                        <td>@(attendee.PassRequired ? "Yes":"No")</td>
-                    </tr>
-                }
-            </table>
-        }
-        @if (Model.RemovedAttendees.Count() > 0)
-        {
-            <h2>Removed:</h2>
-            <table cellspacing="0" cellpadding="10" border="1" width="600">
-                <tr>
-                    <th>Name</th>
-                    <th>Company</th>
-                    <th>Pass Required</th>
-                </tr>
-                @foreach (var attendee in Model.RemovedAttendees)
-                {
-                    <tr>
-                        <td>@attendee.FullName</td>
-                        <td>@attendee.CompanyName</td>
-                        <td>@(attendee.PassRequired ? "Yes":"No")</td>
-                    </tr>
+                @{ 
+                    foreach (VORBS.Models.ViewModels.SecurityEdittedBooking booking in Model.Where(x => x.NewAttendees.Count() > 0).ToList())
+                    {
+                        <tr>
+                            <td>@booking.EdittedBooking.StartDate.ToShortDateString()</td>
+                            <td>@booking.EdittedBooking.StartDate.ToShortTimeString()</td>
+                            <td>
+                                <table>
+                                    <tbody>
+                                        @foreach (var attendee in booking.NewAttendees)
+                                        {
+                                            <tr>
+                                                <td>@attendee.FullName</td>
+                                                <td>@attendee.CompanyName</td>
+                                                <td>@(attendee.PassRequired ? "Yes" : "No")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
                 }
             </table>
         }
         
+        @if (Model.Select(x => x.RemovedAttendees.Count() > 0).Count() > 0)
+        {
+            <h2>Removed:</h2>
+            <table cellspacing="0" cellpadding="10" border="1" width="600">
+                <tr>
+                    <th>Start Date</th>
+                    <th>Start Time</th>
+                    <th>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Company</th>
+                                    <th>Pass Required</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </th>
+                </tr>
+                @{
+                    foreach (VORBS.Models.ViewModels.SecurityEdittedBooking booking in Model.Where(x => x.RemovedAttendees.Count() > 0).ToList())
+                    {
+                        <tr>
+                            <td>@booking.EdittedBooking.StartDate.ToShortDateString()</td>
+                            <td>@booking.EdittedBooking.StartDate.ToShortTimeString()</td>
+                            <td>
+                                <table>
+                                    <tbody>
+                                        @foreach (var attendee in booking.NewAttendees)
+                                        {
+                                            <tr>
+                                                <td>@attendee.FullName</td>
+                                                <td>@attendee.CompanyName</td>
+                                                <td>@(attendee.PassRequired ? "Yes" : "No")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        }
     </p>
 </body>
 </html>

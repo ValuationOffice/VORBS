@@ -1,41 +1,72 @@
-﻿@model VORBS.Models.Booking
+﻿@model List<VORBS.Models.Booking>
 @{
     Layout = "~/Views/Shared/_EmailLayout.cshtml"; ;
+    List<VORBS.Models.Booking> needsAssistance = Model.Where(x => x.DssAssist).ToList();
+    List<VORBS.Models.Booking> noLongerNeedsAssistance = Model.Where(x => !x.DssAssist).ToList();
 }
 
 <html>
 <body>
 
-    @if (Model.DssAssist)
+    @if (needsAssistance.Count > 0)
     {
-        <h2>Support in setting up the SMART room at the following meeting room has been requested:</h2>
-    }
-    else
-    {
-        <h2>Support in setting up the SMART room at the following meeting room is no longer required:</h2>
+        <h2>Support in setting up the SMART room at the following meeting room(s) has been requested:</h2>
+        <table cellspacing="0" cellpadding="10" border="1" width="600">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Location</th>
+                    <th>Room</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (VORBS.Models.Booking booking in needsAssistance)
+                    {
+                        <tr>
+                            <td>@booking.Owner</td>
+                            <td>@booking.Room.Location.Name</td>
+                            <td>@booking.Room.RoomName</td>
+                            <td>@booking.StartDate.ToShortDateString() @booking.StartDate.ToShortTimeString()</td>
+                            <td>@booking.EndDate.ToShortDateString() @booking.EndDate.ToShortTimeString()</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
     }
 
-
-    <table cellspacing="0" cellpadding="10" border="1" width="600">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Location</th>
-                <th>Room</th>
-                <th>Start</th>
-                <th>End</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>@Model.Owner</td>
-                <td>@Model.Room.Location.Name</td>
-                <td>@Model.Room.RoomName</td>
-                <td>@Model.StartDate.ToShortDateString() @Model.StartDate.ToShortTimeString()</td>
-                <td>@Model.EndDate.ToShortDateString() @Model.EndDate.ToShortTimeString()</td>
-            </tr>
-        </tbody>
-    </table>
+    @if(noLongerNeedsAssistance.Count > 0)
+    {
+        <h2>Support in setting up the SMART room at the following meeting room(s) is no longer required:</h2>
+        <table cellspacing="0" cellpadding="10" border="1" width="600">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Location</th>
+                    <th>Room</th>
+                    <th>Start</th>
+                    <th>End</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (VORBS.Models.Booking booking in noLongerNeedsAssistance)
+                    {
+                        <tr>
+                            <td>@booking.Owner</td>
+                            <td>@booking.Room.Location.Name</td>
+                            <td>@booking.Room.RoomName</td>
+                            <td>@booking.StartDate.ToShortDateString() @booking.StartDate.ToShortTimeString()</td>
+                            <td>@booking.EndDate.ToShortDateString() @booking.EndDate.ToShortTimeString()</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
 </body>
 </html>
 

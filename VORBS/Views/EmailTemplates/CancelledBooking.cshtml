@@ -1,11 +1,11 @@
-﻿@model VORBS.Models.Booking
+﻿@model List<VORBS.Models.Booking>
 @{
     Layout = "~/Views/Shared/_EmailLayout.cshtml";
 }
 
 <html>
 <body>
-    <h2>The following booking has been cancelled</h2>
+    <h2>The following booking(s) has been cancelled</h2>
     <table cellspacing="0" cellpadding="10" border="1" width="600">
         <thead>
             <tr>
@@ -18,29 +18,35 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>@Model.Room.Location.Name</td>
-                <td>@Model.Room.RoomName</td>
-                <td>@Model.StartDate.ToShortDateString() @Model.StartDate.ToShortTimeString()</td>
-                <td>@Model.EndDate.ToShortDateString() @Model.EndDate.ToShortTimeString()</td>
-                <td>@Model.Subject</td>
-                <td>
-                    <ul>
-                        @if (Model.Projector)
-                        {
-                            <li>Projector</li>
-                        }
-                        @if (Model.Flipchart)
-                        {
-                            <li>Flipchart</li>
-                        }
-                        @if (!Model.Projector && !Model.Flipchart)
-                        {
-                            <li>None</li>
-                        }
-                    </ul>
-                </td>
-            </tr>
+            @{
+                foreach (VORBS.Models.Booking booking in Model)
+                {
+                    <tr>
+                        <td>@booking.Room.Location.Name</td>
+                        <td>@booking.Room.RoomName</td>
+                        <td>@booking.StartDate.ToShortDateString() @booking.StartDate.ToShortTimeString()</td>
+                        <td>@booking.EndDate.ToShortDateString() @booking.EndDate.ToShortTimeString()</td>
+                        <td>@booking.Subject</td>
+                        <td>
+                            <ul>
+                                @if (booking.Projector)
+                                {
+                                    <li>Projector</li>
+                                }
+                                @if (booking.Flipchart)
+                                {
+                                    <li>Flipchart</li>
+                                }
+                                @if (!booking.Projector && !booking.Flipchart)
+                                {
+                                    <li>None</li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+            }
+           
         </tbody>
     </table>
     <p>To make a new booking, visit the <a href="@string.Format("{0}://{1}{2}", HttpContext.Current.Request.Url.Scheme, HttpContext.Current.Request.Url.Authority, Url.Content("~/NewBooking"))">New Booking</a> page </p>

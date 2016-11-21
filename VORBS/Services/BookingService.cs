@@ -215,6 +215,63 @@ namespace VORBS.Services
             return GetById(editBooking.ID);
         }
 
+        public List<Booking> UpdateExistingBookings(List<Booking> existingBookings, List<Booking> editBookings)
+        {
+            bool succeeded = true;
+            List<Booking> bookingsToSave = new List<Booking>();
+            foreach (Booking editBooking in editBookings)
+            {
+                Booking existingBooking = existingBookings.Where(x => x.ID == editBooking.ID).First();
+                try
+                {
+                    editBooking.ID = existingBooking.ID;
+                    editBooking.Owner = existingBooking.Owner;
+                    editBooking.PID = existingBooking.PID;
+                    editBooking.Room = db.Rooms.SingleOrDefault(x => x.ID == editBooking.RoomID);
+
+                    db.Entry(existingBooking).CurrentValues.SetValues(editBooking);
+                    db.ExternalAttendees.RemoveRange(db.ExternalAttendees.Where(x => x.BookingID == editBooking.ID));
+
+                    if (editBooking.ExternalAttendees != null)
+                    {
+                        editBooking.ExternalAttendees.ToList().ForEach(x => x.BookingID = editBooking.ID);
+                        db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
+                    }
+                    bookingsToSave.Add(editBooking);
+                }
+                catch (Exception e)
+                {
+                    succeeded = false;
+                    _logger.Error($"Unable to delete booking(s): {String.Join(", ", editBookings.Select(x => x.ID))}. An error occured: {e.Message}");
+                    break;
+                }
+            }
+            if (succeeded)
+            {
+                try
+                {
+                    db.SaveChanges(bookingsToSave, false);
+                    List<int> editBookingIds = editBookings.Select(x => x.ID).ToList();
+                    return db.Bookings.Where(x => editBookingIds.Contains(x.ID)).ToList();
+                }
+                catch(BookingConflictException ex)
+                {
+                    _logger.Error($"Unable to edit existing booking(s): {String.Join(", ", editBookings.Select(x => x.ID))}. An error occured: {ex.Message}");
+                    throw ex;
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error($"Unable to edit existing booking(s): {String.Join(", ", editBookings.Select(x => x.ID))}. An error occured: {ex.Message}");
+                    return null;
+                }
+            }
+            else
+            {
+                return null;
+            }
+            
+        }
+
         public bool DeleteById(int Id)
         {
             try
@@ -232,7 +289,38 @@ namespace VORBS.Services
             }
         }
 
-
+        public bool Delete(List<Booking> bookings)
+        {
+            bool succeeded = true;
+            foreach (Booking booking in bookings)
+            {
+                try
+                {
+                    db.Bookings.Remove(booking);
+                }
+                catch (Exception e)
+                {
+                    succeeded = false;
+                    _logger.Error($"Unable to delete booking: ID {booking.ID}. An error occured: {e.Message}");
+                    break;
+                }
+            }
+            if (succeeded)
+            {
+                try
+                {
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }else
+            {
+                return false;
+            }
+        }
 
         protected internal bool HasBookingChanged(Booking editBooking, Booking existingBooking)
         {
@@ -377,6 +465,16 @@ namespace VORBS.Services
 
             clashedBookings = clashedBs;
             return bookingsToCreate;
+        }
+
+        public int GetNextRecurrenceId()
+        {
+            var db2 = new VORBSContext();
+
+            int? currentRecurringLinkId = db2.Bookings.Where(x => x.RecurrenceId != null).ToList().Select(x => x.RecurrenceId).Max();
+            //nextRecurringLinkid = current +1 or 1 if null (no bookings)
+            int nextRecurringLinkid = (currentRecurringLinkId == null) ? 1 : currentRecurringLinkId.Value + 1;
+            return nextRecurringLinkid;
         }
     }
 

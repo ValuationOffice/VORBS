@@ -5,7 +5,7 @@ using System.Web;
 
 namespace VORBS.Models.ViewModels
 {
-    public class facilitiesEdittedBooking
+    public class FacilitiesEdittedBooking
     {
         public Booking OriginalBooking { get; set; }
         public Booking EdittedBooking { get; set; }

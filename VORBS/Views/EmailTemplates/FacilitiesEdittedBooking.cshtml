@@ -1,13 +1,14 @@
-﻿@model VORBS.Models.ViewModels.facilitiesEdittedBooking
+﻿@model List<VORBS.Models.ViewModels.FacilitiesEdittedBooking>
 @{
     Layout = "~/Views/Shared/_EmailLayout.cshtml";
 }
 
 <html>
 <body>
-    <h2>@Model.EdittedBooking.Owner has updated equipment to be provided for the following booking:</h2>
+    <h2>@Model.First().EdittedBooking.Owner has updated equipment to be provided for the following booking(s):</h2>
     <p>
-        @if (Model.EquipmentAdded.Count() > 0)
+        @*if there has been ANY additions to any equipment on any booking*@
+        @if (Model.Select(x => x.EquipmentAdded.Count()).Sum() > 0)
         {
             <h2>Added:</h2>
             <table cellspacing="0" cellpadding="10" border="1" width="600">
@@ -20,66 +21,78 @@
                     <th>Subject</th>
                     <th>Equipment</th>
                 </tr>
-                <tr>
-                    <td>@Model.EdittedBooking.Owner</td>
+                @{
+                    foreach (VORBS.Models.ViewModels.FacilitiesEdittedBooking booking in Model.Where(x => x.EquipmentAdded.Count() > 0).ToList())
+                    {
+                        <tr>
+                            <td>@booking.EdittedBooking.Owner</td>
 
-                    <td>@Model.EdittedBooking.Room.Location.Name</td>
-                    <td>@Model.EdittedBooking.Room.RoomName</td>
-                    <td>@Model.EdittedBooking.StartDate.ToShortDateString() @Model.EdittedBooking.StartDate.ToShortTimeString()</td>
-                    <td>@Model.EdittedBooking.EndDate.ToShortDateString() @Model.EdittedBooking.EndDate.ToShortTimeString()</td>
-                    <td>@Model.EdittedBooking.Subject</td>
-                    <td>
-                        <ul>
-                            @foreach (string equipment in Model.EquipmentAdded)
-                            {
-                                <li>@equipment</li>
-                            }
-                            @if (Model.EquipmentAdded.Count() == 0)
-                            {
-                                <li>None</li>
-                            }
-                        </ul>
-                    </td>
-                </tr>
-
-            </table>
-        }
-        @if (Model.EquipmentRemoved.Count() > 0)
-        {
-            <h2>Removed:</h2>
-            <table cellspacing="0" cellpadding="10" border="1" width="600">
-                <tr>
-                    <th>User</th>
-                    <th>Location</th>
-                    <th>Room</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Subject</th>
-                    <th>Equipment</th>
-                </tr>
-                <tr>
-                    <td>@Model.EdittedBooking.Owner</td>
-                    <td>@Model.EdittedBooking.Room.Location.Name</td>
-                    <td>@Model.EdittedBooking.Room.RoomName</td>
-                    <td>@Model.EdittedBooking.StartDate.ToShortDateString()</td>
-                    <td>@Model.EdittedBooking.StartDate.ToShortTimeString()</td>
-                    <td>@Model.EdittedBooking.Subject</td>
-                    <td>
-                        <ul>
-                            @foreach (string equipment in Model.EquipmentRemoved)
-                            {
-                                <li>@equipment</li>
-                            }
-                            @if (Model.EquipmentRemoved.Count() == 0)
-                            {
-                                <li>None</li>
-                            }
-                        </ul>
-                    </td>
-                </tr>
+                            <td>@booking.EdittedBooking.Room.Location.Name</td>
+                            <td>@booking.EdittedBooking.Room.RoomName</td>
+                            <td>@booking.EdittedBooking.StartDate.ToShortDateString() @booking.EdittedBooking.StartDate.ToShortTimeString()</td>
+                            <td>@booking.EdittedBooking.EndDate.ToShortDateString() @booking.EdittedBooking.EndDate.ToShortTimeString()</td>
+                            <td>@booking.EdittedBooking.Subject</td>
+                            <td>
+                                <ul>
+                                    @foreach (string equipment in booking.EquipmentAdded)
+                                    {
+                                        <li>@equipment</li>
+                                    }
+                                    @if (booking.EquipmentAdded.Count() == 0)
+                                    {
+                                        <li>None</li>
+                                    }
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+                }
 
             </table>
-        }
-    </p>
-</body>
+            }
+            @*if there has been ANY removals to any equipment on any booking*@
+            @if (Model.Select(x => x.EquipmentRemoved.Count()).Sum() > 0)
+            {
+                <h2>Removed:</h2>
+                <table cellspacing="0" cellpadding="10" border="1" width="600">
+                    <tr>
+                        <th>User</th>
+                        <th>Location</th>
+                        <th>Room</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Subject</th>
+                        <th>Equipment</th>
+                    </tr>
+                    @{
+                        foreach (VORBS.Models.ViewModels.FacilitiesEdittedBooking booking in Model.Where(x => x.EquipmentRemoved.Count() > 0).ToList())
+                        {
+                            <tr>
+                                <td>@booking.EdittedBooking.Owner</td>
+
+                                <td>@booking.EdittedBooking.Room.Location.Name</td>
+                                <td>@booking.EdittedBooking.Room.RoomName</td>
+                                <td>@booking.EdittedBooking.StartDate.ToShortDateString() @booking.EdittedBooking.StartDate.ToShortTimeString()</td>
+                                <td>@booking.EdittedBooking.EndDate.ToShortDateString() @booking.EdittedBooking.EndDate.ToShortTimeString()</td>
+                                <td>@booking.EdittedBooking.Subject</td>
+                                <td>
+                                    <ul>
+                                        @foreach (string equipment in booking.EquipmentAdded)
+                                        {
+                                            <li>@equipment</li>
+                                        }
+                                        @if (booking.EquipmentAdded.Count() == 0)
+                                        {
+                                            <li>None</li>
+                                        }
+                                    </ul>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                </table>
+            }
+        </p>
+    </body>
 </html>

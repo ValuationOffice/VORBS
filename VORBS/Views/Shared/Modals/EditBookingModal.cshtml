@@ -107,6 +107,12 @@
                                     This location does not have a dedicated DSS officer, please contact ITSD for support on setting up SMART room meetings.
                                 </div>
                             </div>
+                            <div style="display: block;" ng-show="editBooking.recurrenceId">
+                                <hr />
+                                <div>
+                                    <h3>Edit all bookings in this recurrence <input type="checkbox" ng-model="newBooking.recurrence" /></h3>
+                                </div>
+                            </div>
                         </form>
                     </div>
                     <div class="modal-footer">

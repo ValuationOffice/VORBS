@@ -87,7 +87,7 @@ function SaveEditBooking(existingId, editBooking) {
         $.ajax({
             type: "POST",
             data: JSON.stringify(editBooking),
-            url: "api/bookings/" + existingId,
+            url: "api/bookings/" + existingId + "?recurrence=" + editBooking.recurrence,
             contentType: "application/json",
             success: function (data, status) {
                 if (status === "notmodified") {

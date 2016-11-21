@@ -27,5 +27,7 @@ namespace VORBS.Models.DTOs
 
         public bool DssAssist { get; set; }
         public bool IsSmartMeeting { get; set; }
+
+        public int? RecurrenceId { get; set; }
     }
 }
