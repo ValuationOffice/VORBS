@@ -16,7 +16,7 @@
 
             <div class="input-group">
                 <label class="control-label">Location</label>
-                <select class="form-control" ng-options="location.name for location in Locations" ng-model="adminUser.Location">
+                <select class="form-control" ng-options="location.id as location.name for location in Locations" ng-model="adminUser.LocationID">
                     <option value="" selected disabled>Select a location...</option>
                 </select>
             </div>
@@ -73,7 +73,7 @@
         </thead>
         <tr ng-repeat="admin in admins">
             <td>{{ admin.firstName + ' ' + admin.lastName }}</td>
-            <td>{{ admin.location }}</td>
+            <td>{{ admin.location.name }}</td>
             <td>{{ admin.email }}</td>
             <td>{{ admin.permissionLevelText() }}</td>
             <td><span data-toggle="modal" data-target="#editAdminModal" ng-click="GetAdmin(admin.id)" class="btn glyphicon glyphicon-edit" title="Edit User"></span></td>
@@ -92,7 +92,7 @@
                     <div class="form-inline">
                         <div class="input-group">
                             <label class="control-label">Location</label>
-                            <select class="form-control" ng-options="location.name for location in Locations" ng-model="editAdminUser.location"></select>
+                            <select class="form-control" ng-options="location.id as location.name for location in Locations" ng-model="editAdminUser.location.id"></select>
                         </div>
                         <div class="input-group ">
                             <label class="control-label">Permission</label>

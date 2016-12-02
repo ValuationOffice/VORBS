@@ -46,7 +46,12 @@ namespace VORBS.API
                     FirstName = a.FirstName,
                     LastName = a.LastName,
                     Email = a.Email,
-                    Location = a.Location,
+                    Location = new LocationDTO()
+                    {
+                        Active = a.Location.Active,
+                        ID = a.Location.ID,
+                        Name = a.Location.Name
+                    },
                     PermissionLevel = a.PermissionLevel
                 }));
 
@@ -74,7 +79,12 @@ namespace VORBS.API
                     FirstName = admin.FirstName,
                     LastName = admin.LastName,
                     Email = admin.Email,
-                    Location = admin.Location,
+                    Location = new LocationDTO()
+                    {
+                        Active = admin.Location.Active,
+                        ID = admin.Location.ID,
+                        Name = admin.Location.Name
+                    },
                     PermissionLevel = admin.PermissionLevel
                 };
             }
@@ -117,11 +127,11 @@ namespace VORBS.API
                 Admin existingAdmin = db.Admins.Single(a => a.ID == existingAdminId);
 
                 //No edits found
-                if (existingAdmin.PermissionLevel == editAdmin.PermissionLevel && existingAdmin.Location == editAdmin.Location)
+                if (existingAdmin.PermissionLevel == editAdmin.PermissionLevel && existingAdmin.LocationID == editAdmin.LocationID)
                     return new HttpResponseMessage(HttpStatusCode.NotModified);
 
                 existingAdmin.PermissionLevel = editAdmin.PermissionLevel;
-                existingAdmin.Location = editAdmin.Location;
+                existingAdmin.LocationID = editAdmin.LocationID;
 
                 db.SaveChanges();
 

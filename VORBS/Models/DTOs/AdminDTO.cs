@@ -11,7 +11,7 @@ namespace VORBS.Models.DTOs
         public string PID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Location { get; set; }
+        public LocationDTO Location { get; set; }
         public string Email { get; set; }
         public int PermissionLevel { get; set; }
     }

@@ -22,12 +22,12 @@ function UsersController($scope, $http, $resource) {
         }
 
         //Validate Location
-        if ($scope.adminUser.Location.name === undefined) {
+        if ($scope.adminUser.LocationID === undefined) {
             SetAdminErrorMessage('Invalid location.');
             return;
         }
         else {
-            $scope.adminUser.Location = $scope.adminUser.Location.name;
+            $scope.adminUser.LocationID = $scope.adminUser.LocationID;
         }
 
         //Dont need to validate as we get detials from Active Directory. AD Data is filtered on server first.
@@ -74,10 +74,7 @@ function UsersController($scope, $http, $resource) {
         if (indexAdmin >= 0) {
             $scope.editAdmin = $scope.admins[indexAdmin];
             $scope.editAdminUser.permissionLevel = $scope.editAdmin.permissionLevel
-            var indexLocation = GetIndexFromLocations($scope.Locations, $scope.editAdmin.location)
-            if (indexLocation >= 0) {
-                $scope.editAdminUser.location = $scope.Locations[indexLocation];
-            }
+            $scope.editAdminUser.location.id = $scope.editAdmin.location.id
         }
         else {
             alert('Unable to retrieve admin data. Admin may have already been deleted.');
@@ -91,8 +88,8 @@ function UsersController($scope, $http, $resource) {
         $("#editAdminEditButton").prop('disabled', 'disabled');
         $("#editAdminEditButton").html('Editing Admin. Please wait..');
 
-        if ($scope.editAdminUser.location.name !== $scope.editAdmin.location) {
-            $scope.editAdmin.location = $scope.editAdminUser.location.name
+        if ($scope.editAdminUser.location.id !== $scope.editAdmin.LocationID) {
+            $scope.editAdmin.LocationID = $scope.editAdminUser.location.id
             dateChanged = true;
         }
 
@@ -100,6 +97,9 @@ function UsersController($scope, $http, $resource) {
             $scope.editAdmin.permissionLevel = $scope.editAdminUser.permissionLevel;
             dateChanged = true;
         }
+
+        //im sorry, in a rush and we dont need more locations!!
+        delete $scope.editAdmin.location
 
         if (!dateChanged) {
             alert('Admin data has not changed.');
@@ -173,7 +173,7 @@ function UsersController($scope, $http, $resource) {
             PID: '',
             FirstName: '',
             LastName: '',
-            Location: '',
+            LocationID: '',
             Email: '',
             PermissionLevel: 1
         }
@@ -182,7 +182,9 @@ function UsersController($scope, $http, $resource) {
     $scope.CreateNewUserObject();
 
     $scope.editAdminUser = {
-        location: '',
+        location: {
+            id: ''
+        },
         permissionLevel: 1
     }
 

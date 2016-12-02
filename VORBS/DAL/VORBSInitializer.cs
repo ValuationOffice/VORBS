@@ -24,12 +24,12 @@ namespace VORBS.DAL
 
             var admins = new List<Admin>()
             {
-                new Admin(){ ID = 1, FirstName = "Admin1", LastName = "Admin1", Location = "Location1", Email = "fakeemail1@mail.com", PermissionLevel = 2, PID = "0000001" },
-                new Admin(){ ID = 2, FirstName = "Admin2", LastName = "Admin2", Location = "Location1", Email = "fakeemail2@mail.com", PermissionLevel = 2, PID = "0000002" },
-                new Admin(){ ID = 3, FirstName = "Admin3", LastName = "Admin3", Location = "Location1", Email = "fakeemail3@mail.com", PermissionLevel = 2, PID = "0000003" },
-                new Admin(){ ID = 4, FirstName = "Admin4", LastName = "Admin4", Location = "Location1", Email = "fakeemail4@mail.com", PermissionLevel = 2, PID = "0000004" },
-                new Admin(){ ID = 5, FirstName = "Admin5", LastName = "Admin5", Location = "Location1", Email = "fakeemail5@mail.com", PermissionLevel = 2, PID = "0000005" },
-                new Admin(){ ID = 5, FirstName = "Admin6", LastName = "Admin6", Location = "Location1", Email = "fakeemail6@mail.com", PermissionLevel = 2, PID = "0000006" }
+                new Admin(){ ID = 1, FirstName = "Admin1", LastName = "Admin1", LocationID = 1, Email = "fakeemail1@mail.com", PermissionLevel = 2, PID = "0000001" },
+                new Admin(){ ID = 2, FirstName = "Admin2", LastName = "Admin2", LocationID = 1, Email = "fakeemail2@mail.com", PermissionLevel = 2, PID = "0000002" },
+                new Admin(){ ID = 3, FirstName = "Admin3", LastName = "Admin3", LocationID = 1, Email = "fakeemail3@mail.com", PermissionLevel = 2, PID = "0000003" },
+                new Admin(){ ID = 4, FirstName = "Admin4", LastName = "Admin4", LocationID = 1, Email = "fakeemail4@mail.com", PermissionLevel = 2, PID = "0000004" },
+                new Admin(){ ID = 5, FirstName = "Admin5", LastName = "Admin5", LocationID = 1, Email = "fakeemail5@mail.com", PermissionLevel = 2, PID = "0000005" },
+                new Admin(){ ID = 5, FirstName = "Admin6", LastName = "Admin6", LocationID = 1, Email = "fakeemail6@mail.com", PermissionLevel = 2, PID = "0000006" }
             };
 
             admins.ForEach(a => context.Admins.Add(a));
