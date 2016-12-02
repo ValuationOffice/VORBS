@@ -233,6 +233,7 @@ namespace VORBS.API
 
         [HttpPut]
         [Route("{id:int}")]
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
         public HttpResponseMessage EditLocation(int id, Location editLocation)
         {
             try
@@ -266,6 +267,7 @@ namespace VORBS.API
 
         [HttpPost]
         [Route("")]
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
         public HttpResponseMessage SaveNewLocation(Location newLocation)
         {
             try
@@ -295,6 +297,7 @@ namespace VORBS.API
 
         [HttpPost]
         [Route("{locationId:Int}/{active:bool}")]
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
         public HttpResponseMessage EnableDisableLocation(int locationId, bool active)
         {
             try

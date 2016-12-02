@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 using System.Web.Mvc;
 using System.Web.Routing;
 using VORBS.DAL;
@@ -54,6 +57,28 @@ namespace VORBS.Security
         {
             filterContext.Result = new RedirectToRouteResult(new
             RouteValueDictionary(new { controller = "Errors", action = "Unauthorised" }));
+        }
+    }
+
+    public class VorbsApiAuthoriseAttribute : AuthorizationFilterAttribute
+    {
+        private int _level = 0;
+
+        public VorbsApiAuthoriseAttribute(int level)
+        {
+            _level = level;
+        }
+
+        public override void OnAuthorization(HttpActionContext actionContext)
+        {
+            var controller = ((System.Web.Http.ApiController)actionContext.ControllerContext.Controller);
+
+            string uname = controller.User.Identity.Name;
+
+            if (!VorbsAuthorise.IsUserAuthorised(uname, _level))
+                actionContext.Response = new HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized);
+            
+            base.OnAuthorization(actionContext);
         }
     }
 

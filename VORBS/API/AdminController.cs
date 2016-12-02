@@ -11,6 +11,7 @@ using VORBS.Models.DTOs;
 namespace VORBS.API
 {
     [RoutePrefix("api/admin")]
+    [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
     public class AdminController : ApiController
     {
         private NLog.Logger _logger;
@@ -23,7 +24,7 @@ namespace VORBS.API
         }
 
         public AdminController() : this(new VORBSContext()) { }
-        
+
 
         [HttpGet]
         [Route("{allAdmins}")]

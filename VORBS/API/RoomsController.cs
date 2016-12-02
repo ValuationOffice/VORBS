@@ -185,6 +185,7 @@ namespace VORBS.API
 
         [Route("")]
         [HttpPost]
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
         public HttpResponseMessage SaveNewRoom(Room newRoom)
         {
             try
@@ -207,6 +208,7 @@ namespace VORBS.API
 
         [HttpPost]
         [Route("{existingRoomId:int}")]
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
         public HttpResponseMessage EditRoom(int existingRoomId, Room editRoom)
         {
             try
@@ -241,6 +243,7 @@ namespace VORBS.API
 
         [HttpPost]
         [Route("{roomId:Int}/{active:bool}")]
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
         public HttpResponseMessage EnableDisableRoom(int roomId, bool active)
         {
             try
