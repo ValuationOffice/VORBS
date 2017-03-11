@@ -24,9 +24,6 @@ namespace VORBS.Security
 
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
-            if (AdQueries.IsOffline())
-                return true;
-
             var authorized = base.AuthorizeCore(httpContext);
             if (!authorized)
             {
@@ -86,9 +83,6 @@ namespace VORBS.Security
     {
         public static bool IsUserAuthorised(string userName, int level)
         {
-            if (AdQueries.IsOffline())
-                return true;
-
             VORBSContext db = new VORBSContext();
 
             string uName = userName;

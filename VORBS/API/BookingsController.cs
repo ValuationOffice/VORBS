@@ -30,6 +30,8 @@ namespace VORBS.API
         private VORBSContext db;
         private BookingService _bookingService;
 
+        private IDirectoryService _directoryService;
+
         public BookingsController() : this(new VORBSContext()) { }
 
         public BookingsController(VORBSContext context)
@@ -37,6 +39,7 @@ namespace VORBS.API
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
             _bookingService = new BookingService(db);
+            _directoryService = new StubbedDirectoryService();
         }
 
         [Route("{location}/{start:DateTime}/{end:DateTime}/")]
@@ -202,7 +205,7 @@ namespace VORBS.API
 
             try
             {
-                string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+                string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
                 List<Booking> bookings = _bookingService.GetByDateAndPid(start, currentPid);
 
@@ -333,13 +336,13 @@ namespace VORBS.API
                 //Get the current user
                 if (string.IsNullOrWhiteSpace(newBooking.PID) || string.IsNullOrWhiteSpace(newBooking.Owner))
                 {
-                    var user = (AdQueries.IsOffline()) ? AdQueries.CreateFakeUser() : AdQueries.GetUserByCurrentUser(User.Identity.Name);
+                    User user = _directoryService.GetCurrentUser(User.Identity.Name);
 
                     if (user == null)
                         return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
-                    newBooking.Owner = user.Name;
-                    newBooking.PID = user.SamAccountName;
+                    newBooking.Owner = user.FullName;
+                    newBooking.PID = user.PayId.Identity;
                 }
 
                 if (newBooking.Recurrence.IsRecurring)
@@ -473,7 +476,7 @@ namespace VORBS.API
                         try
                         {
                             //Once Booking has been removed; Send Cancelltion Emails
-                            string toEmail = AdQueries.GetUserByPid(owner).EmailAddress;
+                            string toEmail = _directoryService.GetUser(new User.Pid(owner)).EmailAddress;
                             string errorMessage = (newBooking.Recurrence.AdminOverwriteMessage.Trim().Length > 0) ? newBooking.Recurrence.AdminOverwriteMessage : "An admin has cancelled these bookings.";
                             string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBookingWithMessage.cshtml", new Models.ViewModels.AdminMultiCancelledBookingWithMessage(clashedBookings.Where(x => x.PID == owner), errorMessage));
 
@@ -491,7 +494,7 @@ namespace VORBS.API
 
                 _logger.Info("Booking successfully created: " + newBooking.ID);
 
-                if (AdQueries.IsOffline())
+                if (bool.Parse(ConfigurationManager.AppSettings["sendEmails"]))
                     return new HttpResponseMessage(HttpStatusCode.OK);
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
@@ -499,8 +502,7 @@ namespace VORBS.API
                 try
                 {
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-
-                    string toEmail = AdQueries.GetUserByPid(newBooking.PID).EmailAddress;
+                    string toEmail = _directoryService.GetUser(new User.Pid(newBooking.PID)).EmailAddress;
 
                     string body = "";
 
@@ -582,7 +584,7 @@ namespace VORBS.API
                         try
                         {
                             string body = "";
-                            string toEmail = AdQueries.GetUserByPid(newBooking.PID).EmailAddress;
+                            string toEmail = _directoryService.GetUser(new User.Pid(newBooking.PID)).EmailAddress;
                             body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBookingBookersCopy.cshtml", newBooking);
                             Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests security information for {0}", newBooking.StartDate.ToShortDateString()), body);
                         }
@@ -797,7 +799,7 @@ namespace VORBS.API
 
                 //get markup for owner email
                 string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-                string toOwnerEmail = AdQueries.GetUserByPid(existingBooking.PID).EmailAddress;
+                string toOwnerEmail = _directoryService.GetUser(new User.Pid(existingBooking.PID)).EmailAddress;
                 string toOwnerSubject = "";
 
                 if (existingBooking.PID.ToUpper() != currentUserPid.ToUpper())
@@ -813,7 +815,7 @@ namespace VORBS.API
 
                 //END OF EMAIL BODY CONSTRUCTIONS
 
-                if (AdQueries.IsOffline())
+                if (Boolean.Parse(ConfigurationManager.AppSettings["sendEmails"]))
                     return new HttpResponseMessage(HttpStatusCode.OK);
                 
                 //Send facilities Email
@@ -914,7 +916,7 @@ namespace VORBS.API
                 else
                     _logger.Info("Booking(s) successfully cancelled: " + String.Join(", ", allBookings.Select(x => x.ID)));
 
-                if (AdQueries.IsOffline())
+                if (bool.Parse(ConfigurationManager.AppSettings["sendEmails"]))
                     return new HttpResponseMessage(HttpStatusCode.OK);
 
                 Room locationRoom = db.Rooms.First(b => b.ID == booking.RoomID);
@@ -926,8 +928,8 @@ namespace VORBS.API
                     //Once Booking has been removed; Send Cancelltion Emails
 
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-
-                    string toEmail = AdQueries.GetUserByPid(booking.PID).EmailAddress;
+                    
+                    string toEmail = _directoryService.GetUser(new User.Pid(booking.PID)).EmailAddress;
 
 
                     if (booking.PID.ToUpper() != currentUserPid.ToUpper())
@@ -1058,7 +1060,7 @@ namespace VORBS.API
 
             try
             {
-                string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+                string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
                 List<Booking> bookings = _bookingService.GetByDateAndPidForPeriod(period, currentPid, startDate);
 
@@ -1110,7 +1112,7 @@ namespace VORBS.API
         [Route("search")]
         public IEnumerable<BookingDTO> GetBookingsFilterSearch(int? locationId, DateTime? startDate, string room, bool smartRoom)
         {
-            string currentPid = (AdQueries.IsOffline()) ? "localuser" : User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+            string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
             Location searchLocation = null;
             if (locationId != null && locationId != 0)
