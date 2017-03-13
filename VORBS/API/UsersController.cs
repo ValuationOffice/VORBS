@@ -8,6 +8,7 @@ using VORBS.Models;
 using VORBS.DAL;
 using VORBS.Models.DTOs;
 using VORBS.Utils;
+using VORBS.Services;
 
 namespace VORBS.API
 {
@@ -16,11 +17,13 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
+        private IDirectoryService _directoryService;
 
         public UsersController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
+            _directoryService = new StubbedDirectoryService();
         }
 
         public UsersController() : this(new VORBSContext()) { }
@@ -28,12 +31,22 @@ namespace VORBS.API
 
         [Route("{allUsers:bool}")]
         [HttpGet]
-        public List<AdminDTO> GetAllUsers()
+        public List<UserDTO> GetAllUsers()
         {
-            List<AdminDTO> usersDTO = new List<AdminDTO>();
+            List<UserDTO> usersDTO = new List<UserDTO>();
             try
             {
-                usersDTO = AdQueries.AllUserDetails();
+                List<User> usersResult = _directoryService.GetAllUsers();
+                foreach (User user in usersResult)
+                {
+                    usersDTO.Add(new UserDTO()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.EmailAddress,
+                        PID = user.PayId.Identity
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -45,15 +58,26 @@ namespace VORBS.API
 
         [Route("{name}")]
         [HttpGet]
-        public List<AdminDTO> GetAvailableUsers(string name)
+        public List<UserDTO> GetAvailableUsers(string name)
         {
-            List<AdminDTO> userDTO = new List<AdminDTO>();
+            List<UserDTO> userDTO = new List<UserDTO>();
             try
             {
                 if (string.IsNullOrWhiteSpace(name))
-                    return new List<AdminDTO>();
-
-                userDTO = AdQueries.FindUserDetails(name);
+                    return userDTO;
+                        
+                List<User> userResults = _directoryService.GetBySurname(name);
+                foreach (User user in userResults)
+                {
+                    userDTO.Add(new UserDTO()
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.EmailAddress,
+                        PID = user.PayId.Identity
+                    });
+                }
+                
             }
             catch (Exception ex)
             {
@@ -72,7 +96,7 @@ namespace VORBS.API
                     return null;
 
                 if (name)
-                    return AdQueries.GetUserByPid(pid).Name;
+                    return _directoryService.GetUser(new User.Pid(pid)).FullName;
             }
             catch (Exception ex)
             {

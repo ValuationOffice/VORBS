@@ -8,6 +8,7 @@ using System.Web.Http;
 using VORBS.DAL;
 using VORBS.Models;
 using VORBS.Models.DTOs;
+using VORBS.Services;
 using VORBS.Utils;
 
 namespace VORBS.API
@@ -17,11 +18,13 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
+        private IDirectoryService _directoryService;
 
         public RoomsController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
+            _directoryService = new StubbedDirectoryService();
         }
 
         public RoomsController() : this(new VORBSContext()) { }
@@ -300,7 +303,7 @@ namespace VORBS.API
             try
             {
                 //Once Booking has been removed; Send Cancelltion Emails
-                string toEmail = AdQueries.GetUserByPid(ownerBookings[0].PID).EmailAddress;
+                string toEmail = _directoryService.GetUser(new User.Pid(ownerBookings[0].PID)).EmailAddress;
                 string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
 
                 Utils.EmailHelper.SendEmail(ConfigurationManager.AppSettings["fromEmail"], toEmail, "Meeting room booking(s) cancellation", body);
