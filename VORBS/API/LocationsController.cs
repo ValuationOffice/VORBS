@@ -8,6 +8,7 @@ using VORBS.Models;
 using VORBS.Models.DTOs;
 
 using VORBS.DAL;
+using VORBS.DAL.Repositories;
 using VORBS.Utils;
 using System.Configuration;
 using VORBS.Services;
@@ -20,11 +21,16 @@ namespace VORBS.API
         private NLog.Logger _logger;
         private VORBSContext db;
         private IDirectoryService _directoryService;
+        private LocationRepository _locationRepository;
+        private BookingRepository _bookingRepository;
+
         public LocationsController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
+            _locationRepository = new LocationRepository(db);
             _directoryService = new StubbedDirectoryService();
+            _bookingRepository = new BookingRepository(db);
         }
 
         public LocationsController() : this(new VORBSContext()) { }
@@ -38,8 +44,7 @@ namespace VORBS.API
 
             try
             {
-                List<Location> locations = db.Locations.ToList()
-                    .ToList();
+                List<Location> locations = _locationRepository.GetAllLocations();
 
                 locations.ForEach(x => locationsDTO.Add(new LocationDTO()
                 {
@@ -86,7 +91,7 @@ namespace VORBS.API
         {
             try
             {
-                Location location = db.Locations.Where(x => x.ID == id).SingleOrDefault();
+                Location location = _locationRepository.GetLocationById(id);
                 LocationDTO locationDto = new LocationDTO()
                 {
                     Active = location.Active,
@@ -134,7 +139,7 @@ namespace VORBS.API
 
             try
             {
-                List<Location> locations = db.Locations.Where(x => x.Active == true && x.Rooms.Where(r => r.SmartRoom == true && r.LocationID == x.ID).Count() > 0).ToList();
+                List<Location> locations = _locationRepository.GetLocationsWithSmartRooms();
 
                 if (locations.Exists(l => l.Name == searchLoaction))
                 {
@@ -164,8 +169,7 @@ namespace VORBS.API
 
             try
             {
-                List<Location> locations = db.Locations.Where(x => x.Active == status).ToList()
-                                            .ToList();
+                List<Location> locations = _locationRepository.GetLocationsByStatus(status);
 
                 if (extraInfo)
                 {
@@ -240,23 +244,17 @@ namespace VORBS.API
         {
             try
             {
-                Location originalLoc = db.Locations.Where(x => x.ID == id).SingleOrDefault();
+                Location originalLoc = _locationRepository.GetLocationById(id);
                 if (editLocation.Name != originalLoc.Name)
                 {
-                    int duplicateLocationCheck = db.Locations.Where(l => l.Name == editLocation.Name).Count();
-                    if (duplicateLocationCheck > 0)
+                    bool exists = _locationRepository.GetLocationByName(editLocation.Name) != null;
+                    if (exists)
                         return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Location {0} already exists.", editLocation.Name));
                 }
+                editLocation.ID = id;
 
-                db.Entry(originalLoc).CurrentValues.SetValues(editLocation);
+                _locationRepository.UpdateLocation(editLocation);
 
-                //TODO: Need to tidy this up, we shouldn't have to delete all locations and re-add them each time. Not sure if there is a virtual update method
-                IEnumerable<LocationCredentials> credentials = db.LocationCredentials.Where(x => x.LocationID == id).ToList();
-                db.LocationCredentials.RemoveRange(credentials);
-                editLocation.LocationCredentials.ToList().ForEach(x => x.LocationID = id);
-                db.LocationCredentials.AddRange(editLocation.LocationCredentials);
-
-                db.SaveChanges();
                 _logger.Info(string.Format("Location {0} successfully editted", id));
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
@@ -274,11 +272,10 @@ namespace VORBS.API
         {
             try
             {
-                var existingLocation = db.Locations.Any(l => l.ID == newLocation.ID);
-                if (!existingLocation)
+                var existingLocation = _locationRepository.GetLocationById(newLocation.ID);
+                if (existingLocation == null)
                 {
-                    db.Locations.Add(newLocation);
-                    db.SaveChanges();
+                    _locationRepository.SaveNewLocation(newLocation);
 
                     _logger.Info("New location successfully added: " + newLocation.Name + "/" + newLocation.ID);
 
@@ -304,13 +301,14 @@ namespace VORBS.API
         {
             try
             {
-                Location location = db.Locations.Single(l => l.ID == locationId);
+                Location location = _locationRepository.GetLocationById(locationId);
                 location.Active = active;
-                db.SaveChanges();
+
+                _locationRepository.UpdateLocation(location);
 
                 if (!active)
                 {
-                    List<Booking> bookings = db.Bookings.Where(b => b.Room.LocationID == locationId && b.StartDate >= DateTime.Now)
+                    List<Booking> bookings = _bookingRepository.GetByDateAndLocation(DateTime.Now, location)
                                                 .OrderBy(b => b.Owner)
                                                 .ToList();
 
@@ -337,8 +335,8 @@ namespace VORBS.API
                     //Final Send the last owner bookings
                     SendMultiplyBookingEmail(ownerBookings);
 
-                    db.Bookings.RemoveRange(bookings);
-                    db.SaveChanges();
+                    _bookingRepository.Delete(bookings);
+                    
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);

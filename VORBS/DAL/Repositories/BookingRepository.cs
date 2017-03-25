@@ -7,17 +7,33 @@ using VORBS.API;
 using VORBS.DAL;
 using VORBS.Models;
 
-namespace VORBS.Services
+namespace VORBS.DAL.Repositories
 {
-    public class BookingService
+    public class BookingRepository
     {
         private VORBSContext db;
 
         private NLog.Logger _logger;
-        public BookingService(VORBSContext context)
+        public BookingRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
+        }
+
+        public List<Booking> GetByDateAndLocation(DateTime startDate, Location location)
+        {
+            List<Booking> bookings = db.Bookings
+                    .Where(x => x.StartDate >= startDate && x.Room.Location.ID == location.ID)
+                    .ToList();
+            return bookings;
+        }
+
+        public List<Booking> GetByDateAndRoom(DateTime startDate, Room room)
+        {
+            List<Booking> bookings = db.Bookings
+                    .Where(x => x.StartDate >= startDate && x.Room.ID== room.ID)
+                    .ToList();
+            return bookings;
         }
 
         public List<Booking> GetByDateAndLocation(DateTime startDate, DateTime endDate, Location location)
@@ -184,6 +200,21 @@ namespace VORBS.Services
             return booking;
         }
 
+        public List<Booking> GetById(List<int> ids)
+        {
+            return db.Bookings.Where(x => ids.Contains(x.ID)).ToList();
+        }
+
+        public List<Booking> GetByOwner(string owner)
+        {
+            return db.Bookings.Where(x => x.Owner == owner).ToList();
+        }
+
+        public List<string> GetDistinctListOfOwners()
+        {
+            return db.Bookings.Select(x => x.Owner).Distinct().ToList();
+        }
+
         public Booking UpdateExistingBooking(Booking existingBooking, Booking editBooking)
         {
             try
@@ -268,6 +299,21 @@ namespace VORBS.Services
             else
             {
                 return null;
+            }
+            
+        }
+
+        public void SaveNewBookings(List<Booking> bookings, bool checkForClash = true)
+        {
+            try
+            {
+                db.Bookings.AddRange(bookings);
+                db.SaveChanges(bookings, !checkForClash);
+            }
+            catch (Exception exn)
+            {
+                _logger.Error($"Unable to create new bookings.: {String.Join(", ", bookings.Select(x => x.ID))}. An error occured: {exn.Message}");
+                throw exn;
             }
             
         }
@@ -465,6 +511,14 @@ namespace VORBS.Services
 
             clashedBookings = clashedBs;
             return bookingsToCreate;
+        }
+
+        public List<Booking> GetBookingsInRecurrence(int recurrenceId, bool noTracking = false)
+        {
+            Func<Booking, bool> query = x => x.RecurrenceId == recurrenceId;
+
+            List<Booking> result = noTracking ? db.Bookings.AsNoTracking().Where(query).ToList() : db.Bookings.Where(query).ToList();
+            return result;
         }
 
         public int GetNextRecurrenceId()

@@ -9,16 +9,17 @@ using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Transactions;
 using VORBS.Services;
+using VORBS.DAL.Repositories;
 
 namespace VORBS.DAL
 {
     public class VORBSContext : DbContext
     {
-        private BookingService _bookingService;
+        private BookingRepository _bookingService;
 
         public VORBSContext() : base("VORBSContext")
         {
-            _bookingService = new BookingService(this);
+            _bookingService = new BookingRepository(this);
         }
 
         public virtual DbSet<Location> Locations { get; set; }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using VORBS.DAL;
+using VORBS.DAL.Repositories;
 using VORBS.Models;
 using VORBS.Models.DTOs;
 
@@ -15,12 +16,16 @@ namespace VORBS.API
     public class AdminController : ApiController
     {
         private NLog.Logger _logger;
+        private AdminRepository _adminRepository;
+        private BookingRepository _bookingRepository;
         private VORBSContext db;
 
         public AdminController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
+            _adminRepository = new AdminRepository(db);
+            _bookingRepository = new BookingRepository(db);
         }
 
         public AdminController() : this(new VORBSContext()) { }
@@ -37,7 +42,7 @@ namespace VORBS.API
 
                 List<AdminDTO> adminsDTO = new List<AdminDTO>();
 
-                List<Admin> admins = db.Admins.ToList();
+                List<Admin> admins = _adminRepository.GetAll();
 
                 admins.ForEach(a => adminsDTO.Add(new AdminDTO()
                 {
@@ -70,7 +75,7 @@ namespace VORBS.API
         {
             try
             {
-                Admin admin = db.Admins.Single(a => a.ID == adminId);
+                Admin admin = _adminRepository.GetAdminById(adminId);
 
                 return new AdminDTO()
                 {
@@ -100,11 +105,10 @@ namespace VORBS.API
         {
             try
             {
-                if (db.Admins.Count(a => a.PID == admin.PID) > 0)
+                if (_adminRepository.GetAdminByPid(admin.PID) != null)
                     return Request.CreateResponse(HttpStatusCode.Conflict);
 
-                db.Admins.Add(admin);
-                db.SaveChanges();
+                _adminRepository.SaveNewAdmin(admin);
 
                 _logger.Info("Admin successfully added: " + admin.PID);
 
@@ -124,7 +128,7 @@ namespace VORBS.API
             try
             {
                 //Find Existing Booking
-                Admin existingAdmin = db.Admins.Single(a => a.ID == existingAdminId);
+                Admin existingAdmin = _adminRepository.GetAdminById(existingAdminId);
 
                 //No edits found
                 if (existingAdmin.PermissionLevel == editAdmin.PermissionLevel && existingAdmin.LocationID == editAdmin.LocationID)
@@ -133,7 +137,7 @@ namespace VORBS.API
                 existingAdmin.PermissionLevel = editAdmin.PermissionLevel;
                 existingAdmin.LocationID = editAdmin.LocationID;
 
-                db.SaveChanges();
+                _adminRepository.UpdateAdmin(existingAdmin);
 
                 _logger.Info("Admin successfully Edited: " + editAdmin.PID);
 
@@ -152,8 +156,8 @@ namespace VORBS.API
         {
             try
             {
-                db.Admins.Remove(db.Admins.Single(a => a.ID == adminId));
-                db.SaveChanges();
+                Admin admin = _adminRepository.GetAdminById(adminId);
+                _adminRepository.DeleteAdmin(admin);
 
                 _logger.Info("Admin successfully deleted: " + adminId);
 
@@ -171,7 +175,7 @@ namespace VORBS.API
         {
             try
             {
-                return db.Bookings.Select(b => b.Owner).Distinct().ToList();
+                return _bookingRepository.GetDistinctListOfOwners();
             }
             catch (Exception ex)
             {

@@ -19,6 +19,7 @@ using System.Web.Script.Serialization;
 using System.Linq.Expressions;
 using System.Linq.Dynamic;
 using VORBS.Services;
+using VORBS.DAL.Repositories;
 using VORBS.Models.ViewModels;
 
 namespace VORBS.API
@@ -28,7 +29,9 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
-        private BookingService _bookingService;
+        private BookingRepository _bookingsRepository;
+        private LocationRepository _locationsRepository;
+        private RoomRepository _roomsRepository;
 
         private IDirectoryService _directoryService;
 
@@ -38,7 +41,9 @@ namespace VORBS.API
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _bookingService = new BookingService(db);
+            _bookingsRepository = new BookingRepository(db);
+            _locationsRepository = new LocationRepository(db);
+            _roomsRepository = new RoomRepository(db);
             _directoryService = new StubbedDirectoryService();
         }
 
@@ -53,8 +58,8 @@ namespace VORBS.API
 
             try
             {
-                Location currentLocation = db.Locations.Where(x => x.Name == location).First();
-                List<Booking> bookings = _bookingService.GetByDateAndLocation(start, end, currentLocation);
+                Location currentLocation = _locationsRepository.GetLocationByName(location);
+                List<Booking> bookings = _bookingsRepository.GetByDateAndLocation(start, end, currentLocation);
 
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
                 {
@@ -105,9 +110,9 @@ namespace VORBS.API
 
                 Room currentRoom = null;
                 if (room != null)
-                    currentRoom = db.Rooms.Where(x => x.RoomName == room).First();
+                    currentRoom = _roomsRepository.GetRoomByName(room);
 
-                List<Booking> bookings = _bookingService.GetByDateAndRoom(start, end, currentRoom);
+                List<Booking> bookings = _bookingsRepository.GetByDateAndRoom(start, end, currentRoom);
 
 
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
@@ -158,9 +163,9 @@ namespace VORBS.API
             {
                 Room currentRoom = null;
                 if (room != null)
-                    currentRoom = db.Rooms.Where(x => x.RoomName == room).First();
+                    currentRoom = _roomsRepository.GetRoomByName(room);
 
-                List<Booking> bookings = _bookingService.GetByDateRoomAndOwner(start, end, currentRoom, person);
+                List<Booking> bookings = _bookingsRepository.GetByDateRoomAndOwner(start, end, currentRoom, person);
 
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
                 {
@@ -207,7 +212,7 @@ namespace VORBS.API
             {
                 string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
-                List<Booking> bookings = _bookingService.GetByDateAndPid(start, currentPid);
+                List<Booking> bookings = _bookingsRepository.GetByDateAndPid(start, currentPid);
 
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
                 {
@@ -261,7 +266,7 @@ namespace VORBS.API
 
             try
             {
-                Booking booking = _bookingService.GetById(bookingId);
+                Booking booking = _bookingsRepository.GetById(bookingId);
 
                 bookingsDTO = new BookingDTO()
                 {
@@ -326,7 +331,7 @@ namespace VORBS.API
 
                 List<DateTime> recurringDates = new List<DateTime>();
 
-                Room bookingRoom = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault();
+                Room bookingRoom = _roomsRepository.GetRoomById(newBooking.RoomID);
                 newBooking.RoomID = newBooking.Room.ID;
 
                 int? nextRecurringId = null;
@@ -350,11 +355,11 @@ namespace VORBS.API
                     AvailabilityController aC = new AvailabilityController();
 
                     recurringDates = GetDatesForRecurrencePeriod(newBooking.StartDate, newBooking.Recurrence);
-                    nextRecurringId = _bookingService.GetNextRecurrenceId();
+                    nextRecurringId = _bookingsRepository.GetNextRecurrenceId();
 
                     if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
                     {
-                        var smartBookings = _bookingService.GetAvailableSmartRoomBookings(newBooking, out clashedBookings);
+                        var smartBookings = _bookingsRepository.GetAvailableSmartRoomBookings(newBooking, out clashedBookings);
 
                         //No Rooms avalible; Show clashes to users
                         if (clashedBookings.Count() > 0)
@@ -417,9 +422,9 @@ namespace VORBS.API
                             {
                                 try
                                 {
-                                    int[] ids = clashedBookings.Select(x => x.ID).ToArray();
-                                    var entityClashedBookings = db.Bookings.Where(x => ids.Contains(x.ID));
-                                    db.Bookings.RemoveRange(entityClashedBookings);
+                                    List<int> ids = clashedBookings.Select(x => x.ID).ToList();
+                                    var entityClashedBookings = _bookingsRepository.GetById(ids);
+                                    _bookingsRepository.Delete(entityClashedBookings);
                                     deletedBookings.AddRange(clashedBookings);
                                 }
                                 catch (Exception exn)
@@ -441,7 +446,7 @@ namespace VORBS.API
                 }
                 else if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom) //TODO: Change when we introduce new validation check in UI
                 {
-                    var smartBookings = _bookingService.GetAvailableSmartRoomBookings(newBooking, out clashedBookings);
+                    var smartBookings = _bookingsRepository.GetAvailableSmartRoomBookings(newBooking, out clashedBookings);
 
                     //No Rooms avalible; Show clashes to users
                     if (clashedBookings.Count() > 0)
@@ -465,9 +470,7 @@ namespace VORBS.API
                 if (nextRecurringId != null && nextRecurringId > 0)
                     bookingsToCreate.ForEach(x => x.RecurrenceId = nextRecurringId);
 
-                db.Bookings.AddRange(bookingsToCreate);
-
-                db.SaveChanges(bookingsToCreate, false);
+                _bookingsRepository.SaveNewBookings(bookingsToCreate);
 
                 if (deletedBookings.Count > 0)
                 {
@@ -498,7 +501,7 @@ namespace VORBS.API
                     return new HttpResponseMessage(HttpStatusCode.OK);
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
-                newBooking.Room = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault();
+                newBooking.Room = _roomsRepository.GetRoomById(newBooking.RoomID);
                 try
                 {
                     string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
@@ -509,7 +512,7 @@ namespace VORBS.API
                     if (newBooking.IsSmartMeeting)
                         bookingsToCreate = GetRoomForBookings(bookingsToCreate);
                     else
-                        newBooking.Room = GetRoomForBooking(newBooking);
+                        newBooking.Room = _roomsRepository.GetRoomById(newBooking.RoomID);
 
 
                     if (newBooking.PID.ToUpper() != currentUserPid.ToUpper())
@@ -544,7 +547,7 @@ namespace VORBS.API
 
 
                 //need location to get DSO, security specific emails etc..
-                Location bookingsLocation = db.Rooms.Where(x => x.ID == newBooking.RoomID).FirstOrDefault().Location;
+                Location bookingsLocation = _roomsRepository.GetRoomById(newBooking.RoomID).Location;
                 if (newBooking.Flipchart || newBooking.Projector)
                 {
                     string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
@@ -631,15 +634,15 @@ namespace VORBS.API
         [Route("{existingBookingId:int}/{recurrence:bool?}")]
         public HttpResponseMessage EditExistingBooking(int existingBookingId, Booking editBooking, bool? recurrence = false)
         {
-            
+
             //Find Existing Booking
-            Booking existingBooking = db.Bookings.Single(b => b.ID == existingBookingId);
+            Booking existingBooking = _bookingsRepository.GetById(existingBookingId);
 
             int? recurringBookingId = null;
             if (recurrence.Value)
                 recurringBookingId = existingBooking.RecurrenceId;
-            List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : db.Bookings.Where(x => x.RecurrenceId == recurringBookingId.Value).ToList();
-            List<Booking> originalBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : db.Bookings.AsNoTracking().Where(x => x.RecurrenceId == recurringBookingId.Value).ToList();
+            List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value);
+            List<Booking> originalBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value, true);
 
             List<Booking> editBookings = new List<Booking>();
 
@@ -674,7 +677,7 @@ namespace VORBS.API
                 }
 
 
-                var updatedBookings = _bookingService.UpdateExistingBookings(allBookings, editBookings);
+                var updatedBookings = _bookingsRepository.UpdateExistingBookings(allBookings, editBookings);
                 if (updatedBookings == null)
                 {
                     _logger.Fatal("Unable to edit booking(s): " + editBooking.ID);
@@ -697,7 +700,7 @@ namespace VORBS.API
                 _logger.Info("Booking(s) successfully editted: " + String.Join(",", editBookings.Select(x => x.ID)));
 
                 //Get markup for facilities email
-                Location bookingsLocation = db.Rooms.Where(x => x.ID == editBooking.RoomID).FirstOrDefault().Location;
+                Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
                 List<FacilitiesEdittedBooking> facilitiesViewModels = new List<FacilitiesEdittedBooking>();
                 foreach (Booking booking in editBookings)
                 {
@@ -885,8 +888,8 @@ namespace VORBS.API
         {
             try
             {
-                Booking booking = db.Bookings.First(b => b.ID == bookingId);
-                Location bookingsLocation = db.Rooms.Where(x => x.ID == booking.RoomID).FirstOrDefault().Location;
+                Booking booking = _bookingsRepository.GetById(bookingId);
+                Location bookingsLocation =_roomsRepository.GetRoomById(booking.RoomID).Location;
 
                 string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
 
@@ -908,9 +911,9 @@ namespace VORBS.API
                 int? recurringBookingId = null;
                 if (recurrence.Value)
                     recurringBookingId = booking.RecurrenceId;
-                List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { booking } : db.Bookings.Where(x => x.RecurrenceId == recurringBookingId.Value).ToList();
+                List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { booking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value);
 
-                bool success = _bookingService.Delete(allBookings);
+                bool success = _bookingsRepository.Delete(allBookings);
                 if (!success)
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, "Unable to update existing booking. An error occured, please contact help desk.");
                 else
@@ -919,7 +922,7 @@ namespace VORBS.API
                 if (bool.Parse(ConfigurationManager.AppSettings["sendEmails"]))
                     return new HttpResponseMessage(HttpStatusCode.OK);
 
-                Room locationRoom = db.Rooms.First(b => b.ID == booking.RoomID);
+                Room locationRoom = _roomsRepository.GetRoomById(booking.RoomID);
                 allBookings.ForEach(x => x.Room = locationRoom);
 
                 string body = "";
@@ -1011,13 +1014,13 @@ namespace VORBS.API
 
             Room currentRoom = null;
             if (room != null)
-                currentRoom = db.Rooms.Where(x => x.RoomName == room).First();
+                currentRoom = _roomsRepository.GetRoomByName(room);
 
             Location currentLocation = null;
             if (location != null && location != 0)
-                currentLocation = db.Locations.Where(x => x.ID == location).First();
+                currentLocation = _locationsRepository.GetLocationById(location.Value);
 
-            var bookings = _bookingService.GetByPartialDateRoomLocationSmartAndOwner(start, null, owner, null, currentRoom, currentLocation);
+            var bookings = _bookingsRepository.GetByPartialDateRoomLocationSmartAndOwner(start, null, owner, null, currentRoom, currentLocation);
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
             bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
@@ -1062,7 +1065,7 @@ namespace VORBS.API
             {
                 string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
 
-                List<Booking> bookings = _bookingService.GetByDateAndPidForPeriod(period, currentPid, startDate);
+                List<Booking> bookings = _bookingsRepository.GetByDateAndPidForPeriod(period, currentPid, startDate);
 
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
                 {
@@ -1116,13 +1119,13 @@ namespace VORBS.API
 
             Location searchLocation = null;
             if (locationId != null && locationId != 0)
-                searchLocation = db.Locations.Where(x => x.ID == locationId).First();
+                searchLocation = _locationsRepository.GetLocationById(locationId.Value);
 
             Room searchRoom = null;
             if (room != null)
-                searchRoom = db.Rooms.Where(x => x.RoomName == room).First();
+                searchRoom = _roomsRepository.GetRoomByName(room);
 
-            var bookings = _bookingService.GetByPartialDateRoomSmartLocationAndPid(startDate, DateTime.Now, currentPid, smartRoom, searchRoom, searchLocation);
+            var bookings = _bookingsRepository.GetByPartialDateRoomSmartLocationAndPid(startDate, DateTime.Now, currentPid, smartRoom, searchRoom, searchLocation);
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
             bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
@@ -1157,14 +1160,9 @@ namespace VORBS.API
             return bookingsDTO;
         }
 
-        private Room GetRoomForBooking(Booking newBooking)
-        {
-            return db.Rooms.Single(r => r.ID == newBooking.RoomID);
-        }
-
         protected internal List<Booking> GetRoomForBookings(List<Booking> bookingsToCreate)
         {
-            bookingsToCreate.ForEach(b => b.Room = GetRoomForBooking(b));
+            bookingsToCreate.ForEach(b => b.Room = _roomsRepository.GetRoomById(b.RoomID));
             return bookingsToCreate;
         }
 
