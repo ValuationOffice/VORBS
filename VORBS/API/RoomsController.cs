@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using VORBS.DAL;
+using VORBS.DAL.Repositories;
 using VORBS.Models;
 using VORBS.Models.DTOs;
 using VORBS.Services;
@@ -19,12 +20,18 @@ namespace VORBS.API
         private NLog.Logger _logger;
         private VORBSContext db;
         private IDirectoryService _directoryService;
+        private RoomRepository _roomRepository;
+        private LocationRepository _locationRepository;
+        private BookingRepository _bookingRepository;
 
         public RoomsController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
             _directoryService = new StubbedDirectoryService();
+            _locationRepository = new LocationRepository(db);
+            _roomRepository = new RoomRepository(db);
+            _bookingRepository = new BookingRepository(db);
         }
 
         public RoomsController() : this(new VORBSContext()) { }
@@ -38,7 +45,7 @@ namespace VORBS.API
             {
                 List<RoomDTO> roomDTOs = new List<RoomDTO>();
 
-                List<Room> rooms = db.Rooms.OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
+                List<Room> rooms = _roomRepository.GetAllRooms().OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
 
                 rooms.ForEach(x => roomDTOs.Add(new RoomDTO()
                 {
@@ -73,7 +80,7 @@ namespace VORBS.API
             {
                 RoomDTO roomDTO = new RoomDTO();
 
-                Room room = db.Rooms.Single(r => r.ID == roomId);
+                Room room = _roomRepository.GetRoomById(roomId);
 
                 roomDTO = new RoomDTO()
                 {
@@ -108,7 +115,8 @@ namespace VORBS.API
             {
                 RoomDTO roomDTO = new RoomDTO();
 
-                Room room = db.Rooms.Single(r => r.LocationID == locationId && r.RoomName == roomName);
+                Location location = _locationRepository.GetLocationById(locationId);
+                Room room = _roomRepository.GetByLocationAndName(location, roomName);
 
                 roomDTO = new RoomDTO()
                 {
@@ -142,22 +150,24 @@ namespace VORBS.API
         {
             try
             {
+                Location location = _locationRepository.GetLocationByName(locationName);
+
                 List<RoomDTO> roomDTOs = new List<RoomDTO>();
                 List<Room> rooms = new List<Room>();
 
                 if (status < 0)
                     if (locationName == "location")
-                        rooms = db.Rooms.OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
+                        rooms = _roomRepository.GetAllRooms().OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
                     else
-                        rooms = db.Rooms.Where(r => r.Location.Name == locationName).OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
+                        rooms = _roomRepository.GetByLocationName(locationName).OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
                 else
                 {
                     bool active = (status == 0) ? false : true;
 
                     if (locationName == "location")
-                        rooms = db.Rooms.Where(r => r.Active == active).OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
+                        rooms = _roomRepository.GetByStatus(active).OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
                     else
-                        rooms = db.Rooms.Where(r => r.Location.Name == locationName && r.Active == active).OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
+                        rooms =  _roomRepository.GetByLocationAndStatus(location, active).OrderBy(r => r.Location.Name).ThenBy(r => r.RoomName).ToList();
                 }
 
                 rooms.ForEach(x => roomDTOs.Add(new RoomDTO()
@@ -193,12 +203,13 @@ namespace VORBS.API
         {
             try
             {
-                //Check to see if Room already exists at location
-                if (db.Rooms.Where(r => r.RoomName.ToUpper() == newRoom.RoomName.ToUpper() && r.LocationID == newRoom.LocationID).Count() > 0)
-                    return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", newRoom.RoomName, newRoom.Location.Name));
+                Location location = _locationRepository.GetLocationById(newRoom.LocationID);
 
-                db.Rooms.Add(newRoom);
-                db.SaveChanges();
+                //Check to see if Room already exists at location
+                if (_roomRepository.GetByLocationAndName(location, newRoom.RoomName) != null)
+                    return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", newRoom.RoomName, location.Name));
+
+                _roomRepository.SaveNewRoom(newRoom);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -217,20 +228,20 @@ namespace VORBS.API
             try
             {
                 //Find Existing Booking
-                Room existingRoom = db.Rooms.Single(r => r.ID == existingRoomId);
+                Room existingRoom = _roomRepository.GetRoomById(existingRoomId);
+                Location location = _locationRepository.GetLocationById(existingRoom.LocationID);
 
                 if (existingRoom.RoomName != editRoom.RoomName)
                 {
-                    var duplicateRoomCheck = db.Rooms.Where(r => r.RoomName == editRoom.RoomName && r.LocationID == existingRoom.LocationID).Count();
+                    bool isDuplicate = _roomRepository.GetByLocationAndName(location, editRoom.RoomName) != null;
 
-                    if (duplicateRoomCheck > 0)
+                    if (isDuplicate)
                         return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", editRoom.RoomName, editRoom.Location.Name));
                 }
 
                 editRoom.LocationID = existingRoom.LocationID;
 
-                db.Entry(existingRoom).CurrentValues.SetValues(editRoom);
-                db.SaveChanges();
+                _roomRepository.EditRoom(editRoom);
 
                 _logger.Info("Room successfully Edited: " + editRoom.ID);
 
@@ -251,14 +262,15 @@ namespace VORBS.API
         {
             try
             {
-                Room room = db.Rooms.Single(r => r.ID == roomId);
+                Room room = _roomRepository.GetRoomById(roomId);
 
                 room.Active = active;
-                db.SaveChanges();
+
+                _roomRepository.EditRoom(room);
 
                 if (!active)
                 {
-                    List<Booking> bookings = db.Bookings.Where(b => b.RoomID == roomId && b.StartDate >= DateTime.Now)
+                    List<Booking> bookings = _bookingRepository.GetByDateAndRoom(DateTime.Now, room)
                                                         .OrderBy(b => b.Owner)
                                                         .ToList();
 
@@ -285,8 +297,8 @@ namespace VORBS.API
                     //Final Send the last owner bookings
                     SendMultiplyBookingEmail(ownerBookings);
 
-                    db.Bookings.RemoveRange(bookings);
-                    db.SaveChanges();
+                    _bookingRepository.Delete(bookings);
+
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK);

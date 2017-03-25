@@ -10,6 +10,7 @@ using VORBS.Models.DTOs;
 using VORBS.Utils;
 using System.Data.Entity.Core.Objects;
 using VORBS.Services;
+using VORBS.DAL.Repositories;
 
 namespace VORBS.API
 {
@@ -18,13 +19,13 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
-        private BookingService _bookingService;
+        private BookingRepository _bookingRepository;
 
         public AvailabilityController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _bookingService = new BookingService(db);
+            _bookingRepository = new BookingRepository(db);
         }
 
         public AvailabilityController() : this(new VORBSContext()) { }
@@ -254,7 +255,7 @@ namespace VORBS.API
 
                 List<Room> availableRooms = new List<Room>();
 
-                Booking existingBooking = _bookingService.GetById(existingBookignId);
+                Booking existingBooking = _bookingRepository.GetById(existingBookignId);
 
                 List<Booking> clashedBookings;
                 existingBooking.StartDate = start;
