@@ -58,7 +58,7 @@ namespace VORBS.Services
 
         public User GetUser(User.Pid pid)
         {
-            return stubbedUsers.Where(x => x.PayId == pid).First();
+            return stubbedUsers.Where(x => x.PayId.Identity == pid.Identity).First();
         }
     }
 }
