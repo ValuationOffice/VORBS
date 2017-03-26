@@ -7,11 +7,11 @@ using VORBS.Models;
 
 namespace VORBS.DAL.Repositories
 {
-    public class LocationRepository
+    public class EFLocationRepository : ILocationRepository
     {
         private VORBSContext db;
         private NLog.Logger _logger;
-        public LocationRepository(VORBSContext context)
+        public EFLocationRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();

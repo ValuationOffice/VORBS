@@ -19,13 +19,13 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
-        private BookingRepository _bookingRepository;
+        private IBookingRepository _bookingRepository;
 
         public AvailabilityController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _bookingRepository = new BookingRepository(db);
+            _bookingRepository = new EFBookingRepository(db);
         }
 
         public AvailabilityController() : this(new VORBSContext()) { }

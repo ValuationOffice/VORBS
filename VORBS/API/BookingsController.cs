@@ -29,9 +29,9 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
-        private BookingRepository _bookingsRepository;
-        private LocationRepository _locationsRepository;
-        private RoomRepository _roomsRepository;
+        private IBookingRepository _bookingsRepository;
+        private ILocationRepository _locationsRepository;
+        private IRoomRepository _roomsRepository;
 
         private IDirectoryService _directoryService;
 
@@ -41,9 +41,9 @@ namespace VORBS.API
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _bookingsRepository = new BookingRepository(db);
-            _locationsRepository = new LocationRepository(db);
-            _roomsRepository = new RoomRepository(db);
+            _bookingsRepository = new EFBookingRepository(db);
+            _locationsRepository = new EFLocationRepository(db);
+            _roomsRepository = new EFRoomRepository(db);
             _directoryService = new StubbedDirectoryService();
         }
 

@@ -6,12 +6,12 @@ using VORBS.Models;
 
 namespace VORBS.DAL.Repositories
 {
-    public class RoomRepository
+    public class EFRoomRepository : IRoomRepository
     {
         private VORBSContext db;
         private NLog.Logger _logger;
 
-        public RoomRepository(VORBSContext context)
+        public EFRoomRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();

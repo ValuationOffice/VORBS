@@ -15,11 +15,11 @@ namespace VORBS.DAL
 {
     public class VORBSContext : DbContext
     {
-        private BookingRepository _bookingService;
+        private IBookingRepository _bookingService;
 
         public VORBSContext() : base("VORBSContext")
         {
-            _bookingService = new BookingRepository(this);
+            _bookingService = new EFBookingRepository(this);
         }
 
         public virtual DbSet<Location> Locations { get; set; }

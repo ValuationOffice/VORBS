@@ -16,16 +16,16 @@ namespace VORBS.API
     public class AdminController : ApiController
     {
         private NLog.Logger _logger;
-        private AdminRepository _adminRepository;
-        private BookingRepository _bookingRepository;
+        private IAdminRepository _adminRepository;
+        private IBookingRepository _bookingRepository;
         private VORBSContext db;
 
         public AdminController(VORBSContext context)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _adminRepository = new AdminRepository(db);
-            _bookingRepository = new BookingRepository(db);
+            _adminRepository = new EFAdminRepository(db);
+            _bookingRepository = new EFBookingRepository(db);
         }
 
         public AdminController() : this(new VORBSContext()) { }

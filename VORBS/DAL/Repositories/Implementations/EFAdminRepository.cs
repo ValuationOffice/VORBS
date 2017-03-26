@@ -6,12 +6,12 @@ using VORBS.Models;
 
 namespace VORBS.DAL.Repositories
 {
-    public class AdminRepository
+    public class EFAdminRepository : IAdminRepository
     {
         private VORBSContext db;
         private NLog.Logger _logger;
 
-        public AdminRepository(VORBSContext context)
+        public EFAdminRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();

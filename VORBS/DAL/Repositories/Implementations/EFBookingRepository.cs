@@ -9,12 +9,12 @@ using VORBS.Models;
 
 namespace VORBS.DAL.Repositories
 {
-    public class BookingRepository
+    public class EFBookingRepository : IBookingRepository
     {
         private VORBSContext db;
 
         private NLog.Logger _logger;
-        public BookingRepository(VORBSContext context)
+        public EFBookingRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
