@@ -7,7 +7,7 @@ using VORBS.Models;
 
 namespace VORBS.Services
 {
-    interface IDirectoryService
+    public interface IDirectoryService
     {
         User GetCurrentUser(string identity);
         User GetUser(User.Pid pid);

@@ -28,23 +28,21 @@ namespace VORBS.API
     public class BookingsController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db;
-        private BookingRepository _bookingsRepository;
-        private LocationRepository _locationsRepository;
-        private RoomRepository _roomsRepository;
+        private IBookingRepository _bookingsRepository;
+        private ILocationRepository _locationsRepository;
+        private IRoomRepository _roomsRepository;
 
         private IDirectoryService _directoryService;
 
-        public BookingsController() : this(new VORBSContext()) { }
-
-        public BookingsController(VORBSContext context)
+        public BookingsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IRoomRepository roomsRepository, IDirectoryService directoryService)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
-            db = context;
-            _bookingsRepository = new BookingRepository(db);
-            _locationsRepository = new LocationRepository(db);
-            _roomsRepository = new RoomRepository(db);
-            _directoryService = new StubbedDirectoryService();
+
+            _directoryService = directoryService;
+
+            _bookingsRepository = bookingRepository;
+            _locationsRepository = locationRepository;
+            _roomsRepository = roomsRepository;
         }
 
         [Route("{location}/{start:DateTime}/{end:DateTime}/")]
@@ -352,7 +350,7 @@ namespace VORBS.API
 
                 if (newBooking.Recurrence.IsRecurring)
                 {
-                    AvailabilityController aC = new AvailabilityController();
+                    AvailabilityService aC = new AvailabilityService(_bookingsRepository, _roomsRepository, _locationsRepository);
 
                     recurringDates = GetDatesForRecurrencePeriod(newBooking.StartDate, newBooking.Recurrence);
                     nextRecurringId = _bookingsRepository.GetNextRecurrenceId();

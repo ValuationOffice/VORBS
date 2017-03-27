@@ -6,12 +6,12 @@ using VORBS.Models;
 
 namespace VORBS.DAL.Repositories
 {
-    public class RoomRepository
+    public class EFRoomRepository : IRoomRepository
     {
         private VORBSContext db;
         private NLog.Logger _logger;
 
-        public RoomRepository(VORBSContext context)
+        public EFRoomRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -25,6 +25,16 @@ namespace VORBS.DAL.Repositories
         public List<Room> GetByLocationName(string locationName)
         {
             return db.Rooms.Where(r => r.Location.Name == locationName).ToList();
+        }
+
+        public List<Room> GetByLocationAndSeatCount(Location location, int seatCount)
+        {
+            return db.Rooms.Where(x => x.Location.ID == location.ID && x.SeatCount >= seatCount && x.Active == true).ToList();
+        }
+
+        public List<Room> GetByLocationAndSmartRoom(Location location, bool isSmart)
+        {
+            return db.Rooms.Where(x => x.Location.ID == location.ID && x.SmartRoom == true && x.Active == true).ToList();
         }
 
         public List<Room> GetAllRooms()

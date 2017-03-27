@@ -6,12 +6,12 @@ using VORBS.Models;
 
 namespace VORBS.DAL.Repositories
 {
-    public class AdminRepository
+    public class EFAdminRepository : IAdminRepository
     {
         private VORBSContext db;
         private NLog.Logger _logger;
 
-        public AdminRepository(VORBSContext context)
+        public EFAdminRepository(VORBSContext context)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -24,12 +24,12 @@ namespace VORBS.DAL.Repositories
 
         public Admin GetAdminById(int ID)
         {
-            return db.Admins.Single(a => a.ID == ID);
+            return db.Admins.Where(a => a.ID == ID).FirstOrDefault();
         }
 
         public Admin GetAdminByPid(string PID)
         {
-            return db.Admins.Single(x => x.PID == PID);
+            return db.Admins.Where(x => x.PID == PID).FirstOrDefault();
         }
 
         public void UpdateAdmin(Admin admin)

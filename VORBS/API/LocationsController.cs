@@ -21,20 +21,18 @@ namespace VORBS.API
         private NLog.Logger _logger;
         private VORBSContext db;
         private IDirectoryService _directoryService;
-        private LocationRepository _locationRepository;
-        private BookingRepository _bookingRepository;
+        private ILocationRepository _locationRepository;
+        private IBookingRepository _bookingRepository;
 
-        public LocationsController(VORBSContext context)
+        public LocationsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IDirectoryService directoryService)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
-            db = context;
-            _locationRepository = new LocationRepository(db);
-            _directoryService = new StubbedDirectoryService();
-            _bookingRepository = new BookingRepository(db);
-        }
 
-        public LocationsController() : this(new VORBSContext()) { }
-        
+            _directoryService = directoryService;
+
+            _locationRepository = locationRepository;
+            _bookingRepository = bookingRepository;
+        }
 
         [HttpGet]
         [Route("")]
