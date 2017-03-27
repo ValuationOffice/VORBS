@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Web;
 using VORBS.API;
 using VORBS.DAL;
 using VORBS.Models;
+using VORBS.Services;
 
 namespace VORBS.DAL.Repositories
 {
@@ -13,11 +15,17 @@ namespace VORBS.DAL.Repositories
     {
         private VORBSContext db;
 
+        private ILocationRepository _locationRepository;
+        private IRoomRepository _roomRepository;
+
         private NLog.Logger _logger;
-        public EFBookingRepository(VORBSContext context)
+        public EFBookingRepository(VORBSContext context, ILocationRepository locationRepository, IRoomRepository roomRepository)
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
+
+            _locationRepository = locationRepository;
+            _roomRepository = roomRepository;
         }
 
         public List<Booking> GetByDateAndLocation(DateTime startDate, Location location)
@@ -34,6 +42,15 @@ namespace VORBS.DAL.Repositories
                     .Where(x => x.StartDate >= startDate && x.Room.ID== room.ID)
                     .ToList();
             return bookings;
+        }
+
+        public List<Booking> GetByDateOnlyAndRoom(DateTime dateOnly, Room room)
+        {
+            return db.Bookings
+                    //Bookings only for this room
+                    .Where(x => x.RoomID == room.ID)
+                    //Only bookings on the certain days that we want to book for
+                    .Where(y => dateOnly.Date == EntityFunctions.TruncateTime(y.StartDate)).ToList();
         }
 
         public List<Booking> GetByDateAndLocation(DateTime startDate, DateTime endDate, Location location)
@@ -454,9 +471,8 @@ namespace VORBS.DAL.Repositories
             List<int> smartRoomIds = new List<int>();
 
             smartRoomIds.Add(newBooking.RoomID);
-
-            //TODO: THIS MUST BE CHANGED TO THE AVAILABILITY SERVICE WHEN IT IS MADE.
-            AvailabilityController aC = new AvailabilityController();
+            
+            AvailabilityService aC = new AvailabilityService(this, _roomRepository, _locationRepository);
 
             foreach (var smartLoc in newBooking.SmartLoactions)
             {

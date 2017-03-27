@@ -18,24 +18,21 @@ namespace VORBS.API
     public class RoomsController : ApiController
     {
         private NLog.Logger _logger;
-        private VORBSContext db;
         private IDirectoryService _directoryService;
         private IRoomRepository _roomRepository;
         private ILocationRepository _locationRepository;
         private IBookingRepository _bookingRepository;
 
-        public RoomsController(VORBSContext context)
+        public RoomsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IRoomRepository roomRepository, IDirectoryService directoryService)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
-            db = context;
-            _directoryService = new StubbedDirectoryService();
-            _locationRepository = new EFLocationRepository(db);
-            _roomRepository = new EFRoomRepository(db);
-            _bookingRepository = new EFBookingRepository(db);
-        }
 
-        public RoomsController() : this(new VORBSContext()) { }
-        
+            _directoryService = directoryService;
+
+            _locationRepository = locationRepository;
+            _roomRepository = roomRepository;
+            _bookingRepository = bookingRepository;
+        }
 
         [HttpGet]
         [Route("")]

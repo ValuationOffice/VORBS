@@ -34,12 +34,12 @@ namespace VORBS.DAL.Repositories
 
         public Location GetLocationByName(string name)
         {
-            return db.Locations.Where(x => x.Name == name).First();
+            return db.Locations.Where(x => x.Name == name).FirstOrDefault();
         }
 
         public Location GetLocationById(int id)
         {
-            return db.Locations.Where(x => x.ID == id).First();
+            return db.Locations.Where(x => x.ID == id).FirstOrDefault();
         }
 
         public void SaveNewLocation(Location location)

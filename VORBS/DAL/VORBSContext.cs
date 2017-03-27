@@ -15,11 +15,15 @@ namespace VORBS.DAL
 {
     public class VORBSContext : DbContext
     {
-        private IBookingRepository _bookingService;
+        private ILocationRepository _locationRepository;
+        private IBookingRepository _bookingRepository;
+        private IRoomRepository _roomRepository;
 
         public VORBSContext() : base("VORBSContext")
         {
-            _bookingService = new EFBookingRepository(this);
+            _bookingRepository = new EFBookingRepository(this, _locationRepository, _roomRepository);
+            _locationRepository = new EFLocationRepository(this);
+            _roomRepository = new EFRoomRepository(this);
         }
 
         public virtual DbSet<Location> Locations { get; set; }
@@ -37,7 +41,7 @@ namespace VORBS.DAL
             {
                 using (var scope = TransactionUtils.CreateTransactionScope())
                 {
-                    AvailabilityController aC = new AvailabilityController();
+                    AvailabilityService aC = new AvailabilityService(_bookingRepository, _roomRepository, _locationRepository);
 
                     bool invalid = aC.DoesMeetingClash(booking, out clashedBookings);
                     //Checks if the booking that clashed is the current booking being saved, this allows us to edit bookings.
@@ -77,7 +81,7 @@ namespace VORBS.DAL
 
             if (!dontCheckClash)
             {
-                AvailabilityController aC = new AvailabilityController();
+                AvailabilityService aC = new AvailabilityService(_bookingRepository, _roomRepository, _locationRepository);
                 List<Booking> clashedBookings;
 
                 using (var scope = TransactionUtils.CreateTransactionScope())
@@ -102,7 +106,7 @@ namespace VORBS.DAL
                     {
                         int? recurrenceId = bookings.Select(x => x.RecurrenceId).FirstOrDefault();
                         //Check if the recurrence id is infact the next id in the DB (could potentially not be if a recurrence was made during execution of this request)
-                        int nextRecurrenceId = _bookingService.GetNextRecurrenceId();
+                        int nextRecurrenceId = _bookingRepository.GetNextRecurrenceId();
                         if (recurrenceId != null && recurrenceId != nextRecurrenceId)
                             //if the bookings recurrenceid is not the next, then set it.
                             bookings.ForEach(x => x.RecurrenceId = nextRecurrenceId);

@@ -18,18 +18,14 @@ namespace VORBS.API
         private NLog.Logger _logger;
         private IAdminRepository _adminRepository;
         private IBookingRepository _bookingRepository;
-        private VORBSContext db;
 
-        public AdminController(VORBSContext context)
+        public AdminController(IBookingRepository bookingRepository, IAdminRepository adminRepository)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
-            db = context;
-            _adminRepository = new EFAdminRepository(db);
-            _bookingRepository = new EFBookingRepository(db);
+
+            _adminRepository = adminRepository;
+            _bookingRepository = bookingRepository;
         }
-
-        public AdminController() : this(new VORBSContext()) { }
-
 
         [HttpGet]
         [Route("{allAdmins}")]

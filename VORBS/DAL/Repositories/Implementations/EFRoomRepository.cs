@@ -27,6 +27,16 @@ namespace VORBS.DAL.Repositories
             return db.Rooms.Where(r => r.Location.Name == locationName).ToList();
         }
 
+        public List<Room> GetByLocationAndSeatCount(Location location, int seatCount)
+        {
+            return db.Rooms.Where(x => x.Location.ID == location.ID && x.SeatCount >= seatCount && x.Active == true).ToList();
+        }
+
+        public List<Room> GetByLocationAndSmartRoom(Location location, bool isSmart)
+        {
+            return db.Rooms.Where(x => x.Location.ID == location.ID && x.SmartRoom == true && x.Active == true).ToList();
+        }
+
         public List<Room> GetAllRooms()
         {
             return db.Rooms.ToList();

@@ -24,17 +24,15 @@ namespace VORBS.API
         private ILocationRepository _locationRepository;
         private IBookingRepository _bookingRepository;
 
-        public LocationsController(VORBSContext context)
+        public LocationsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IDirectoryService directoryService)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
-            db = context;
-            _locationRepository = new EFLocationRepository(db);
-            _directoryService = new StubbedDirectoryService();
-            _bookingRepository = new EFBookingRepository(db);
-        }
 
-        public LocationsController() : this(new VORBSContext()) { }
-        
+            _directoryService = directoryService;
+
+            _locationRepository = locationRepository;
+            _bookingRepository = bookingRepository;
+        }
 
         [HttpGet]
         [Route("")]

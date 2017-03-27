@@ -17,6 +17,7 @@ namespace VORBS.DAL.Repositories
         List<Booking> GetByDateAndPid(DateTime startDate, string pid);
         List<Booking> GetByDateAndPidForPeriod(int period, string pid, DateTime startDate);
         List<Booking> GetByDateAndRoom(DateTime startDate, Room room);
+        List<Booking> GetByDateOnlyAndRoom(DateTime dateOnly, Room room);
         List<Booking> GetByDateAndRoom(DateTime startDate, DateTime endDate, Room room);
         List<Booking> GetByDateRoomAndOwner(DateTime startDate, DateTime endDate, Room room, string owner);
         List<Booking> GetByDateRoomAndPid(DateTime startDate, DateTime endDate, Room room, string pid);

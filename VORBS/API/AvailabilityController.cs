@@ -20,16 +20,21 @@ namespace VORBS.API
         private NLog.Logger _logger;
         private VORBSContext db;
         private IBookingRepository _bookingRepository;
+        private ILocationRepository _locationRepository;
+        private IRoomRepository _roomsRepository;
 
-        public AvailabilityController(VORBSContext context)
+        public AvailabilityController(VORBSContext context, 
+            IBookingRepository bookingRepository,
+            ILocationRepository locationRepository,
+            IRoomRepository roomsRepository)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _bookingRepository = new EFBookingRepository(db);
+
+            _bookingRepository = bookingRepository;
+            _locationRepository = locationRepository;
+            _roomsRepository = roomsRepository;
         }
-
-        public AvailabilityController() : this(new VORBSContext()) { }
-
 
         [HttpGet]
         [Route("{location}/{start:DateTime}/{smartRoom:bool}")]
@@ -260,7 +265,10 @@ namespace VORBS.API
                 List<Booking> clashedBookings;
                 existingBooking.StartDate = start;
                 existingBooking.EndDate = end;
-                bool meetingClash = DoesMeetingClash(existingBooking, out clashedBookings);
+
+                AvailabilityService availabilityService = new AvailabilityService(_bookingRepository, _roomsRepository, _locationRepository);
+                bool meetingClash = availabilityService.DoesMeetingClash(existingBooking, out clashedBookings);
+
                 if (meetingClash && clashedBookings.Count == 1 && clashedBookings[0].ID == existingBooking.ID)
                     availableRooms.Add(existingBooking.Room);
 
@@ -300,107 +308,6 @@ namespace VORBS.API
                 _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
             }
             return rooms;
-        }
-
-        /// <summary>
-        /// Finds meetings that clash with a given booking
-        /// </summary>
-        /// <param name="originalBooking">Bookings to check for clashes</param>
-        /// <param name="clashedBooking">OUT Booking that possibly clashes with the booking</param>
-        /// <returns>Boolean based on whether there was a clash.</returns>
-        protected internal bool DoesMeetingClash(Booking originalBooking, out List<Booking> clashedBookings)
-        {
-            clashedBookings = db.Bookings
-                //Meetings in the same room
-                .Where(x => x.RoomID == originalBooking.RoomID && x.Room.LocationID == db.Rooms.FirstOrDefault(r => r.ID == x.RoomID).LocationID)
-                //Where meeting clashes
-                .Where(b => (originalBooking.StartDate <= b.StartDate && originalBooking.EndDate > b.StartDate) || (originalBooking.StartDate >= b.StartDate && originalBooking.StartDate < b.EndDate))
-                .ToList();
-
-            return clashedBookings.Count > 0;
-
-        }
-
-        /// <summary>
-        /// Finds meetings that clash with a certain time on specific dates.
-        /// </summary>
-        /// <param name="room">Room to check for meetings in. Provided as this allows us to specify the room, rather than riskly grabbing the room of a random booking</param>
-        /// <param name="startTime">Time for which the meetings will begin</param>
-        /// <param name="endTime">Time for which the meetings will end</param>
-        /// <param name="dates">Dates for to check for meeting clashes</param>
-        /// <param name="clashedBookings">OUT bookings which clash with the given parameters</param>
-        /// <returns>Boolean based on whether there were any clashes</returns>
-        protected internal bool DoMeetingsClashRecurringly(Room room, TimeSpan startTime, TimeSpan endTime, DateTime date, out IEnumerable<Booking> clashedBookings)
-        {
-            ////Get dates only as we are checking against only the date portion in the DB
-            //var datesOnly = dates.Select(x => x.Date);
-
-            var totalBookingsClashed = db.Bookings
-                    //Bookings only for this room
-                    .Where(x => x.RoomID == room.ID)
-                    //Only bookings on the certain days that we want to book for
-                    .Where(y => date.Date == EntityFunctions.TruncateTime(y.StartDate))
-                    //Only bookings on the days that intersect our given time period
-                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second)
-                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))
-                .ToList(); // bug fix
-
-            clashedBookings = totalBookingsClashed; // WORKING
-            return totalBookingsClashed.Count > 0;
-
-        }
-
-        protected internal bool DoMeetingsClashRecurringly(List<Room> rooms, TimeSpan startTime, TimeSpan endTime, List<DateTime> dates, out List<Booking> allClashedBookings)
-        {
-            List<Booking> currentClashedBookings = new List<Booking>();
-            IEnumerable<Booking> clashedBookings;
-
-            bool clashed = false;
-            int k = 0;
-
-            for (int i = 0; i < rooms.Count; i++)
-            {
-                if (DoMeetingsClashRecurringly(rooms[i], startTime, endTime, dates[k], out clashedBookings))
-                {
-                    currentClashedBookings.AddRange(clashedBookings);
-                    clashed = true;
-                }
-
-                k = (dates.Count() == (k + 1)) ? 0 : k + 1;
-            }
-
-            allClashedBookings = currentClashedBookings;
-            return clashed;
-        }
-
-
-        protected internal Room GetAlternateRoom(TimeSpan startTime, TimeSpan endTime, int numberOfAttendees, int locationId, bool orderAsc)
-        {
-            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SeatCount >= numberOfAttendees && x.Active == true &&
-                               (x.Bookings.Where(b => startTime < EntityFunctions.CreateTime(b.EndDate.Hour, b.EndDate.Minute, b.EndDate.Second) && endTime > EntityFunctions.CreateTime(b.StartDate.Hour, b.StartDate.Minute, b.StartDate.Second)).Count() == 0));
-
-
-            availableRooms = (orderAsc) ? availableRooms.OrderBy(r => r.SeatCount) : availableRooms.OrderByDescending(r => r.SeatCount);
-
-            return availableRooms.FirstOrDefault();
-        }
-
-        protected internal Room GetAlternateSmartRoom(int bookingRoomId, DateTime startDate, DateTime endDate, int locationId)
-        {
-            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SmartRoom == true && x.Active == true && x.ID != bookingRoomId &&
-                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
-                                 .OrderByDescending(r => r.SeatCount);
-
-            return availableRooms.FirstOrDefault();
-        }
-
-        protected internal Room GetAlternateSmartRoom(IEnumerable<int> bookingRoomIds, DateTime startDate, DateTime endDate, int locationId)
-        {
-            var availableRooms = db.Rooms.Where(x => x.Location.ID == locationId && x.SmartRoom == true && x.Active == true && !bookingRoomIds.Contains(x.ID) &&
-                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
-                                 .OrderByDescending(r => r.SeatCount);
-
-            return availableRooms.FirstOrDefault();
         }
     }
 }
