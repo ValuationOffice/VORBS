@@ -5,6 +5,8 @@
     "angular": "~1.2.23",
     "angular-resource": "~1.2.23",
     "moment": "~2.15.1",
-    "typeahead.js": "v0.11.1"
+    "typeahead.js": "v0.11.1",
+    "modernizr": "v2.8.3",
+    "respond": "1.4.2"
   }
 }
