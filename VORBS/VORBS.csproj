@@ -943,6 +943,8 @@
     <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.min.js.map">
       <DependentUpon>bootstrap-timepicker.min.js</DependentUpon>
     </Content>
+    <Content Include="bower.json" />
+    <Content Include=".bowerrc" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\FullCalandar\fullcalendar.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -974,16 +976,9 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\NewBooking\Index.cshtml" />
     <Content Include="Views\MyBookings\Index.cshtml" />
     <Content Include="Views\ManageBookings\Index.cshtml" />
-    <Content Include="Views\Test\UI_1.cshtml" />
-    <Content Include="Views\Test\UI_2.cshtml" />
-    <Content Include="Views\Test\UI_3.cshtml" />
-    <Content Include="Views\Test\UI2.cshtml" />
     <Content Include="Views\EmailTemplates\NewBooking.cshtml" />
     <Content Include="Views\EmailTemplates\AdminNewBooking.cshtml" />
     <Content Include="Views\EmailTemplates\EdittedBooking.cshtml" />
