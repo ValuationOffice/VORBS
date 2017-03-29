@@ -2,8 +2,8 @@
   "name": "asp.net",
   "private": true,
   "dependencies": {
-    "angular": "~1.2.23",
-    "angular-resource": "~1.2.23",
+    "angular": "~1.5.11",
+    "angular-resource": "~1.5.11",
     "moment": "~2.15.1",
     "typeahead.js": "v0.11.1",
     "modernizr": "v2.8.3",
