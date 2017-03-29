@@ -261,12 +261,13 @@
     <Content Include="Content\Site.css" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\Administration\locationsController.js" />
-    <Content Include="Scripts\Administration\moduleManager.js" />
+    <Content Include="Scripts\Administration\admin.module.js" />
     <Content Include="Scripts\Administration\bookingsController.js" />
     <Content Include="Scripts\Administration\roomsController.js" />
     <Content Include="Scripts\Administration\usersController.js" />
+    <Content Include="Scripts\app.module.js" />
     <Content Include="Scripts\Help Page\helpController.js" />
-    <Content Include="Scripts\Help Page\moduleManager.js" />
+    <Content Include="Scripts\Help Page\help.module.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.min.js" />
     <Content Include="Scripts\lib\angular-resource\angular-resource.js" />
@@ -958,9 +959,9 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Scripts\MyBookings\moduleManager.js" />
+    <Content Include="Scripts\MyBookings\myBookings.module.js" />
     <Content Include="Scripts\MyBookings\myBookingsController.js" />
-    <Content Include="Scripts\NewBooking\moduleManager.js" />
+    <Content Include="Scripts\NewBooking\newBooking.module.js" />
     <Content Include="Scripts\NewBooking\newBookingController.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
@@ -1018,19 +1019,6 @@
     <Content Include="Views\EmailTemplates\DSSDeletedBooking.cshtml" />
     <Content Include="Views\Shared\_EmailLayout.cshtml" />
     <Content Include="Views\EmailTemplates\SecurityNewBookingBookersCopy.cshtml" />
-    <Content Include="Scripts\lib\angular-resource\.bower.json" />
-    <Content Include="Scripts\lib\angular-resource\angular-resource.min.js.map" />
-    <Content Include="Scripts\lib\angular-resource\bower.json" />
-    <Content Include="Scripts\lib\angular-resource\LICENSE.md" />
-    <Content Include="Scripts\lib\angular-resource\package.json" />
-    <Content Include="Scripts\lib\angular-resource\README.md" />
-    <Content Include="Scripts\lib\angular\.bower.json" />
-    <Content Include="Scripts\lib\angular\angular.min.js.gzip" />
-    <Content Include="Scripts\lib\angular\angular.min.js.map" />
-    <Content Include="Scripts\lib\angular\bower.json" />
-    <Content Include="Scripts\lib\angular\LICENSE.md" />
-    <Content Include="Scripts\lib\angular\package.json" />
-    <Content Include="Scripts\lib\angular\README.md" />
     <Content Include="Scripts\lib\jquery\.bower.json" />
     <Content Include="Scripts\lib\jquery\bower.json" />
     <Content Include="Scripts\lib\jquery\dist\jquery.min.map" />
@@ -1077,6 +1065,19 @@
     <Content Include="Scripts\lib\typeahead.js\README.md" />
     <Content Include="Scripts\lib\typeahead.js\test\ci" />
     <Content Include="Scripts\lib\typeahead.js\typeahead.js.jquery.json" />
+    <Content Include="Scripts\lib\angular-resource\.bower.json" />
+    <Content Include="Scripts\lib\angular-resource\angular-resource.min.js.map" />
+    <Content Include="Scripts\lib\angular-resource\bower.json" />
+    <Content Include="Scripts\lib\angular-resource\LICENSE.md" />
+    <Content Include="Scripts\lib\angular-resource\package.json" />
+    <Content Include="Scripts\lib\angular-resource\README.md" />
+    <Content Include="Scripts\lib\angular\.bower.json" />
+    <Content Include="Scripts\lib\angular\angular.min.js.gzip" />
+    <Content Include="Scripts\lib\angular\angular.min.js.map" />
+    <Content Include="Scripts\lib\angular\bower.json" />
+    <Content Include="Scripts\lib\angular\LICENSE.md" />
+    <Content Include="Scripts\lib\angular\package.json" />
+    <Content Include="Scripts\lib\angular\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

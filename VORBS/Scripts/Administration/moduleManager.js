@@ -1,1 +1,0 @@
-﻿var administration = angular.module('administration', ['ngResource']);

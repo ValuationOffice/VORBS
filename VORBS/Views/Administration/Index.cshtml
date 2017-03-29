@@ -6,9 +6,9 @@
     Administration
 </h1>
 @*<div class="panel panel-border-wide vertical-bottom-space-large">
-    <p>This administration panel enables you administer all content in this application, including managing users, existing bookings, add/remove locations and rooms.</p>
-</div>*@
-<div id="content" ng-app="administration">
+        <p>This administration panel enables you administer all content in this application, including managing users, existing bookings, add/remove locations and rooms.</p>
+    </div>*@
+<div id="content" ng-app="vorbs.admin">
 
     <link href="~/Content/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
 
@@ -57,7 +57,6 @@
 </div>
 
 @section scripts{
-    <script src="~/Scripts/Administration/moduleManager.js"></script>
     <script src="~/Scripts/Administration/usersController.js"></script>
     <script src="~/Scripts/Administration/roomsController.js"></script>
     <script src="~/Scripts/Administration/bookingsController.js"></script>
