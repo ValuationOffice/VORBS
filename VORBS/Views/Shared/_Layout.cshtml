@@ -11,8 +11,10 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/typeahead")
 </head>
-<body>
+<body ng-app="vorbs">
     <header role="banner" id="global-header" class="with-proposition">
         <div class="header-wrapper">
             <div class="header-global">
@@ -59,6 +61,12 @@
             </div>
         </div>
     </main>
+    @Scripts.Render("~/bundles/angular")
+    <script src="~/Scripts/MyBookings/myBookings.module.js"></script>
+    <script src="~/Scripts/NewBooking/newBooking.module.js"></script>
+    <script src="~/Scripts/Administration/admin.module.js"></script>
+    <script src="~/Scripts/Help Page/help.module.js"></script>
     @RenderSection("scripts", required: false)
+    <script src="~/Scripts/app.module.js"></script>
 </body>
 </html>
