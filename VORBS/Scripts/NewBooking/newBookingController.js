@@ -626,7 +626,6 @@
 
             if (ValidateRecurrenceSettings($scope.newBooking.Recurrence.Frequency)) {
                 $scope.newBooking.Recurrence.IsRecurring = true;
-                $scope.$apply();
                 var breakDownText = '';
                 switch ($scope.newBooking.Recurrence.Frequency) {
                     case 'daily':
