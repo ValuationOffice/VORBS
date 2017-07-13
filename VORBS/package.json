@@ -1,0 +1,13 @@
+{
+  "version": "0.12.0",
+  "name": "vorbs",
+  "private": true,
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "jasmine-core": "^2.6.4",
+    "karma": "^1.7.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "phantomjs": "^2.1.7"
+  }
+}

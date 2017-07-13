@@ -288,6 +288,7 @@
     </Content>
     <Content Include="bower.json" />
     <Content Include=".bowerrc" />
+    <Content Include="package.json" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\FullCalandar\fullcalendar.min.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
