@@ -35,6 +35,37 @@ namespace VORBS.Services
             _logger = logger;
         }
 
+        public void DeleteExistingBooking(Booking booking, bool? recurrence, User user, NameValueCollection appSettings)
+        {
+            int? recurringBookingId = null;
+            if (recurrence.Value)
+                recurringBookingId = booking.RecurrenceId;
+
+            List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { booking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value);
+
+            bool success = _bookingsRepository.Delete(allBookings);
+            if (!success)
+                throw new DeletionException();
+            else
+                _logger.Info("Booking(s) successfully cancelled: " + String.Join(", ", allBookings.Select(x => x.ID)));
+
+            if (!bool.Parse(appSettings["sendEmails"].ToString()))
+                return;
+            string fromEmail = appSettings["fromEmail"];
+
+            Room locationRoom = _roomsRepository.GetRoomById(booking.RoomID);
+            allBookings.ForEach(x => x.Room = locationRoom);
+
+            if (booking.PID.ToUpper() != user.PayId.Identity.ToUpper())
+                SendEmailToOwnerForAdminDelete(fromEmail, booking, user, allBookings);
+            else
+                SendEmailToOwnerForDelete(fromEmail, booking, user, allBookings);
+            if (booking.Flipchart || booking.Projector)
+                SendEmailToFacilitiesForDelete(fromEmail, booking, allBookings);
+            if (booking.DssAssist)
+                SendEmailToDSSForDelete(fromEmail, booking, allBookings);
+        }
+
         public void EditExistingBooking(Booking existingBooking, Booking editBooking, bool? recurrence, User user, NameValueCollection appSettings)
         {
             int? recurringBookingId = null;
@@ -91,11 +122,11 @@ namespace VORBS.Services
                 editBookings.Select(x => (x.Flipchart != originalBookings.Where(y => y.ID == x.ID).First().Flipchart)).Count() > 0
                 || editBookings.Select(x => (x.Projector != originalBookings.Where(y => y.ID == x.ID).First().Projector)).Count() > 0)
             {
-                SendEmailToFacilitiesForEditBooking(fromEmail, editBooking, editBookings, originalBookings);
+                SendEmailToFacilitiesForEdit(fromEmail, editBooking, editBookings, originalBookings);
             }
 
             if (editBookings.Select(x => (x.DssAssist != originalBookings.Where(y => y.ID == x.ID).First().DssAssist)).Count() > 0)
-                SendEmailToDSSForEditBooking(fromEmail, editBooking, editBookings, originalBookings);
+                SendEmailToDSSForEdit(fromEmail, editBooking, editBookings, originalBookings);
 
 
             Func<Booking, Booking, bool> attendeeCompare = delegate (Booking newBooking, Booking currentBooking)
@@ -103,12 +134,12 @@ namespace VORBS.Services
                 return !(new HashSet<string>(currentBooking.ExternalAttendees.Select(x => x.FullName)).SetEquals(newBooking.ExternalAttendees.Select(x => x.FullName)));
             };
             if (editBookings.Select(x => attendeeCompare(x, originalBookings.Where(y => y.ID == x.ID).First())).Count() > 0)
-                SendEmailToSecurityForEditBooking(fromEmail, editBooking, editBookings, originalBookings);
+                SendEmailToSecurityForEdit(fromEmail, editBooking, editBookings, originalBookings);
 
             if (existingBooking.PID.ToUpper() != user.PayId.Identity.ToUpper())
-                SendEmailToAdminForEditBooking(fromEmail, existingBooking, editBookings);
+                SendEmailToOwnerForAdminEdit(fromEmail, existingBooking, editBookings);
             else
-                SendEmailToOwnerForEditBooking(fromEmail, existingBooking, editBookings, user);
+                SendEmailToOwnerForEdit(fromEmail, existingBooking, editBookings, user);
 
         }
 
@@ -127,7 +158,7 @@ namespace VORBS.Services
             if (newBooking.Recurrence.IsRecurring)
             {
                 ProcessRecurringBookings(user, ref newBooking, ref clashedBookings, ref bookingsToCreate, ref deletedBookings);
-                
+
                 int? nextRecurringId = _bookingsRepository.GetNextRecurrenceId();
                 if (nextRecurringId != null && nextRecurringId > 0)
                     bookingsToCreate.ForEach(x => x.RecurrenceId = nextRecurringId);
@@ -139,7 +170,7 @@ namespace VORBS.Services
 
             //Reset  Room as we dont want to create another room
             bookingsToCreate.ForEach(x => x.Room = null);
-            
+
             _bookingsRepository.SaveNewBookings(bookingsToCreate);
             _logger.Info("Booking successfully created: " + newBooking.ID);
 
@@ -149,23 +180,23 @@ namespace VORBS.Services
             string fromEmail = appSettings["fromEmail"];
 
             if (deletedBookings.Count > 0)
-                SendEmailToBookingsRemoved(fromEmail, deletedBookings, newBooking, clashedBookings);
+                SendEmailToOwnerForAdminOverwriteWithMessage(fromEmail, deletedBookings, newBooking, clashedBookings);
 
             newBooking.Room = _roomsRepository.GetRoomById(newBooking.RoomID);
 
             Location bookingsLocation = _roomsRepository.GetRoomById(newBooking.RoomID).Location;
 
             if (newBooking.PID.ToUpper() != user.PayId.Identity.ToUpper())
-                SendAdminEmailsForNewBooking(fromEmail, user, newBooking, bookingsToCreate);
+                SendEmailToOwnerForAdminCreate(fromEmail, user, newBooking, bookingsToCreate);
             else
-                SendPersonalEmailsForNewBooking(fromEmail, user, newBooking, bookingsToCreate);
+                SendEmailToOwnerForCreate(fromEmail, user, newBooking, bookingsToCreate);
 
             if (newBooking.Flipchart || newBooking.Projector)
-                SendEmailToFacilitiesForNewBooking(newBooking, fromEmail, bookingsLocation);
+                SendEmailToFacilitiesForCreate(newBooking, fromEmail, bookingsLocation);
             if (newBooking.ExternalAttendees != null && newBooking.ExternalAttendees.Count > 0)
-                SendEmailToSecurityForNewBooking(fromEmail, newBooking, bookingsLocation);
+                SendEmailToSecurityForCreate(fromEmail, newBooking, bookingsLocation);
             if (newBooking.DssAssist)
-                SendEmailToDSSForNewBooking(fromEmail, newBooking, bookingsLocation);
+                SendEmailToDSSForCreate(fromEmail, newBooking, bookingsLocation);
         }
 
         private void ProcessSmartLocations(ref Booking newBooking, ref List<Booking> clashedBookings, ref List<Booking> bookingsToCreate)
@@ -269,7 +300,75 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToAdminForEditBooking(string fromEmail, Booking existingBooking, List<Booking> editBookings)
+        private void SendEmailToOwnerForAdminDelete(string fromEmail, Booking booking, User user, List<Booking> allBookings)
+        {
+            try
+            {
+                string toEmail = _directoryService.GetUser(new User.Pid(booking.PID)).EmailAddress;
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", allBookings);
+
+                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
+            }
+        }
+
+        private void SendEmailToOwnerForDelete(string fromEmail, Booking booking, User user, List<Booking> allBookings)
+        {
+            try
+            {
+                string toEmail = _directoryService.GetUser(new User.Pid(booking.PID)).EmailAddress;
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", allBookings);
+
+                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
+            }
+        }
+
+        private void SendEmailToFacilitiesForDelete(string fromEmail, Booking booking, List<Booking> allBookings)
+        {
+            Location bookingsLocation = _roomsRepository.GetRoomById(booking.RoomID).Location;
+            string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
+
+            if (facilitiesEmail != null)
+            {
+                try
+                {
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", allBookings);
+                    Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Meeting room equipment cancellation for booking(s)", body);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send email to facilities for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
+                }
+            }
+        }
+
+        private void SendEmailToDSSForDelete(string fromEmail, Booking booking, List<Booking> allBookings)
+        {
+            Location bookingsLocation = _roomsRepository.GetRoomById(booking.RoomID).Location;
+            string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+
+            if (dssEmail != null)
+            {
+                try
+                {
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSDeletedBooking.cshtml", allBookings);
+                    Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "Meeting room booking cancellation(s)", body);
+                }
+                catch (Exception ex)
+                {
+                    _logger.ErrorException("Unable to send email to dss for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
+                }
+            }
+        }
+
+        private void SendEmailToOwnerForAdminEdit(string fromEmail, Booking existingBooking, List<Booking> editBookings)
         {
             try
             {
@@ -287,7 +386,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToOwnerForEditBooking(string fromEmail, Booking existingBooking, List<Booking> editBookings, User user)
+        private void SendEmailToOwnerForEdit(string fromEmail, Booking existingBooking, List<Booking> editBookings, User user)
         {
             Pid currentUserPid = user.PayId;
 
@@ -307,7 +406,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToSecurityForEditBooking(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
+        private void SendEmailToSecurityForEdit(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
         {
             List<SecurityEdittedBooking> securityViewModels = new List<SecurityEdittedBooking>();
             Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
@@ -344,7 +443,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToDSSForEditBooking(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
+        private void SendEmailToDSSForEdit(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
         {
             List<Booking> dssEditBookings = new List<Booking>();
             Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
@@ -378,7 +477,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToFacilitiesForEditBooking(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
+        private void SendEmailToFacilitiesForEdit(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
         {
             Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
             string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
@@ -432,7 +531,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToBookingsRemoved(string fromEmail, List<Booking> deletedBookings, Booking newBooking, List<Booking> clashedBookings)
+        private void SendEmailToOwnerForAdminOverwriteWithMessage(string fromEmail, List<Booking> deletedBookings, Booking newBooking, List<Booking> clashedBookings)
         {
             foreach (string owner in deletedBookings.Select(x => x.PID).Distinct())
             {
@@ -452,7 +551,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToDSSForNewBooking(string fromEmail, Booking newBooking, Location bookingsLocation)
+        private void SendEmailToDSSForCreate(string fromEmail, Booking newBooking, Location bookingsLocation)
         {
             string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
             if (dssEmail != null)
@@ -470,7 +569,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToSecurityForNewBooking(string fromEmail, Booking newBooking, Location bookingsLocation)
+        private void SendEmailToSecurityForCreate(string fromEmail, Booking newBooking, Location bookingsLocation)
         {
 
             string securityEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
@@ -503,7 +602,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendEmailToFacilitiesForNewBooking(Booking newBooking, string fromEmail, Location bookingsLocation)
+        private void SendEmailToFacilitiesForCreate(Booking newBooking, string fromEmail, Location bookingsLocation)
         {
 
             string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
@@ -522,7 +621,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendAdminEmailsForNewBooking(string fromEmail, User user, Booking newBooking, List<Booking> bookingsToCreate)
+        private void SendEmailToOwnerForAdminCreate(string fromEmail, User user, Booking newBooking, List<Booking> bookingsToCreate)
         {
             try
             {
@@ -548,7 +647,7 @@ namespace VORBS.Services
             }
         }
 
-        private void SendPersonalEmailsForNewBooking(string fromEmail, User user, Booking newBooking, List<Booking> bookingsToCreate)
+        private void SendEmailToOwnerForCreate(string fromEmail, User user, Booking newBooking, List<Booking> bookingsToCreate)
         {
             try
             {
@@ -772,5 +871,7 @@ namespace VORBS.Services
         public class UnauthorisedOverwriteException : Exception { }
 
         public class UnableToEditBookingException : Exception { }
+
+        public class DeletionException : Exception { }
     }
 }

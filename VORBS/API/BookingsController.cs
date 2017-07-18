@@ -325,15 +325,9 @@ namespace VORBS.API
 
             try
             {
-                User currentUser = new User();
-
-                if (string.IsNullOrWhiteSpace(newBooking.PID) || string.IsNullOrWhiteSpace(newBooking.Owner))
-                {
-                    currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
-
-                    if (currentUser == null)
-                        return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
-                }
+                User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
+                if (currentUser == null)
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
                 bookingService.SaveNewBooking(newBooking, currentUser, ConfigurationManager.AppSettings);
                 return new HttpResponseMessage(HttpStatusCode.OK);
@@ -375,15 +369,9 @@ namespace VORBS.API
 
             try
             {
-                User currentUser = new User();
-
-                if (string.IsNullOrWhiteSpace(editBooking.PID) || string.IsNullOrWhiteSpace(editBooking.Owner))
-                {
-                    currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
-
-                    if (currentUser == null)
-                        return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
-                }
+                User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
+                if (currentUser == null)
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
                 bookingService.EditExistingBooking(existingBooking, editBooking, recurrence, currentUser, ConfigurationManager.AppSettings);
                 return new HttpResponseMessage(HttpStatusCode.OK);
@@ -410,117 +398,19 @@ namespace VORBS.API
         {
             try
             {
+                BookingsService bookingService = new BookingsService(_logger, _bookingsRepository, _roomsRepository, _locationsRepository, _directoryService);
                 Booking booking = _bookingsRepository.GetById(bookingId);
-                Location bookingsLocation = _roomsRepository.GetRoomById(booking.RoomID).Location;
 
-                string fromEmail = ConfigurationManager.AppSettings["fromEmail"];
+                User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
+                if (currentUser == null)
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
-                //NOT NEEDED RIGHT NOW, BUT WILL SEND SECURITY E-MAILS WHEN NEEDED.
-                //string securityEmailBody = "";
-                //if (booking.ExternalAttendees.Count > 0)
-                //{
-                //    securityEmailBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityDeletedBooking.cshtml", booking);
-                //}
-
-
-                //    if (!_bookingService.DeleteById(bookingId))
-                //    {
-                //        return Request.CreateResponse(HttpStatusCode.InternalServerError, "Unable to update existing booking. An error occured, please contact help desk.");
-                //    }
-                //    _logger.Info("Booking successfully cancelled: " + bookingId);
-
-
-                int? recurringBookingId = null;
-                if (recurrence.Value)
-                    recurringBookingId = booking.RecurrenceId;
-                List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { booking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value);
-
-                bool success = _bookingsRepository.Delete(allBookings);
-                if (!success)
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, "Unable to update existing booking. An error occured, please contact help desk.");
-                else
-                    _logger.Info("Booking(s) successfully cancelled: " + String.Join(", ", allBookings.Select(x => x.ID)));
-
-                if (bool.Parse(ConfigurationManager.AppSettings["sendEmails"]))
-                    return new HttpResponseMessage(HttpStatusCode.OK);
-
-                Room locationRoom = _roomsRepository.GetRoomById(booking.RoomID);
-                allBookings.ForEach(x => x.Room = locationRoom);
-
-                string body = "";
-                try
-                {
-                    //Once Booking has been removed; Send Cancelltion Emails
-
-                    string currentUserPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-
-                    string toEmail = _directoryService.GetUser(new User.Pid(booking.PID)).EmailAddress;
-
-
-                    if (booking.PID.ToUpper() != currentUserPid.ToUpper())
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", allBookings);
-                    else
-                        body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", allBookings);
-
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
-                }
-                catch (Exception ex)
-                {
-                    _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
-                }
-
-
-                if (booking.Flipchart || booking.Projector)
-                {
-
-                    string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
-                    if (facilitiesEmail != null)
-                    {
-                        try
-                        {
-                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", allBookings);
-                            Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Meeting room equipment cancellation for booking(s)", body);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.ErrorException("Unable to send email to facilities for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
-                        }
-                    }
-                }
-
-                if (booking.DssAssist)
-                {
-                    string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
-                    if (dssEmail != null)
-                    {
-                        try
-                        {
-                            body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSDeletedBooking.cshtml", allBookings);
-                            Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "Meeting room booking cancellation(s)", body);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.ErrorException("Unable to send email to dss for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
-                        }
-                    }
-                }
-
-                //NOT NEEDED RIGHT NOW, BUT WILL SEND SECURITY E-MAILS WHEN NEEDED.
-                //string securityEmailAddress = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
-                //if (!string.IsNullOrEmpty(securityEmailBody) && !string.IsNullOrEmpty(securityEmailAddress))
-                //{
-                //    try
-                //    {
-                //        Utils.EmailHelper.SendEmail(fromEmail, securityEmailAddress, "Meeting room booking cancellation", securityEmailBody);
-                //    }
-                //    catch (Exception exn)
-                //    {
-                //        _logger.ErrorException("Unable to send email to security for deleting booking: " + bookingId, exn);
-                //    }
-                //}
-
-
+                bookingService.DeleteExistingBooking(booking, recurrence, currentUser, ConfigurationManager.AppSettings);
                 return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (DeletionException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "Unable to delete existing booking. An error occured, please contact help desk.");
             }
             catch (Exception ex)
             {
