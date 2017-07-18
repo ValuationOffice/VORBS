@@ -259,6 +259,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="gulp.config.js" />
+    <Content Include="gulpfile.js" />
     <Content Include="Icon.png" />
     <Content Include="Scripts\Administration\locationsController.js" />
     <Content Include="Scripts\Administration\admin.module.js" />

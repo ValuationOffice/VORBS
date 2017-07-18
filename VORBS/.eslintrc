@@ -24,7 +24,7 @@
   "rules": {
     ////////// Possible Errors //////////
 
-    "no-comma-dangle": 1, // disallow trailing commas in object literals
+    "comma-dangle": 1, // disallow trailing commas in object literals
     "no-cond-assign": 1, // disallow assignment in conditional expressions
     "no-console": 1, // disallow use of console (off by default in the node environment)
     "no-constant-condition": 1, // disallow use of constant expressions in conditions
@@ -32,7 +32,7 @@
     "no-debugger": 1, // disallow use of debugger
     "no-dupe-keys": 1, // disallow duplicate keys when creating object literals
     "no-empty": 1, // disallow empty statements
-    "no-empty-class": 1, // disallow the use of empty character classes in regular expressions
+    "no-empty-character-class": 1, // disallow the use of empty character classes in regular expressions
     "no-ex-assign": 1, // disallow assigning to the exception in a catch block
     "no-extra-boolean-cast": 1, // disallow double-negation boolean casts in a boolean context
     "no-extra-parens": 1, // disallow unnecessary parentheses (off by default)
@@ -66,7 +66,6 @@
     "no-caller": 1, // disallow use of arguments.caller or arguments.callee
     "no-div-regex": 0, // disallow division operators explicitly at beginning of regular expression (off by default)
     "no-else-return": 1, // disallow else after a return in an if (off by default)
-    "no-empty-label": 1, // disallow use of labels for anything other then loops and switches
     "no-eq-null": 1, // disallow comparisons to null without a type-checking operator (off by default)
     "no-eval": 1, // disallow use of eval()
     "no-extend-native": 1, // disallow adding to native types
@@ -145,12 +144,11 @@
     "no-multiple-empty-lines": 0, // disallow multiple empty lines (off by default)
     "no-nested-ternary": 0, // disallow nested ternary expressions (off by default)
     "no-new-object": 1, // disallow use of the Object constructor
-    "no-space-before-semi": 1, // disallow space before semicolon
+    "semi-spacing": 1, // disallow space before semicolon
     "no-spaced-func": 1, // disallow space between function identifier and application
     "no-ternary": 0, // disallow the use of ternary operators (off by default)
     "no-trailing-spaces": 1, // disallow trailing whitespace at the end of lines
     "no-underscore-dangle": 1, // disallow dangling underscores in identifiers
-    "no-wrap-func": 1, // disallow wrapping of non-IIFE statements in parens
     "one-var": 0, // allow just one var statement per function (off by default)
     "operator-assignment": 0, // require assignment operator shorthand where possible or prohibit it entirely (off by default)
     "padded-blocks": 0, // enforce padding within blocks (off by default)
@@ -164,9 +162,9 @@
     "space-in-brackets": 0, // require or disallow spaces inside brackets (off by default)
     "space-in-parens": 0, // require or disallow spaces inside parentheses (off by default)
     "space-infix-ops": 1, // require spaces around operators
-    "space-return-throw-case": 1, // require a space after return, throw, and case
+    "keyword-spacing": 1, // require a space after return, throw, and case
     "space-unary-ops": 0, // Require or disallow spaces before/after unary operators (words on by default, nonwords off by default)
-    "spaced-line-comment": 1, // require or disallow a space immediately following the // in a line comment (off by default)
+    "spaced-comment": 1, // require or disallow a space immediately following the // in a line comment (off by default)
     "wrap-regex": 1, // require regex literals to be wrapped in parentheses (off by default)
 
 
