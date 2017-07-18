@@ -6,7 +6,9 @@ using System.Web;
 using VORBS.DAL.Repositories;
 using VORBS.Models;
 using VORBS.Models.DTOs;
+using VORBS.Models.ViewModels;
 using VORBS.Security;
+using static VORBS.Models.User;
 
 namespace VORBS.Services
 {
@@ -33,6 +35,83 @@ namespace VORBS.Services
             _logger = logger;
         }
 
+        public void EditExistingBooking(Booking existingBooking, Booking editBooking, bool? recurrence, User user, NameValueCollection appSettings)
+        {
+            int? recurringBookingId = null;
+            if (recurrence.Value)
+                recurringBookingId = existingBooking.RecurrenceId;
+
+            List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value);
+            List<Booking> originalBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value, true);
+
+            List<Booking> editBookings = new List<Booking>();
+
+            for (int i = 0; i < allBookings.Count; i++)
+            {
+                Booking currentBooking = allBookings[i];
+                currentBooking.DssAssist = editBooking.DssAssist;
+                if (editBooking.ExternalAttendees != null && editBooking.ExternalAttendees.Count > 0)
+                {
+                    foreach (ExternalAttendees attendee in editBooking.ExternalAttendees)
+                    {
+                        currentBooking.ExternalAttendees.Add(new ExternalAttendees()
+                        {
+                            BookingID = currentBooking.ID,
+                            FullName = attendee.FullName,
+                            CompanyName = attendee.CompanyName,
+                            PassRequired = attendee.PassRequired
+                        });
+                    }
+                }
+
+                currentBooking.Flipchart = editBooking.Flipchart;
+                currentBooking.NumberOfAttendees = editBooking.NumberOfAttendees;
+                currentBooking.StartDate = currentBooking.StartDate.Date + new TimeSpan(editBooking.StartDate.Hour, editBooking.StartDate.Minute, editBooking.StartDate.Second);
+                currentBooking.EndDate = currentBooking.EndDate.Date + new TimeSpan(editBooking.EndDate.Hour, editBooking.EndDate.Minute, editBooking.EndDate.Second);
+                currentBooking.Projector = editBooking.Projector;
+                currentBooking.Subject = editBooking.Subject;
+
+                editBookings.Add(currentBooking);
+            }
+
+            var updatedBookings = _bookingsRepository.UpdateExistingBookings(allBookings, editBookings);
+            if (updatedBookings == null)
+            {
+                _logger.Fatal("Unable to edit booking(s): " + editBooking.ID);
+                throw new UnableToEditBookingException();
+            }
+            else
+                _logger.Info("Booking(s) successfully editted: " + String.Join(", ", editBookings.Select(x => x.ID)));
+
+            if (!bool.Parse(appSettings["sendEmails"].ToString()))
+                return;
+            string fromEmail = appSettings["fromEmail"];
+
+            if (
+                editBookings.Select(x => (x.Flipchart != originalBookings.Where(y => y.ID == x.ID).First().Flipchart)).Count() > 0
+                || editBookings.Select(x => (x.Projector != originalBookings.Where(y => y.ID == x.ID).First().Projector)).Count() > 0)
+            {
+                SendEmailToFacilitiesForEditBooking(fromEmail, editBooking, editBookings, originalBookings);
+            }
+
+            if (editBookings.Select(x => (x.DssAssist != originalBookings.Where(y => y.ID == x.ID).First().DssAssist)).Count() > 0)
+                SendEmailToDSSForEditBooking(fromEmail, editBooking, editBookings, originalBookings);
+
+
+            Func<Booking, Booking, bool> attendeeCompare = delegate (Booking newBooking, Booking currentBooking)
+            {
+                return !(new HashSet<string>(currentBooking.ExternalAttendees.Select(x => x.FullName)).SetEquals(newBooking.ExternalAttendees.Select(x => x.FullName)));
+            };
+            if (editBookings.Select(x => attendeeCompare(x, originalBookings.Where(y => y.ID == x.ID).First())).Count() > 0)
+                SendEmailToSecurityForEditBooking(fromEmail, editBooking, editBookings, originalBookings);
+
+            if (existingBooking.PID.ToUpper() != user.PayId.Identity.ToUpper())
+                SendEmailToAdminForEditBooking(fromEmail, existingBooking, editBookings);
+            else
+                SendEmailToOwnerForEditBooking(fromEmail, existingBooking, editBookings, user);
+
+        }
+
         public void SaveNewBooking(Booking newBooking, User user, NameValueCollection appSettings)
         {
             List<Booking> bookingsToCreate = new List<Booking>();
@@ -46,7 +125,13 @@ namespace VORBS.Services
             newBooking.PID = user.PayId.Identity;
 
             if (newBooking.Recurrence.IsRecurring)
+            {
                 ProcessRecurringBookings(user, ref newBooking, ref clashedBookings, ref bookingsToCreate, ref deletedBookings);
+                
+                int? nextRecurringId = _bookingsRepository.GetNextRecurrenceId();
+                if (nextRecurringId != null && nextRecurringId > 0)
+                    bookingsToCreate.ForEach(x => x.RecurrenceId = nextRecurringId);
+            }
             else if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
                 ProcessSmartLocations(ref newBooking, ref clashedBookings, ref bookingsToCreate);
             else
@@ -54,12 +139,7 @@ namespace VORBS.Services
 
             //Reset  Room as we dont want to create another room
             bookingsToCreate.ForEach(x => x.Room = null);
-
-            //add the recurrence link id if needed
-            int? nextRecurringId = _bookingsRepository.GetNextRecurrenceId();
-            if (nextRecurringId != null && nextRecurringId > 0)
-                bookingsToCreate.ForEach(x => x.RecurrenceId = nextRecurringId);
-
+            
             _bookingsRepository.SaveNewBookings(bookingsToCreate);
             _logger.Info("Booking successfully created: " + newBooking.ID);
 
@@ -67,7 +147,7 @@ namespace VORBS.Services
             if (!bool.Parse(appSettings["sendEmails"].ToString()))
                 return;
             string fromEmail = appSettings["fromEmail"];
-            
+
             if (deletedBookings.Count > 0)
                 SendEmailToBookingsRemoved(fromEmail, deletedBookings, newBooking, clashedBookings);
 
@@ -186,6 +266,169 @@ namespace VORBS.Services
                 }
                 else
                     throw new BookingConflictException(clashedBookings);
+            }
+        }
+
+        private void SendEmailToAdminForEditBooking(string fromEmail, Booking existingBooking, List<Booking> editBookings)
+        {
+            try
+            {
+                string toOwnerEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
+
+                string ownerBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBookings);
+                string toOwnerSubject = "Meeting room edit confirmation";
+
+                if (!string.IsNullOrEmpty(ownerBody) && !string.IsNullOrEmpty(toOwnerEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toOwnerEmail, toOwnerSubject, ownerBody);
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), e);
+            }
+        }
+
+        private void SendEmailToOwnerForEditBooking(string fromEmail, Booking existingBooking, List<Booking> editBookings, User user)
+        {
+            Pid currentUserPid = user.PayId;
+
+            try
+            {
+                string toOwnerEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
+
+                string ownerBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBookings);
+                string toOwnerSubject = "Meeting room booking confirmation";
+
+                if (!string.IsNullOrEmpty(ownerBody) && !string.IsNullOrEmpty(toOwnerEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toOwnerEmail, toOwnerSubject, ownerBody);
+            }
+            catch (Exception e)
+            {
+                _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), e);
+            }
+        }
+
+        private void SendEmailToSecurityForEditBooking(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
+        {
+            List<SecurityEdittedBooking> securityViewModels = new List<SecurityEdittedBooking>();
+            Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
+
+            string securityEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
+
+            foreach (Booking booking in editBookings)
+            {
+                Booking currentBooking = originalBookings.Where(x => x.ID == booking.ID).First();
+
+                if (!(new HashSet<string>(currentBooking.ExternalAttendees.Select(x => x.FullName)).SetEquals(booking.ExternalAttendees.Select(x => x.FullName))))
+                {
+
+                    IEnumerable<ExternalAttendees> removedAttendees = currentBooking.ExternalAttendees.Where(x => !booking.ExternalAttendees.Select(y => y.FullName).Contains(x.FullName));
+                    IEnumerable<ExternalAttendees> addedAttendees = booking.ExternalAttendees.Where(x => !currentBooking.ExternalAttendees.Select(y => y.FullName).Contains(x.FullName));
+                    SecurityEdittedBooking viewModel = new Models.ViewModels.SecurityEdittedBooking() { EdittedBooking = booking, NewAttendees = addedAttendees, RemovedAttendees = removedAttendees };
+
+                    securityViewModels.Add(viewModel);
+                }
+            }
+            try
+            {
+                if (securityViewModels.Count > 0)
+                {
+                    string securityEmailBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityEdittedBooking.cshtml", securityViewModels);
+                    if (!string.IsNullOrEmpty(securityEmailBody) && !string.IsNullOrEmpty(securityEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, securityEmail, "(Updated) External guests notification", securityEmailBody);
+
+                }
+            }
+            catch (Exception exn)
+            {
+                _logger.ErrorException("Unable to retrieve security email markup for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), exn);
+            }
+        }
+
+        private void SendEmailToDSSForEditBooking(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
+        {
+            List<Booking> dssEditBookings = new List<Booking>();
+            Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
+
+            string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+
+            foreach (Booking booking in editBookings)
+            {
+                Booking currentBooking = originalBookings.Where(x => x.ID == booking.ID).First();
+                if (booking.DssAssist != currentBooking.DssAssist)
+                {
+                    if (dssEmail != null)
+                    {
+                        booking.Room.Location = currentBooking.Room.Location;
+                        dssEditBookings.Add(booking);
+                    }
+                }
+            }
+            try
+            {
+                if (dssEditBookings.Count > 0)
+                {
+                    string dssBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSEdittedBooking.cshtml", dssEditBookings);
+                    if (!string.IsNullOrEmpty(dssBody))
+                        Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "(Updated) SMART room set up support", dssBody);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to retrieve E-Mail markup for DSS for new booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
+            }
+        }
+
+        private void SendEmailToFacilitiesForEditBooking(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
+        {
+            Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
+            string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
+
+            List<FacilitiesEdittedBooking> facilitiesViewModels = new List<FacilitiesEdittedBooking>();
+
+            foreach (Booking booking in editBookings)
+            {
+                Booking currentBooking = originalBookings.Where(x => x.ID == booking.ID).First();
+                if ((currentBooking.Flipchart != booking.Flipchart) || (booking.Projector != currentBooking.Projector))
+                {
+
+                    if (facilitiesEmail != null)
+                    {
+
+                        List<string> addedEquipment = new List<string>();
+                        List<string> removedEquipment = new List<string>();
+                        if (booking.Projector != currentBooking.Projector)
+                        {
+                            //If it is present in edit booking, and above equality check is false, then we know the projector request is new
+                            if (booking.Projector)
+                                addedEquipment.Add("Projector");
+                            else
+                                removedEquipment.Add("Projector");
+                        }
+                        if (booking.Flipchart != currentBooking.Flipchart)
+                        {
+                            if (booking.Flipchart)
+                                addedEquipment.Add("Flip Chart");
+                            else
+                                removedEquipment.Add("Flip Chart");
+                        }
+
+                        Models.ViewModels.FacilitiesEdittedBooking viewModel = new Models.ViewModels.FacilitiesEdittedBooking() { EdittedBooking = booking, OriginalBooking = currentBooking, EquipmentAdded = addedEquipment, EquipmentRemoved = removedEquipment };
+                        facilitiesViewModels.Add(viewModel);
+                    }
+                }
+            }
+            try
+            {
+                if (facilitiesViewModels.Count > 0)
+                {
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", facilitiesViewModels);
+                    if (!string.IsNullOrEmpty(body))
+                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "(Updated) Meeting room equipment for booking(s)", body);
+                }
+            }
+            catch (Exception exn)
+            {
+                _logger.ErrorException("Unable to retrieve email markup for facilities for editted booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), exn);
             }
         }
 
@@ -528,5 +771,6 @@ namespace VORBS.Services
 
         public class UnauthorisedOverwriteException : Exception { }
 
+        public class UnableToEditBookingException : Exception { }
     }
 }
