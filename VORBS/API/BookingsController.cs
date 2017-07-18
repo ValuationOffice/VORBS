@@ -34,12 +34,14 @@ namespace VORBS.API
         private IRoomRepository _roomsRepository;
 
         private IDirectoryService _directoryService;
+        private BookingsService _bookingService;
 
         public BookingsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IRoomRepository roomsRepository, IDirectoryService directoryService)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
+            _bookingService = new BookingsService(_logger, bookingRepository, roomsRepository, locationRepository, directoryService);
 
             _bookingsRepository = bookingRepository;
             _locationsRepository = locationRepository;
@@ -321,15 +323,13 @@ namespace VORBS.API
         [HttpPost]
         public HttpResponseMessage SaveNewBooking(Booking newBooking)
         {
-            BookingsService bookingService = new BookingsService(_logger, _bookingsRepository, _roomsRepository, _locationsRepository, _directoryService);
-
             try
             {
                 User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
                 if (currentUser == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
-                bookingService.SaveNewBooking(newBooking, currentUser, ConfigurationManager.AppSettings);
+                _bookingService.SaveNewBooking(newBooking, currentUser, ConfigurationManager.AppSettings);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (BookingsService.BookingConflictException e)
@@ -362,8 +362,6 @@ namespace VORBS.API
         [Route("{existingBookingId:int}/{recurrence:bool?}")]
         public HttpResponseMessage EditExistingBooking(int existingBookingId, Booking editBooking, bool? recurrence = false)
         {
-            BookingsService bookingService = new BookingsService(_logger, _bookingsRepository, _roomsRepository, _locationsRepository, _directoryService);
-
             //Find Existing Booking
             Booking existingBooking = _bookingsRepository.GetById(existingBookingId);
 
@@ -373,7 +371,7 @@ namespace VORBS.API
                 if (currentUser == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
-                bookingService.EditExistingBooking(existingBooking, editBooking, recurrence, currentUser, ConfigurationManager.AppSettings);
+                _bookingService.EditExistingBooking(existingBooking, editBooking, recurrence, currentUser, ConfigurationManager.AppSettings);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (UnableToEditBookingException e)
@@ -398,14 +396,13 @@ namespace VORBS.API
         {
             try
             {
-                BookingsService bookingService = new BookingsService(_logger, _bookingsRepository, _roomsRepository, _locationsRepository, _directoryService);
                 Booking booking = _bookingsRepository.GetById(bookingId);
 
                 User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
                 if (currentUser == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
-                bookingService.DeleteExistingBooking(booking, recurrence, currentUser, ConfigurationManager.AppSettings);
+                _bookingService.DeleteExistingBooking(booking, recurrence, currentUser, ConfigurationManager.AppSettings);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (DeletionException e)

@@ -8,6 +8,8 @@ using VORBS.DAL;
 using VORBS.DAL.Repositories;
 using VORBS.Models;
 using VORBS.Models.DTOs;
+using VORBS.Services;
+using static VORBS.Services.AdminService;
 
 namespace VORBS.API
 {
@@ -16,12 +18,15 @@ namespace VORBS.API
     public class AdminController : ApiController
     {
         private NLog.Logger _logger;
+        private AdminService _adminService;
+
         private IAdminRepository _adminRepository;
         private IBookingRepository _bookingRepository;
 
         public AdminController(IBookingRepository bookingRepository, IAdminRepository adminRepository)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
+            _adminService = new AdminService(_logger, adminRepository);
 
             _adminRepository = adminRepository;
             _bookingRepository = bookingRepository;
@@ -101,14 +106,12 @@ namespace VORBS.API
         {
             try
             {
-                if (_adminRepository.GetAdminByPid(admin.PID) != null)
-                    return Request.CreateResponse(HttpStatusCode.Conflict);
-
-                _adminRepository.SaveNewAdmin(admin);
-
-                _logger.Info("Admin successfully added: " + admin.PID);
-
+                _adminService.AddNewAdmin(admin);
                 return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (AdminExistsException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict);
             }
             catch (Exception ex)
             {
@@ -123,20 +126,12 @@ namespace VORBS.API
         {
             try
             {
-                //Find Existing Booking
                 Admin existingAdmin = _adminRepository.GetAdminById(existingAdminId);
 
-                //No edits found
                 if (existingAdmin.PermissionLevel == editAdmin.PermissionLevel && existingAdmin.LocationID == editAdmin.LocationID)
                     return new HttpResponseMessage(HttpStatusCode.NotModified);
 
-                existingAdmin.PermissionLevel = editAdmin.PermissionLevel;
-                existingAdmin.LocationID = editAdmin.LocationID;
-
-                _adminRepository.UpdateAdmin(existingAdmin);
-
-                _logger.Info("Admin successfully Edited: " + editAdmin.PID);
-
+                _adminService.EditExistingAdmin(existingAdmin, editAdmin);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -153,9 +148,8 @@ namespace VORBS.API
             try
             {
                 Admin admin = _adminRepository.GetAdminById(adminId);
-                _adminRepository.DeleteAdmin(admin);
 
-                _logger.Info("Admin successfully deleted: " + adminId);
+                _adminService.DeleteExistingAdmin(admin);
 
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }

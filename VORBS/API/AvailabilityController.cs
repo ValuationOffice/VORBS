@@ -19,6 +19,8 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
+        private AvailabilityService _availabilityService;
+
         private IBookingRepository _bookingRepository;
         private ILocationRepository _locationRepository;
         private IRoomRepository _roomsRepository;
@@ -30,6 +32,7 @@ namespace VORBS.API
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
+            _availabilityService = new AvailabilityService(_bookingRepository, roomsRepository, locationRepository);
 
             _bookingRepository = bookingRepository;
             _locationRepository = locationRepository;
@@ -266,8 +269,7 @@ namespace VORBS.API
                 existingBooking.StartDate = start;
                 existingBooking.EndDate = end;
 
-                AvailabilityService availabilityService = new AvailabilityService(_bookingRepository, _roomsRepository, _locationRepository);
-                bool meetingClash = availabilityService.DoesMeetingClash(existingBooking, out clashedBookings);
+                bool meetingClash = _availabilityService.DoesMeetingClash(existingBooking, out clashedBookings);
 
                 if (meetingClash && clashedBookings.Count == 1 && clashedBookings[0].ID == existingBooking.ID)
                     availableRooms.Add(existingBooking.Room);
