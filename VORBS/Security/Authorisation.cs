@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using VORBS.DAL;
 using VORBS.Utils;
+using static VORBS.Models.User;
 
 namespace VORBS.Security
 {
@@ -81,21 +82,26 @@ namespace VORBS.Security
 
     public static class VorbsAuthorise
     {
-        public static bool IsUserAuthorised(string userName, int level)
+        public static bool IsUserAuthorised(Pid pid, int level)
         {
             VORBSContext db = new VORBSContext();
 
-            string uName = userName;
-            string _userPID = uName.Substring(uName.IndexOf("\\") + 1);
-
-            if (userName == null)
-                return false;
-          
-            var adminUser = db.Admins.Where(x => x.PID == _userPID).SingleOrDefault();
+            var adminUser = db.Admins.Where(x => x.PID == pid.Identity).SingleOrDefault();
             if (adminUser != null)
                 return adminUser.PermissionLevel >= level;
             else
                 return false;
+        }
+
+        public static bool IsUserAuthorised(string userName, int level)
+        {
+            Pid _userPID = new Pid(userName.Substring(userName.IndexOf("\\") + 1));
+
+            if (userName == null)
+                return false;
+
+            return IsUserAuthorised(_userPID, level);
+
         }
     }
 }

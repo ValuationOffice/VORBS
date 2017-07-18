@@ -197,6 +197,7 @@
     <Compile Include="Security\Authorisation.cs" />
     <Compile Include="DAL\Repositories\Implementations\EFBookingRepository.cs" />
     <Compile Include="Services\AvailabilityService.cs" />
+    <Compile Include="Services\BookingsService.cs" />
     <Compile Include="Services\Interfaces\IDirectoryService.cs" />
     <Compile Include="Services\ActiveDirectoryService.cs" />
     <Compile Include="API\AvailabilityController.cs" />
