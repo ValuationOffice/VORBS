@@ -307,7 +307,10 @@ namespace VORBS.Services
                 string toEmail = _directoryService.GetUser(new User.Pid(booking.PID)).EmailAddress;
                 string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", allBookings);
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                else
+                    throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
@@ -322,7 +325,10 @@ namespace VORBS.Services
                 string toEmail = _directoryService.GetUser(new User.Pid(booking.PID)).EmailAddress;
                 string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", allBookings);
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                else
+                    throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
@@ -333,38 +339,40 @@ namespace VORBS.Services
         private void SendEmailToFacilitiesForDelete(string fromEmail, Booking booking, List<Booking> allBookings)
         {
             Location bookingsLocation = _roomsRepository.GetRoomById(booking.RoomID).Location;
-            string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
 
-            if (facilitiesEmail != null)
+            try
             {
-                try
-                {
-                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", allBookings);
-                    Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "Meeting room equipment cancellation for booking(s)", body);
-                }
-                catch (Exception ex)
-                {
-                    _logger.ErrorException("Unable to send email to facilities for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
-                }
+                string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", allBookings);
+
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room equipment cancellation for booking(s)", body);
+                else
+                    throw new Exception("Body or To-Email is null.");
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send email to facilities for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
 
         private void SendEmailToDSSForDelete(string fromEmail, Booking booking, List<Booking> allBookings)
         {
             Location bookingsLocation = _roomsRepository.GetRoomById(booking.RoomID).Location;
-            string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
 
-            if (dssEmail != null)
+            try
             {
-                try
-                {
-                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSDeletedBooking.cshtml", allBookings);
-                    Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "Meeting room booking cancellation(s)", body);
-                }
-                catch (Exception ex)
-                {
-                    _logger.ErrorException("Unable to send email to dss for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
-                }
+                string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSDeletedBooking.cshtml", allBookings);
+
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                else
+                    throw new Exception("Body or To-Email is null.");
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send email to dss for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
 
@@ -372,13 +380,14 @@ namespace VORBS.Services
         {
             try
             {
-                string toOwnerEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
+                string toEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBookings);
+                string subject = "Meeting room edit confirmation";
 
-                string ownerBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminEdittedBooking.cshtml", editBookings);
-                string toOwnerSubject = "Meeting room edit confirmation";
-
-                if (!string.IsNullOrEmpty(ownerBody) && !string.IsNullOrEmpty(toOwnerEmail))
-                    Utils.EmailHelper.SendEmail(fromEmail, toOwnerEmail, toOwnerSubject, ownerBody);
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, subject, body);
+                else
+                    throw new Exception("Body or To-Email is null.");
             }
             catch (Exception e)
             {
@@ -392,13 +401,15 @@ namespace VORBS.Services
 
             try
             {
-                string toOwnerEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
+                string toEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
 
-                string ownerBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBookings);
-                string toOwnerSubject = "Meeting room booking confirmation";
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBookings);
+                string subject = "Meeting room booking confirmation";
 
-                if (!string.IsNullOrEmpty(ownerBody) && !string.IsNullOrEmpty(toOwnerEmail))
-                    Utils.EmailHelper.SendEmail(fromEmail, toOwnerEmail, toOwnerSubject, ownerBody);
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, subject, body);
+                else
+                    throw new Exception("Body or To-Email is null.");
             }
             catch (Exception e)
             {
@@ -410,8 +421,6 @@ namespace VORBS.Services
         {
             List<SecurityEdittedBooking> securityViewModels = new List<SecurityEdittedBooking>();
             Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
-
-            string securityEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
 
             foreach (Booking booking in editBookings)
             {
@@ -431,9 +440,13 @@ namespace VORBS.Services
             {
                 if (securityViewModels.Count > 0)
                 {
-                    string securityEmailBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityEdittedBooking.cshtml", securityViewModels);
-                    if (!string.IsNullOrEmpty(securityEmailBody) && !string.IsNullOrEmpty(securityEmail))
-                        Utils.EmailHelper.SendEmail(fromEmail, securityEmail, "(Updated) External guests notification", securityEmailBody);
+                    string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
+
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityEdittedBooking.cshtml", securityViewModels);
+                    if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, "(Updated) External guests notification", body);
+                    else
+                        throw new Exception("Body or To-Email is null.");
 
                 }
             }
@@ -448,27 +461,26 @@ namespace VORBS.Services
             List<Booking> dssEditBookings = new List<Booking>();
             Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
 
-            string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
-
             foreach (Booking booking in editBookings)
             {
                 Booking currentBooking = originalBookings.Where(x => x.ID == booking.ID).First();
                 if (booking.DssAssist != currentBooking.DssAssist)
                 {
-                    if (dssEmail != null)
-                    {
-                        booking.Room.Location = currentBooking.Room.Location;
-                        dssEditBookings.Add(booking);
-                    }
+                    booking.Room.Location = currentBooking.Room.Location;
+                    dssEditBookings.Add(booking);
                 }
             }
             try
             {
                 if (dssEditBookings.Count > 0)
                 {
-                    string dssBody = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSEdittedBooking.cshtml", dssEditBookings);
-                    if (!string.IsNullOrEmpty(dssBody))
-                        Utils.EmailHelper.SendEmail(fromEmail, dssEmail, "(Updated) SMART room set up support", dssBody);
+                    string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSEdittedBooking.cshtml", dssEditBookings);
+
+                    if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, "(Updated) SMART room set up support", body);
+                    else
+                        throw new Exception("Body or To-Email is null.");
                 }
             }
             catch (Exception ex)
@@ -480,7 +492,6 @@ namespace VORBS.Services
         private void SendEmailToFacilitiesForEdit(string fromEmail, Booking editBooking, List<Booking> editBookings, List<Booking> originalBookings)
         {
             Location bookingsLocation = _roomsRepository.GetRoomById(editBooking.RoomID).Location;
-            string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
 
             List<FacilitiesEdittedBooking> facilitiesViewModels = new List<FacilitiesEdittedBooking>();
 
@@ -490,39 +501,38 @@ namespace VORBS.Services
                 if ((currentBooking.Flipchart != booking.Flipchart) || (booking.Projector != currentBooking.Projector))
                 {
 
-                    if (facilitiesEmail != null)
+                    List<string> addedEquipment = new List<string>();
+                    List<string> removedEquipment = new List<string>();
+                    if (booking.Projector != currentBooking.Projector)
                     {
-
-                        List<string> addedEquipment = new List<string>();
-                        List<string> removedEquipment = new List<string>();
-                        if (booking.Projector != currentBooking.Projector)
-                        {
-                            //If it is present in edit booking, and above equality check is false, then we know the projector request is new
-                            if (booking.Projector)
-                                addedEquipment.Add("Projector");
-                            else
-                                removedEquipment.Add("Projector");
-                        }
-                        if (booking.Flipchart != currentBooking.Flipchart)
-                        {
-                            if (booking.Flipchart)
-                                addedEquipment.Add("Flip Chart");
-                            else
-                                removedEquipment.Add("Flip Chart");
-                        }
-
-                        Models.ViewModels.FacilitiesEdittedBooking viewModel = new Models.ViewModels.FacilitiesEdittedBooking() { EdittedBooking = booking, OriginalBooking = currentBooking, EquipmentAdded = addedEquipment, EquipmentRemoved = removedEquipment };
-                        facilitiesViewModels.Add(viewModel);
+                        //If it is present in edit booking, and above equality check is false, then we know the projector request is new
+                        if (booking.Projector)
+                            addedEquipment.Add("Projector");
+                        else
+                            removedEquipment.Add("Projector");
                     }
+                    if (booking.Flipchart != currentBooking.Flipchart)
+                    {
+                        if (booking.Flipchart)
+                            addedEquipment.Add("Flip Chart");
+                        else
+                            removedEquipment.Add("Flip Chart");
+                    }
+
+                    Models.ViewModels.FacilitiesEdittedBooking viewModel = new Models.ViewModels.FacilitiesEdittedBooking() { EdittedBooking = booking, OriginalBooking = currentBooking, EquipmentAdded = addedEquipment, EquipmentRemoved = removedEquipment };
+                    facilitiesViewModels.Add(viewModel);
                 }
             }
             try
             {
                 if (facilitiesViewModels.Count > 0)
                 {
+                    string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
                     string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", facilitiesViewModels);
-                    if (!string.IsNullOrEmpty(body))
-                        Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, "(Updated) Meeting room equipment for booking(s)", body);
+                    if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, "(Updated) Meeting room equipment for booking(s)", body);
+                    else
+                        throw new Exception("Body or To-Email is null.");
                 }
             }
             catch (Exception exn)
@@ -541,7 +551,10 @@ namespace VORBS.Services
                     string errorMessage = (newBooking.Recurrence.AdminOverwriteMessage.Trim().Length > 0) ? newBooking.Recurrence.AdminOverwriteMessage : "An admin has cancelled these bookings.";
                     string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBookingWithMessage.cshtml", new Models.ViewModels.AdminMultiCancelledBookingWithMessage(clashedBookings.Where(x => x.PID == owner), errorMessage));
 
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                    if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                    else
+                        throw new Exception("Body or To-Email is null.");
                 }
                 catch (Exception exn)
                 {
@@ -553,33 +566,35 @@ namespace VORBS.Services
 
         private void SendEmailToDSSForCreate(string fromEmail, Booking newBooking, Location bookingsLocation)
         {
-            string dssEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
-            if (dssEmail != null)
+            try
             {
-                try
-                {
-                    string body = "";
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", newBooking);
-                    Utils.EmailHelper.SendEmail(fromEmail, dssEmail, string.Format("SMART room set up support on {0}", newBooking.StartDate.ToShortDateString()), body);
-                }
-                catch (Exception ex)
-                {
-                    _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + newBooking.ID, ex);
-                }
+                string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.dss.ToString()).Select(x => x.Email).FirstOrDefault();
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", newBooking);
+
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("SMART room set up support on {0}", newBooking.StartDate.ToShortDateString()), body);
+                else
+                    throw new Exception("Body or To-Email is null.");
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + newBooking.ID, ex);
             }
         }
 
         private void SendEmailToSecurityForCreate(string fromEmail, Booking newBooking, Location bookingsLocation)
         {
-
-            string securityEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
-            if (securityEmail != null)
+            string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
+            if (toEmail != null)
             {
                 try
                 {
-                    string body = "";
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBooking.cshtml", newBooking);
-                    Utils.EmailHelper.SendEmail(fromEmail, securityEmail, string.Format("External guests notifcation for {0}", newBooking.StartDate.ToShortDateString()), body);
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBooking.cshtml", newBooking);
+
+                    if (!string.IsNullOrEmpty(body))
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests notifcation for {0}", newBooking.StartDate.ToShortDateString()), body);
+                    else
+                        throw new Exception("Body is null.");
                 }
                 catch (Exception ex)
                 {
@@ -590,10 +605,13 @@ namespace VORBS.Services
             {
                 try
                 {
-                    string body = "";
-                    string toEmail = _directoryService.GetUser(new User.Pid(newBooking.PID)).EmailAddress;
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBookingBookersCopy.cshtml", newBooking);
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests security information for {0}", newBooking.StartDate.ToShortDateString()), body);
+                    toEmail = _directoryService.GetUser(new User.Pid(newBooking.PID)).EmailAddress;
+                    string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBookingBookersCopy.cshtml", newBooking);
+
+                    if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                        Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests security information for {0}", newBooking.StartDate.ToShortDateString()), body);
+                    else
+                        throw new Exception("Body or To-Email is null.");
                 }
                 catch (Exception ex)
                 {
@@ -604,20 +622,19 @@ namespace VORBS.Services
 
         private void SendEmailToFacilitiesForCreate(Booking newBooking, string fromEmail, Location bookingsLocation)
         {
-
-            string facilitiesEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
-            if (facilitiesEmail != null)
+            try
             {
-                try
-                {
-                    string body = "";
-                    body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesNewBooking.cshtml", newBooking);
-                    Utils.EmailHelper.SendEmail(fromEmail, facilitiesEmail, string.Format("Meeting room equipment booking on {0}", newBooking.StartDate.ToShortDateString()), body);
-                }
-                catch (Exception ex)
-                {
-                    _logger.ErrorException("Unable to send E-Mail to facilities for new booking: " + newBooking.ID, ex);
-                }
+                string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
+                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesNewBooking.cshtml", newBooking);
+
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, string.Format("Meeting room equipment booking on {0}", newBooking.StartDate.ToShortDateString()), body);
+                else
+                    throw new Exception("Body or To-Email is null.");
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to send E-Mail to facilities for new booking: " + newBooking.ID, ex);
             }
         }
 
@@ -627,7 +644,7 @@ namespace VORBS.Services
             {
                 string toEmail = _directoryService.GetUser(new User.Pid(newBooking.PID)).EmailAddress;
 
-                string body = "";
+                string body = null;
 
                 if (newBooking.IsSmartMeeting)
                     body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewSmartBooking.cshtml", bookingsToCreate);
@@ -639,7 +656,10 @@ namespace VORBS.Services
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminNewBooking.cshtml", newBooking);
                 }
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room ooking confirmation", body);
+                else
+                    throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
@@ -653,7 +673,7 @@ namespace VORBS.Services
             {
                 string toEmail = _directoryService.GetUser(new User.Pid(newBooking.PID)).EmailAddress;
 
-                string body = "";
+                string body = null;
 
                 if (newBooking.IsSmartMeeting)
                     bookingsToCreate = GetRoomForBookings(bookingsToCreate);
@@ -670,7 +690,10 @@ namespace VORBS.Services
                         body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/NewBooking.cshtml", newBooking);
                 }
 
-                Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
+                if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
+                else
+                    throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
