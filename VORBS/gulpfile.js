@@ -22,7 +22,27 @@ gulp.task('vet', function () {
         .pipe($.eslint.failAfterError())
 });
 
+gulp.task('test', ['vet'], function (done) {
+    startTests(true /* singleRun */, done);
+});
+
+gulp.task('autotest', ['vet'], function (done) {
+    startTests(false /* singleRun */, done);
+});
+
 ///////////////////////////////////////////////////
+
+function startTests(singleRun, done) {
+    var karma = require('karma').Server;
+    var excludeFiles = [];
+
+    karma.start({
+        configFile: __dirname + '/karma.conf.js',
+        exclude: excludeFiles,
+        singleRun: !!singleRun
+    }, done());
+
+}
 
 function log(msg) {
     if (typeof (msg) === 'object') {
