@@ -2,9 +2,9 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource'];
+    NewBookingController.$inject = ['$scope', '$http', '$resource', 'Bookings'];
 
-    function NewBookingController($scope, $http, $resource) {
+    function NewBookingController($scope, $http, $resource, Bookings) {
         CreateServices($resource);
 
         $scope.locations = Locations.query({ status: true, extraInfo: true });
@@ -476,44 +476,36 @@
                     $scope.newBooking.ExternalAttendees = $scope.booking.ExternalAttendees;//.join(';');
                 }
 
-                $.ajax({
-                    type: "POST",
-                    data: JSON.stringify($scope.newBooking),
-                    url: "api/bookings",
-                    contentType: "application/json",
-                    success: function (data, status) {
-                        alert('Booking Confirmed.');
-                        window.location.href = "/MyBookings"; //Redirect to my bookings
-                    },
-                    error: function (error) {
-                        switch (error.status) {
-                            case 409:
-                                //conflict in recurrance booking(s)
-                                $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
-                                $scope.$apply();
-                                $("#meetingClashSelection").modal('show');
-                                break;
-                            case 502:
-                                //no smart rooms avalible
-                                $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
-                                $scope.$apply();
-                                $("#smartMeetingClashSelection").modal('show');
-                                break;
-                            case 406:
-                                //Server Conflict
-                                alert("Simultaneous booking conflict. Please try again.");
-                                $scope.SearchBookings(false);
-                                $("#confirmModal").modal('hide');
-                                break;
-                            default:
-                                alert('Unable to Book Meeting Room. ' + error.responseText);
-                                break;
-                        }
-                        $scope.ResetConflictAction();
-                        EnableNewBookingButton();
+                Bookings.create({}, $scope.newBooking).$promise.then(function () {
+                    alert('Booking Confirmed.');
+                    window.location.href = "/MyBookings"; //Redirect to my bookings
+                }, function (error) {
+                    switch (error.status) {
+                        case 409:
+                            //conflict in recurrance booking(s)
+                            $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
+                            $scope.$apply();
+                            $("#meetingClashSelection").modal('show');
+                            break;
+                        case 502:
+                            //no smart rooms avalible
+                            $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
+                            $scope.$apply();
+                            $("#smartMeetingClashSelection").modal('show');
+                            break;
+                        case 406:
+                            //Server Conflict
+                            alert("Simultaneous booking conflict. Please try again.");
+                            $scope.SearchBookings(false);
+                            $("#confirmModal").modal('hide');
+                            break;
+                        default:
+                            alert('Unable to Book Meeting Room. ' + error.responseText);
+                            break;
                     }
-                }
-                );
+                    $scope.ResetConflictAction();
+                    EnableNewBookingButton();
+                });
                 $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
             } catch (e) {
                 EnableNewBookingButton();

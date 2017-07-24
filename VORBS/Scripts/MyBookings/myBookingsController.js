@@ -3,9 +3,9 @@
     angular.module('vorbs.myBookings')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$http', '$resource'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'Bookings'];
 
-    function MyBookingsController($scope, $http, $resource) {
+    function MyBookingsController($scope, $resource, Bookings) {
 
         CreateServices($resource);
 
@@ -20,12 +20,16 @@
             smartRoom: false
         };
 
+        $scope.bookings = [];
         $scope.SearchBookings = function () {
-            $scope.bookings = FilterBookings.query({
+
+            Bookings.search({
                 locationId: $scope.bookingFilter.location.id,
                 room: $scope.bookingFilter.room,
                 startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, false),
                 smartRoom: $scope.bookingFilter.smartRoom
+            }).$promise.then(function (response) {
+                $scope.bookings = response;
             });
         }
 
@@ -36,21 +40,28 @@
         $scope.GetBookings = function () {
 
             var period = 7;
+            var startDate = new moment().utc().format("MM-DD-YYYY-HHmm");
 
-            $scope.bookings = BookingsByPeriod.query({
-                startDate: new moment().utc().format("MM-DD-YYYY-HHmm"),
-                period: period
-            });
+            Bookings.getByPeriod({ startDate: startDate, period: period })
+                .$promise.then(function (data) {
+                    $scope.bookings = data;
+                });
         }
 
         $scope.GetBookings();
 
         $scope.bookingId = 0;
 
+        $scope.currentBookingToModify = null;
         $scope.SetBookingId = function (id) {
             $scope.bookingId = id;
-            $scope.currentBookingToModify = Booking.query({
+            Bookings.getByID({
                 bookingId: id
+            }).$promise.then(function (response) {
+                $scope.currentBookingToModify = response;
+            }, function (error) {
+                //TODO: Error Handler
+                $scope.currentBookingToModify = null;
             });
         }
 
@@ -73,83 +84,83 @@
             ResetExternalNamesUI();
             SetEditActiveTab('editBooking');
 
-            $scope.SetBookingId(bookingId);
+            $scope.bookingId = bookingId;
 
-            $scope.editBooking = Booking.query({
-                bookingId: $scope.bookingId
-            },
-                function (sucess) {
-                    $scope.newBooking.Room.RoomName = $scope.editBooking.room.roomName.replace('_', '.');
-                    $scope.newBooking.Subject = $scope.editBooking.subject;
-                    $scope.newBooking.FlipChart = $scope.editBooking.flipchart;
-                    $scope.newBooking.Projector = $scope.editBooking.projector;
-                    $scope.newBooking.RoomID = $scope.editBooking.room.id;
-                    $scope.newBooking.IsSmartMeeting = $scope.editBooking.isSmartMeeting;
-                    $scope.newBooking.DSSAssist = $scope.editBooking.dssAssist;
+            Bookings.getByID({
+                bookingId: bookingId
+            }).$promise.then(function (response) {
+                $scope.newBooking.Room.RoomName = response.room.roomName;
+                $scope.newBooking.Subject = response.subject;
+                $scope.newBooking.FlipChart = response.flipchart;
+                $scope.newBooking.Projector = response.projector;
+                $scope.newBooking.RoomID = response.room.id;
+                $scope.newBooking.IsSmartMeeting = response.isSmartMeeting;
+                $scope.newBooking.DSSAssist = response.dssAssist;
 
-                    if ($scope.editBooking.externalAttendees !== null) {
-                        //$scope.booking.externalAttendees = $scope.editBooking.externalNames.split(';');
-                        $scope.booking.externalAttendees = $scope.editBooking.externalAttendees;
-                    }
-                    else {
-                        $scope.booking.externalAttendees = []; //Reset External Name List
-                    }
-
-                    $scope.booking.numberOfAttendees = $scope.editBooking.numberOfAttendees;
-                    $scope.booking.startTime = FormatTimeDate($scope.editBooking.startDate, false);
-                    $scope.booking.endTime = FormatTimeDate($scope.editBooking.endDate, false);
-                    $scope.booking.date = FormatTimeDate($scope.editBooking.startDate, true);
-
-                    //Store the vital existing booking data
-                    $scope.existingBooking.numberOfAttendees = $scope.booking.numberOfAttendees;
-                    $scope.existingBooking.startTime = $scope.booking.startTime;
-                    $scope.existingBooking.endTime = $scope.booking.endTime;
-                    $scope.existingBooking.date = $scope.booking.date;
-
-                    if (!$scope.editBooking.room.smartRoom || !$scope.newBooking.IsSmartMeeting) {
-                        $("#dssAssistChoice").css('display', 'none');
-                        $("#dssAssistContWarning").css("display", "none");
-                    } else {
-                        var dssDetails = GetLocationCredentialsFromList("dss", $scope.editBooking.location.locationCredentials);
-                        if (!dssDetails || dssDetails.email === "") {
-                            $("#dssAssistChoice").css('display', 'none');
-                            $("#dssAssistContWarning").css("display", "block");
-                        } else {
-                            $("#dssAssistChoice").css('display', 'block');
-                            $("#dssAssistContWarning").css("display", "none");
-                        }
-                    }
-
-                    var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, $scope.editBooking.location.locationCredentials);
-                    //if (!securityDetails || securityDetails.email === "") {
-                    //Overrided existing security department check, as users need to be available to add guests but will be sent an email personally to inform security.
-                    if (false) {
-                        $("#externalAttendeesCont").css("display", "none");
-
-                        var message = "This location does not have a dedicated security desk.";
-                        var facilities = GetLocationCredentialsFromList(facilitiesCredentialsName, $scope.editBooking.location.locationCredentials);
-                        if (facilities) {
-                            message = message + " Please contact the local facilities officer at " + facilities.email + " for visitory access protocols.";
-                        }
-                        $("#externalAttendeesContWarning").text(message);
-                        $("#externalAttendeesContWarning").css("display", "block");
-                    } else {
-                        $("#externalAttendeesCont").css("display", "block");
-                        $("#externalAttendeesContWarning").css("display", "none");
-                    }
-
-                    var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, $scope.editBooking.location.locationCredentials);
-                    if (!facilitiesDetails || facilitiesDetails.email === "") {
-                        $("#additionalEquipmentCont").css("display", "none");
-                        $("#additionalEquipmentContWarning").css("display", "block");
-                    } else {
-                        $("#additionalEquipmentCont").css("display", "block");
-                        $("#additionalEquipmentContWarning").css("display", "none");
-                    }
-                    $scope.$apply();
-                    $("#editModal #bookingDate").datepicker('update');
+                if (response.externalAttendees !== null) {
+                    $scope.booking.externalAttendees = response.externalAttendees;
                 }
-            )
+                else {
+                    $scope.booking.externalAttendees = []; //Reset External Name List
+                }
+
+                $scope.booking.numberOfAttendees = response.numberOfAttendees;
+                $scope.booking.startTime = FormatTimeDate(response.startDate, false);
+                $scope.booking.endTime = FormatTimeDate(response.endDate, false);
+                $scope.booking.date = FormatTimeDate(response.startDate, true);
+
+                //Store the vital existing booking data
+                $scope.existingBooking.numberOfAttendees = $scope.booking.numberOfAttendees;
+                $scope.existingBooking.startTime = $scope.booking.startTime;
+                $scope.existingBooking.endTime = $scope.booking.endTime;
+                $scope.existingBooking.date = $scope.booking.date;
+
+                if (!response.room.smartRoom || !$scope.newBooking.IsSmartMeeting) {
+                    $("#dssAssistChoice").css('display', 'none');
+                    $("#dssAssistContWarning").css("display", "none");
+                } else {
+                    var dssDetails = GetLocationCredentialsFromList("dss", response.location.locationCredentials);
+                    if (!dssDetails || dssDetails.email === "") {
+                        $("#dssAssistChoice").css('display', 'none');
+                        $("#dssAssistContWarning").css("display", "block");
+                    } else {
+                        $("#dssAssistChoice").css('display', 'block');
+                        $("#dssAssistContWarning").css("display", "none");
+                    }
+                }
+
+                var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, response.location.locationCredentials);
+                //if (!securityDetails || securityDetails.email === "") {
+                //Overrided existing security department check, as users need to be available to add guests but will be sent an email personally to inform security.
+                if (false) {
+                    $("#externalAttendeesCont").css("display", "none");
+
+                    var message = "This location does not have a dedicated security desk.";
+                    var facilities = GetLocationCredentialsFromList(facilitiesCredentialsName, response.location.locationCredentials);
+                    if (facilities) {
+                        message = message + " Please contact the local facilities officer at " + facilities.email + " for visitory access protocols.";
+                    }
+                    $("#externalAttendeesContWarning").text(message);
+                    $("#externalAttendeesContWarning").css("display", "block");
+                } else {
+                    $("#externalAttendeesCont").css("display", "block");
+                    $("#externalAttendeesContWarning").css("display", "none");
+                }
+
+                var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, response.location.locationCredentials);
+                if (!facilitiesDetails || facilitiesDetails.email === "") {
+                    $("#additionalEquipmentCont").css("display", "none");
+                    $("#additionalEquipmentContWarning").css("display", "block");
+                } else {
+                    $("#additionalEquipmentCont").css("display", "block");
+                    $("#additionalEquipmentContWarning").css("display", "none");
+                }
+                $("#editModal #bookingDate").datepicker('update');               
+                $scope.editBooking = response;            
+            }, function (error) {
+                // TODO: Error Handler
+                $scope.editBooking = null;
+            });
         }
 
         $scope.CheckEditBooking = function () {
@@ -198,7 +209,7 @@
                 var timespanChanged = moment($scope.booking.startTime, "hh:mm") < moment($scope.existingBooking.startTime, "hh:mm") || moment($scope.booking.endTime, "hh:mm") > moment($scope.existingBooking.endTime, "hh:mm");
 
                 if (!attendeesChanged && !dateChanged && !timespanChanged) {
-                    SaveEditBooking($scope.bookingId, $scope.newBooking);
+                    saveBooking($scope.bookingId, $scope.newBooking);
                 }
                 else {
                     $scope.availableRooms = Available.query({
@@ -216,10 +227,10 @@
                                 SetModalErrorMessage('No Rooms Available using the below Date/Time/Attendees.');
                             }
                             else if ($scope.availableRooms.length === 1 && $scope.availableRooms[0].roomName == $scope.newBooking.Room.RoomName) {
-                                SaveEditBooking($scope.bookingId, $scope.newBooking);
+                                saveBooking($scope.bookingId, $scope.newBooking);
                             }
                             else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
-                                SaveEditBooking($scope.bookingId, $scope.newBooking);
+                                saveBooking($scope.bookingId, $scope.newBooking);
                             }
                             else {
                                 EnableAcceptBookingButton();
@@ -251,13 +262,34 @@
             $("#confirmBookingConfirmButton").html('Editing Booking. Please wait..');
 
             $scope.newBooking.RoomID = $scope.currentRoom.id;
-            SaveEditBooking($scope.bookingId, $scope.newBooking);
+            saveBooking($scope.bookingId, $scope.newBooking);
 
             //Disabled as the page refresh after save render the page with button enabled. By activating it here, there is a brief period where the user can select
             //the button twice, and give a false positive for a secondary failure of the same save
             //EnableConfirmBookingButton();
         }
 
+        function saveBooking(id, booking) {
+            Bookings.update({
+                existingId: id,
+                recurrence: booking.recurrence || false
+            }, booking).$promise.then(function (response) {
+
+                alert('Booking Updated Successfully.');
+                ReloadThisPage("bookings");
+
+            }, function (error) {
+                //Server Conflict
+                if (error.status == 406) {
+                    alert("Simultaneous booking conflict. Please try again.");
+                    ReloadThisPage("bookings");
+                }
+                else {
+                    alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
+                }
+                EnableEditBookingButton();
+            });
+        }
 
         $scope.modifyBookingOptions = resetModifyBookingOptions();
 
@@ -273,12 +305,11 @@
             $("#deleteBookingConfirmButton").html('Deleting booking. Please wait..');
 
             try {
-                Booking.remove(
+                Bookings.remove(
                     {
                         bookingId: $scope.bookingId,
                         recurrence: $scope.modifyBookingOptions.deleteAllInRecurrence
-                    },
-                    function (success) {
+                    }).$promise.then(function (success) {
                         $("#deleteModal").modal('hide');
                         $scope.GetBookings();
                         EnableDeleteBookingButton();
@@ -361,48 +392,6 @@
                     return "No";
                 }
             }
-        };
-
-        Bookings = $resource('/api/bookings/:startDate/:person', { startDate: 'startDate', person: 'person' },
-            {
-                query: { method: 'GET', isArray: true }
-            });
-
-        Bookings.prototype = {
-            DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
-            startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
-            endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
-            roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
-        };
-
-        Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId' },
-            {
-                query: { method: 'GET' },
-                remove: { method: 'DELETE' }
-            });
-
-
-        BookingsByPeriod = $resource('/api/bookings/:startDate/:period', { startDate: '', period: 7 },
-            {
-                query: { method: 'GET', isArray: true },
-                remove: { method: 'DELETE' }
-            });
-
-        BookingsByPeriod.prototype = {
-            DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
-            startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
-            endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
-            roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
-        };
-
-        FilterBookings = $resource('/api/bookings/search', {}, {
-            query: { method: 'GET', isArray: true }
-        });
-        FilterBookings.prototype = {
-            DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
-            startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
-            endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
-            roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
         };
     }
 })();

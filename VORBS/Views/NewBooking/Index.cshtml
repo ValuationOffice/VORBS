@@ -124,7 +124,7 @@
                     <pre>{{ bookingFilter.location.additionalInformation }}</pre>
                 </p>
             </div>
-            
+
             <div id="bookingTable">
 
             </div>
@@ -136,78 +136,79 @@
 </div>
 
 @section scripts{
-<script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
-<script src="~/Scripts/NewBooking/newBookingController.js"></script>
-<script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
+    <script src="~/Scripts/Services/Bookings.js"></script>
+    <script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
+    <script src="~/Scripts/NewBooking/newBookingController.js"></script>
+    <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
 
-<script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.js"></script>
-<script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
+    <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.js"></script>
+    <script src="~/Scripts/BootStrapDatePicker/bootstrap-datepicker.js"></script>
 
-<script src="~/Scripts/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="~/Scripts/jquery-uiBootstrap/jquery.bootstrap-touchspin.min.js"></script>
 
 
-<script>
-    $(function () {
-        $('.datepicker').datepicker({
-            startDate: '-0m',
-            endDate: '+12m',
-            format: 'dd-mm-yyyy',
-            autoClose: true,
-            todayBtn: true,
-            todayBtn: 'linked',
-            todayHighlight: true,
-            weekStart: 1,
-            daysOfWeekDisabled: [0, 6]
+    <script>
+        $(function () {
+            $('.datepicker').datepicker({
+                startDate: '-0m',
+                endDate: '+12m',
+                format: 'dd-mm-yyyy',
+                autoClose: true,
+                todayBtn: true,
+                todayBtn: 'linked',
+                todayHighlight: true,
+                weekStart: 1,
+                daysOfWeekDisabled: [0, 6]
+            });
+
+            $('.datepicker').datepicker({
+                startDate: '-0m',
+                endDate: '+12m',
+                format: 'dd-mm-yyyy',
+                autoClose: true,
+                todayBtn: true,
+                todayBtn: 'linked',
+                todayHighlight: true,
+                weekStart: 1,
+                daysOfWeekDisabled: [0, 6]
+            });
+
+            $('.timepicker').timepicker({
+                showInputs: false,
+                minuteStep: 30,
+                showMeridian: false
+            });
         });
 
-        $('.datepicker').datepicker({
-            startDate: '-0m',
-            endDate: '+12m',
-            format: 'dd-mm-yyyy',
-            autoClose: true,
-            todayBtn: true,
-            todayBtn: 'linked',
-            todayHighlight: true,
-            weekStart: 1,
-            daysOfWeekDisabled: [0, 6]
-        });
-
-        $('.timepicker').timepicker({
-            showInputs: false,
-            minuteStep: 30,
-            showMeridian: false
-        });
-    });
-
-    function trim11(input) {
-        str = str.replace(/^\s+/, '');
-        for (var i = str.length - 1; i >= 0; i--) {
-            if (/\S/.test(str.charAt(i))) {
-                str = str.substring(0, i + 1);
-                break;
+        function trim11(input) {
+            str = str.replace(/^\s+/, '');
+            for (var i = str.length - 1; i >= 0; i--) {
+                if (/\S/.test(str.charAt(i))) {
+                    str = str.substring(0, i + 1);
+                    break;
+                }
             }
+            return str;
         }
-        return str;
-    }
 
-    document.getElementById('bookingTable').addEventListener('mousewheel', function (e) {
-        this.scrollLeft -= (e.wheelDelta);
-        e.preventDefault();
-    }, false);
+        document.getElementById('bookingTable').addEventListener('mousewheel', function (e) {
+            this.scrollLeft -= (e.wheelDelta);
+            e.preventDefault();
+        }, false);
 
 
-    $(document).ready(function () {
-        $('#searchFilter input').keydown(function (event) {
-            if (event.keyCode == 32) {
-                event.preventDefault();
-            }
+        $(document).ready(function () {
+            $('#searchFilter input').keydown(function (event) {
+                if (event.keyCode == 32) {
+                    event.preventDefault();
+                }
+            });
+
+            $("#confirmModal input").on("blur", function () {
+                $(this).val($(this).val().trim())
+            });
+
         });
 
-        $("#confirmModal input").on("blur", function () {
-            $(this).val($(this).val().trim())
-        });
-
-    });
-
-</script>
+    </script>
 }

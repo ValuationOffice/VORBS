@@ -49,11 +49,11 @@
                     <tr>
                         <th>&nbsp;</th>
                         <th>&nbsp;</th>
-                        <th><a href="#" ng-click="orderByField='location'; reverseSort = !reverseSort">Location<span ng-show="orderByField == 'location'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='room'; reverseSort = !reverseSort">Room<span ng-show="orderByField == 'room'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='date'; reverseSort = !reverseSort">Date<span ng-show="orderByField == 'date'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='startTime'; reverseSort = !reverseSort">Time<span ng-show="orderByField == 'startTime'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>
-                        <th><a href="#" ng-click="orderByField='subject'; reverseSort = !reverseSort">Subject<span ng-show="orderByField == 'subject'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></a></th>                        
+                        <th><a href="#" ng-click="orderByField='location'; reverseSort = !reverseSort">Location<span ng-show="orderByField == 'location'"><span ng-show="!reverseSort"><span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"><span class="glyphicon glyphicon-circle-arrow-down"></span></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='room'; reverseSort = !reverseSort">Room<span ng-show="orderByField == 'room'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='date'; reverseSort = !reverseSort">Date<span ng-show="orderByField == 'date'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='startTime'; reverseSort = !reverseSort">Time<span ng-show="orderByField == 'startTime'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></span></a></th>
+                        <th><a href="#" ng-click="orderByField='subject'; reverseSort = !reverseSort">Subject<span ng-show="orderByField == 'subject'"><span ng-show="!reverseSort"> <span class="glyphicon glyphicon-circle-arrow-up"></span></span><span ng-show="reverseSort"> <span class="glyphicon glyphicon-circle-arrow-down"></span></span></span></a></th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -64,9 +64,9 @@
                         <td ng-if="booking.recurrenceId != null"><span class="glyphicon glyphicon-refresh" title="Is part of a recurrence"></span></td>
                         <td ng-if="!(booking.recurrenceId != null)">&nbsp;</td>
                         <td>{{ booking.location.name}}</td>
-                        <td>{{ booking.roomNameFormatted() }}</td>
-                        <td>{{ booking.DateFormatted() }}</td>
-                        <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
+                        <td>{{ booking.room.roomName }}</td>
+                        <td>{{ booking.startDate | date: 'dd/MM/yyyy' }}</td>
+                        <td>{{ booking.startDate | date: 'H:mm' }} - {{ booking.endDate | date: 'H:mm' }}</td>
                         <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
                         <td>
                             <button data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="button button--table">Edit</button>
@@ -101,6 +101,7 @@
 
 
 @section scripts{
+    <script src="~/Scripts/Services/Bookings.js"></script>
     <script src="~/Scripts/MyBookings/myBookingsController.js"></script>
     <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>
     <script src="~/Scripts/BootStrapTimePicker/bootstrap-timepicker.min.js"></script>
