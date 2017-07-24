@@ -11,7 +11,7 @@
         <div class="form-group">
             <div class="input-group" id="searchLocation">
                 <label class="control-label">Location</label>
-                <select class="form-control" ng-options="location.name for location in locations" ng-model="bookingFilter.location" ng-change="">
+                <select class="form-control" ng-options="location.name for location in locations | orderBy: 'name'" ng-model="bookingFilter.location" ng-change="">
                     <option value="" selected disabled>Select a location...</option>
                 </select>
             </div>

@@ -105,7 +105,7 @@
                 </p>
                 <div class="input-group" id="searchLocation">
                     <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="currentLocation" ng-change="GetHelpData()">
+                    <select class="form-control" ng-options="location.name for location in locations | orderBy: 'name'" ng-model="currentLocation" ng-change="GetHelpData()">
                         <option value="" selected disabled>Select a location...</option>
                     </select>
                 </div>

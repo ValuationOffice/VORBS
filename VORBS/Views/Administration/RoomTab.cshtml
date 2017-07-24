@@ -15,7 +15,7 @@
             <div class="form-group">
                 <div class="input-group col-xs-2">
                     <label class="control-label ">Location</label>
-                    <select class="form-control" ng-options="location.name for location in Locations" ng-model="currentLocation"></select>
+                    <select class="form-control" ng-options="location.name for location in Locations | orderBy: 'name'" ng-model="currentLocation"></select>
                 </div>
                 <div class="input-group col-xs-2" id="roomName">
                     <label class="control-label">Name</label>
@@ -69,7 +69,7 @@
 
     <div class="form-inline" id="roomFilterOptions">
         <label class="control-label">Filter Rooms By:</label>
-        <select class="form-control" ng-model="roomFilter.location" ng-change="GetRoomsByFilter()" ng-options="location.name for location in Locations">
+        <select class="form-control" ng-model="roomFilter.location" ng-change="GetRoomsByFilter()" ng-options="location.name for location in Locations | orderBy: 'name'">
             <option value="" selected>All Locations</option>
         </select>
         <select class="form-control" ng-model="roomFilter.status" ng-change="GetRoomsByFilter()">

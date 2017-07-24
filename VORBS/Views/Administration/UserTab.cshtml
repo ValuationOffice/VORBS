@@ -16,7 +16,7 @@
 
             <div class="input-group">
                 <label class="control-label">Location</label>
-                <select class="form-control" ng-options="location.id as location.name for location in Locations" ng-model="adminUser.LocationID">
+                <select class="form-control" ng-options="location.id as location.name for location in Locations | orderBy: 'name'" ng-model="adminUser.LocationID">
                     <option value="" selected disabled>Select a location...</option>
                 </select>
             </div>
@@ -92,7 +92,7 @@
                     <div class="form-inline">
                         <div class="input-group">
                             <label class="control-label">Location</label>
-                            <select class="form-control" ng-options="location.id as location.name for location in Locations" ng-model="editAdminUser.location.id"></select>
+                            <select class="form-control" ng-options="location.id as location.name for location in Locations | orderBy: 'name'" ng-model="editAdminUser.location.id"></select>
                         </div>
                         <div class="input-group ">
                             <label class="control-label">Permission</label>

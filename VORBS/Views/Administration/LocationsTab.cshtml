@@ -23,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="location in Locations">
+                <tr ng-repeat="location in Locations | orderBy: 'name'">
                     <td>{{ location.name }}</td>
                     <td>{{ location.rooms.length }}</td>
                     <td ng-show="{{location.active}}"><span class="glyphicon glyphicon-ok-circle activeIcons" title="Active Location"></span></td>

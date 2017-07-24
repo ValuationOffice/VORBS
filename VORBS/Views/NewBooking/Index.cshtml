@@ -71,7 +71,7 @@
                     </div>
                     <div class="input-group col-xs-5" id="smartLocationSelect">
                         <label class="control-label">SMART Location(s)</label>
-                        <select id="smartLoactionDropDown" class="form-control" ng-options="o.id as o.displayName for o in smartLoactions" ng-model="currentSmartLocation" ng-change="ValidateSelection()">
+                        <select id="smartLoactionDropDown" class="form-control" ng-options="o.id as o.displayName for o in smartLoactions | orderBy: 'displayName'" ng-model="currentSmartLocation" ng-change="ValidateSelection()">
                             <option value="" selected disabled>Select a location...</option>
                         </select>
                     </div>
