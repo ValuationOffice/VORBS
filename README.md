@@ -13,9 +13,13 @@ You can find a lightweight express version here: https://www.microsoft.com/en-us
 ### Front-End Dependencies ###
 To download the dependencies you will need [NodeJS]("https://nodejs.org/en/") installed.
 
-Once installed, download the [bower]("https://bower.io/") package globally using the following command: `npm install bower -g`
+Navigate inside the VORBS project directory and run the command: `npm install`.
 
-Finally, navigate inside the VORBS project and run the command: `bower install`
+To list all the available gulp tasks, navigate inside the VORBS project directory and run the command: `gulp`
+
+### Testing ###
+
+To run the tests for the front-end project, navigate inside the VORBS project directory and run the command: `gulp test`
 
 ### Seeding data ###
 There is the choice to seed the database with data when it is created. You can specify the values in the DAL/VORBSInitializer.cs file.
