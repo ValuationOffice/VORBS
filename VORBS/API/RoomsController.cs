@@ -11,6 +11,7 @@ using VORBS.Models;
 using VORBS.Models.DTOs;
 using VORBS.Services;
 using VORBS.Utils;
+using static VORBS.Services.RoomService;
 
 namespace VORBS.API
 {
@@ -18,7 +19,10 @@ namespace VORBS.API
     public class RoomsController : ApiController
     {
         private NLog.Logger _logger;
+
         private IDirectoryService _directoryService;
+        private RoomService _roomService;
+
         private IRoomRepository _roomRepository;
         private ILocationRepository _locationRepository;
         private IBookingRepository _bookingRepository;
@@ -28,6 +32,7 @@ namespace VORBS.API
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
+            _roomService = new RoomService(_logger, locationRepository, roomRepository, bookingRepository, directoryService);
 
             _locationRepository = locationRepository;
             _roomRepository = roomRepository;
@@ -224,25 +229,14 @@ namespace VORBS.API
         {
             try
             {
-                //Find Existing Booking
                 Room existingRoom = _roomRepository.GetRoomById(existingRoomId);
-                Location location = _locationRepository.GetLocationById(existingRoom.LocationID);
 
-                if (existingRoom.RoomName != editRoom.RoomName)
-                {
-                    bool isDuplicate = _roomRepository.GetByLocationAndName(location, editRoom.RoomName) != null;
-
-                    if (isDuplicate)
-                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", editRoom.RoomName, editRoom.Location.Name));
-                }
-
-                editRoom.LocationID = existingRoom.LocationID;
-
-                _roomRepository.EditRoom(editRoom);
-
-                _logger.Info("Room successfully Edited: " + editRoom.ID);
-
+                _roomService.EditRoom(existingRoom, editRoom);
                 return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (RoomExistsException ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Room {0} already exists at {1}.", editRoom.RoomName, editRoom.Location.Name));
             }
             catch (Exception ex)
             {
@@ -261,43 +255,7 @@ namespace VORBS.API
             {
                 Room room = _roomRepository.GetRoomById(roomId);
 
-                room.Active = active;
-
-                _roomRepository.EditRoom(room);
-
-                if (!active)
-                {
-                    List<Booking> bookings = _bookingRepository.GetByDateAndRoom(DateTime.Now, room)
-                                                        .OrderBy(b => b.Owner)
-                                                        .ToList();
-
-                    if (bookings.Count() < 1)
-                        return Request.CreateResponse(HttpStatusCode.OK);
-
-                    List<Booking> ownerBookings = new List<Booking>();
-
-                    string currentOwner = bookings[0].Owner;
-
-                    foreach (var booking in bookings)
-                    {
-                        if (booking.Owner != currentOwner)
-                        {
-                            SendMultiplyBookingEmail(ownerBookings);
-
-                            ownerBookings = new List<Booking>();
-                            currentOwner = booking.Owner;
-                        }
-
-                        ownerBookings.Add(booking);
-                    }
-
-                    //Final Send the last owner bookings
-                    SendMultiplyBookingEmail(ownerBookings);
-
-                    _bookingRepository.Delete(bookings);
-
-                }
-
+                _roomService.ToggleRoomActive(room, active, ConfigurationManager.AppSettings);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -307,20 +265,6 @@ namespace VORBS.API
             }
         }
 
-        private void SendMultiplyBookingEmail(List<Booking> ownerBookings)
-        {
-            try
-            {
-                //Once Booking has been removed; Send Cancelltion Emails
-                string toEmail = _directoryService.GetUser(new User.Pid(ownerBookings[0].PID)).EmailAddress;
-                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
 
-                Utils.EmailHelper.SendEmail(ConfigurationManager.AppSettings["fromEmail"], toEmail, "Meeting room booking(s) cancellation", body);
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to send admin multiple bookings email.", ex);
-            }
-        }
     }
 }
