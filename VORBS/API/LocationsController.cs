@@ -12,6 +12,7 @@ using VORBS.DAL.Repositories;
 using VORBS.Utils;
 using System.Configuration;
 using VORBS.Services;
+using static VORBS.Services.LocationsService;
 
 namespace VORBS.API
 {
@@ -20,7 +21,10 @@ namespace VORBS.API
     {
         private NLog.Logger _logger;
         private VORBSContext db;
+
         private IDirectoryService _directoryService;
+        private LocationsService _locationService;
+
         private ILocationRepository _locationRepository;
         private IBookingRepository _bookingRepository;
 
@@ -29,6 +33,7 @@ namespace VORBS.API
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
+            _locationService = new LocationsService(_logger, locationRepository, bookingRepository, directoryService);
 
             _locationRepository = locationRepository;
             _bookingRepository = bookingRepository;
@@ -243,18 +248,13 @@ namespace VORBS.API
             try
             {
                 Location originalLoc = _locationRepository.GetLocationById(id);
-                if (editLocation.Name != originalLoc.Name)
-                {
-                    bool exists = _locationRepository.GetLocationByName(editLocation.Name) != null;
-                    if (exists)
-                        return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Location {0} already exists.", editLocation.Name));
-                }
-                editLocation.ID = id;
 
-                _locationRepository.UpdateLocation(editLocation);
-
-                _logger.Info(string.Format("Location {0} successfully editted", id));
+                _locationService.EditLocation(originalLoc, editLocation);
                 return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (LocationExistsException ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.Conflict, string.Format("Location {0} already exists.", editLocation.Name));
             }
             catch (Exception ex)
             {
@@ -270,20 +270,12 @@ namespace VORBS.API
         {
             try
             {
-                var existingLocation = _locationRepository.GetLocationById(newLocation.ID);
-                if (existingLocation == null)
-                {
-                    _locationRepository.SaveNewLocation(newLocation);
-
-                    _logger.Info("New location successfully added: " + newLocation.Name + "/" + newLocation.ID);
-
-                    return new HttpResponseMessage(HttpStatusCode.OK);
-                }
-                else
-                {
-                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
-                }
-
+                _locationService.SaveNewLocation(newLocation);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (LocationExistsException e)
+            {
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
             }
             catch (Exception ex)
             {
@@ -300,43 +292,8 @@ namespace VORBS.API
             try
             {
                 Location location = _locationRepository.GetLocationById(locationId);
-                location.Active = active;
 
-                _locationRepository.UpdateLocation(location);
-
-                if (!active)
-                {
-                    List<Booking> bookings = _bookingRepository.GetByDateAndLocation(DateTime.Now, location)
-                                                .OrderBy(b => b.Owner)
-                                                .ToList();
-
-                    if (bookings.Count() < 1)
-                        return Request.CreateResponse(HttpStatusCode.OK);
-
-                    List<Booking> ownerBookings = new List<Booking>();
-
-                    string currentOwner = bookings[0].Owner;
-
-                    foreach (var booking in bookings)
-                    {
-                        if (booking.Owner != currentOwner)
-                        {
-                            SendMultiplyBookingEmail(ownerBookings);
-
-                            ownerBookings = new List<Booking>();
-                            currentOwner = booking.Owner;
-                        }
-
-                        ownerBookings.Add(booking);
-                    }
-
-                    //Final Send the last owner bookings
-                    SendMultiplyBookingEmail(ownerBookings);
-
-                    _bookingRepository.Delete(bookings);
-                    
-                }
-
+                _locationService.ToggleLocationActive(location, active, ConfigurationManager.AppSettings);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -345,22 +302,5 @@ namespace VORBS.API
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
-
-        private void SendMultiplyBookingEmail(List<Booking> ownerBookings)
-        {
-            try
-            {
-                //Once Booking has been removed; Send Cancelltion Emails
-                string toEmail = _directoryService.GetUser(new User.Pid(ownerBookings[0].PID)).EmailAddress;
-                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
-
-                Utils.EmailHelper.SendEmail(ConfigurationManager.AppSettings["fromEmail"], toEmail, "Meeting room booking(s) cancellation", body);
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to send admin multiple bookings email.", ex);
-            }
-        }
-
     }
 }
