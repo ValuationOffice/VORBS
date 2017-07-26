@@ -3,9 +3,9 @@
     angular.module('vorbs.myBookings')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'Bookings'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService'];
 
-    function MyBookingsController($scope, $resource, Bookings) {
+    function MyBookingsController($scope, $resource, BookingsService) {
 
         CreateServices($resource);
 
@@ -23,7 +23,7 @@
         $scope.bookings = [];
         $scope.SearchBookings = function () {
 
-            Bookings.search({
+            BookingsService.search({
                 locationId: $scope.bookingFilter.location.id,
                 room: $scope.bookingFilter.room,
                 startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, false),
@@ -42,7 +42,7 @@
             var period = 7;
             var startDate = new moment().utc().format("MM-DD-YYYY-HHmm");
 
-            Bookings.getByPeriod({ startDate: startDate, period: period })
+            BookingsService.getByPeriod({ startDate: startDate, period: period })
                 .$promise.then(function (data) {
                     $scope.bookings = data;
                 });
@@ -55,7 +55,7 @@
         $scope.currentBookingToModify = null;
         $scope.SetBookingId = function (id) {
             $scope.bookingId = id;
-            Bookings.getByID({
+            BookingsService.getByID({
                 bookingId: id
             }).$promise.then(function (response) {
                 $scope.currentBookingToModify = response;
@@ -86,7 +86,7 @@
 
             $scope.bookingId = bookingId;
 
-            Bookings.getByID({
+            BookingsService.getByID({
                 bookingId: bookingId
             }).$promise.then(function (response) {
                 $scope.newBooking.Room.RoomName = response.room.roomName;
@@ -270,7 +270,7 @@
         }
 
         function saveBooking(id, booking) {
-            Bookings.update({
+            BookingsService.update({
                 existingId: id,
                 recurrence: booking.recurrence || false
             }, booking).$promise.then(function (response) {
@@ -305,7 +305,7 @@
             $("#deleteBookingConfirmButton").html('Deleting booking. Please wait..');
 
             try {
-                Bookings.remove(
+                BookingsService.remove(
                     {
                         bookingId: $scope.bookingId,
                         recurrence: $scope.modifyBookingOptions.deleteAllInRecurrence

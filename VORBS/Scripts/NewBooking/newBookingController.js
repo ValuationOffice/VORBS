@@ -2,9 +2,9 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource', 'Bookings'];
+    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService'];
 
-    function NewBookingController($scope, $http, $resource, Bookings) {
+    function NewBookingController($scope, $http, $resource, BookingsService) {
         CreateServices($resource);
 
         $scope.locations = Locations.query({ status: true, extraInfo: true });
@@ -476,7 +476,7 @@
                     $scope.newBooking.ExternalAttendees = $scope.booking.ExternalAttendees;//.join(';');
                 }
 
-                Bookings.create({}, $scope.newBooking).$promise.then(function () {
+                BookingsService.create({}, $scope.newBooking).$promise.then(function () {
                     alert('Booking Confirmed.');
                     window.location.href = "/MyBookings"; //Redirect to my bookings
                 }, function (error) {

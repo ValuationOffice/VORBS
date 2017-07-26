@@ -5,9 +5,9 @@
 
     beforeEach(angular.mock.module('vorbs.services'));
 
-    beforeEach(inject(function (_Bookings_, _$httpBackend_) {
+    beforeEach(inject(function (_BookingsService_, _$httpBackend_) {
         $httpBackend = _$httpBackend_;
-        BookingsService = _Bookings_;
+        BookingsService = _BookingsService_;
     }));
 
     afterEach(function () {

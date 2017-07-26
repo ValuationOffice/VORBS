@@ -3,9 +3,9 @@
     angular.module('vorbs.admin')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'Bookings'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService'];
 
-    function MyBookingsController($scope, $resource, Bookings) {
+    function MyBookingsController($scope, $resource, BookingsService) {
 
         CreateBookingServices($resource);
 
@@ -19,7 +19,7 @@
         $scope.SetBookingId = function (id) {
             $scope.bookingId = id;
 
-            Bookings.getByID({
+            BookingsService.getByID({
                 bookingId: id
             }).$promise.then(function (response) {
                 $scope.currentBookingToModify = response;
@@ -70,7 +70,7 @@
 
             $scope.bookingId = bookingId;
 
-            Bookings.getByID({
+            BookingsService.getByID({
                 bookingId: bookingId
             }).$promise.then(function (response) {
 
@@ -200,7 +200,7 @@
         }
 
         function saveBooking(id, booking) {
-            Bookings.update({
+            BookingsService.update({
                 existingId: id,
                 recurrence: booking.recurrence || false
             }, booking).$promise.then(function (response) {
@@ -235,7 +235,7 @@
             $("#deleteBookingConfirmButton").html('Deleting booking. Please wait..');
 
             try {
-                Bookings.remove(
+                BookingsService.remove(
                     {
                         bookingId: $scope.bookingId,
                         recurrence: $scope.modifyBookingOptions.deleteAllInRecurrence
@@ -261,7 +261,7 @@
                 return;
             }
 
-            Bookings.search({
+            BookingsService.search({
                 location: $scope.bookingFilter.location.id,
                 room: $scope.bookingFilter.room,
                 owner: $('#fullNameTextBox').typeahead('val'),

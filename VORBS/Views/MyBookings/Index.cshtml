@@ -65,8 +65,8 @@
                         <td ng-if="!(booking.recurrenceId != null)">&nbsp;</td>
                         <td>{{ booking.location.name}}</td>
                         <td>{{ booking.room.roomName }}</td>
-                        <td>{{ booking.startDate | date: 'dd/MM/yyyy' }}</td>
-                        <td>{{ booking.startDate | date: 'H:mm' }} - {{ booking.endDate | date: 'H:mm' }}</td>
+                        <td>{{ booking.start.date }}</td>
+                        <td>{{ booking.start.time }} - {{ booking.end.time }}</td>
                         <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
                         <td>
                             <button data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="button button--table">Edit</button>
