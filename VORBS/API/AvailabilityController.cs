@@ -32,7 +32,7 @@ namespace VORBS.API
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _availabilityService = new AvailabilityService(_bookingRepository, roomsRepository, locationRepository);
+            _availabilityService = new AvailabilityService(bookingRepository, roomsRepository, locationRepository);
 
             _bookingRepository = bookingRepository;
             _locationRepository = locationRepository;
