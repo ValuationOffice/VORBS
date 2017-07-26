@@ -11,14 +11,18 @@ namespace VORBS.Services
     public class RoomService
     {
         NLog.Logger _logger;
+        Utils.EmailHelper _emailHelper;
+
         ILocationRepository _locationRepository;
         IRoomRepository _roomRepository;
         IBookingRepository _bookingRepository;
         IDirectoryService _directoryService;
 
-        public RoomService(NLog.Logger logger, ILocationRepository locationRepository, IRoomRepository roomRepository, IBookingRepository bookingRepository, IDirectoryService directoryService)
+        public RoomService(NLog.Logger logger, ILocationRepository locationRepository, IRoomRepository roomRepository, IBookingRepository bookingRepository, IDirectoryService directoryService, Utils.EmailHelper emailHelper)
         {
             _logger = logger;
+            _emailHelper = emailHelper;
+
             _locationRepository = locationRepository;
             _roomRepository = roomRepository;
             _bookingRepository = bookingRepository;
@@ -88,10 +92,10 @@ namespace VORBS.Services
             try
             {
                 string toEmail = _directoryService.GetUser(new User.Pid(ownerBookings[0].PID)).EmailAddress;
-                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
+                string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                    _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
                 else
                     throw new Exception("Body or To-Email is null.");
             }

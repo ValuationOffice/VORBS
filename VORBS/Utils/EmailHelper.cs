@@ -8,11 +8,20 @@ using System.Configuration;
 using System.Web.Mvc;
 using System.IO;
 using System.Web.Routing;
+using VORBS.Utils.interfaces;
 
 namespace VORBS.Utils
 {
-    public static class EmailHelper
+    public class EmailHelper
     {
+        private ISmtpClient mailClient;
+        private HttpContextBase _context;
+        public EmailHelper(ISmtpClient mailClient, HttpContextBase context)
+        {
+            this.mailClient = mailClient;
+            _context = context;
+        }
+
         /// <summary>
         /// Sends internal email
         /// </summary>
@@ -21,19 +30,8 @@ namespace VORBS.Utils
         /// <param name="toAddress">E-Mail address of who will be recieving the email</param>
         /// <param name="subject">Subject line for E-Mail</param>
         /// <param name="body">Body of E-Mail (html-enabled)</param>
-        public static void SendEmail(string fromAddress, string onBehalfOf, string toAddress, string subject, string body, bool bcc = true)
-        {
-            string exchangeDomain = ConfigurationManager.AppSettings["exchangeDomain"];
-            string userName = ConfigurationManager.AppSettings["emailUserName"];
-            string password = ConfigurationManager.AppSettings["emailPassword"];
-            string domain = ConfigurationManager.AppSettings["emailDomain"];
-
-            SmtpClient mailClient = new SmtpClient(exchangeDomain);
-            mailClient.UseDefaultCredentials = false;
-            mailClient.Credentials = new NetworkCredential(userName, password, domain);
-
-            mailClient.DeliveryMethod = SmtpDeliveryMethod.Network;
-
+        public void SendEmail(string fromAddress, string onBehalfOf, string toAddress, string subject, string body, bool bcc = true)
+        {   
             MailMessage message = new MailMessage();
             message.From = new MailAddress(fromAddress);
 
@@ -42,8 +40,7 @@ namespace VORBS.Utils
                 message.From = new MailAddress(onBehalfOf);
                 message.Sender = new MailAddress(fromAddress);
             }
-
-
+            
             message.To.Add(new MailAddress(toAddress));
             message.Subject = subject;
             message.Body = body;
@@ -57,8 +54,8 @@ namespace VORBS.Utils
 
             AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
 
-            htmlView.LinkedResources.Add(new LinkedResource(HttpContext.Current.Server.MapPath("~/Content/images/EmailTemplates/govuklogo.png")) { ContentId = "govuklogo" });
-            htmlView.LinkedResources.Add(new LinkedResource(HttpContext.Current.Server.MapPath("~/Content/images/EmailTemplates/voalogo.png")) { ContentId = "voalogo" });
+            htmlView.LinkedResources.Add(mailClient.GetLinkedResource(_context.Server.MapPath("~/Content/images/EmailTemplates/govuklogo.png"), "govgovuklogo"));
+            htmlView.LinkedResources.Add(mailClient.GetLinkedResource(_context.Server.MapPath("~/Content/images/EmailTemplates/voalogo.png"), "voalogo"));
 
             message.AlternateViews.Add(htmlView);
             message.IsBodyHtml = true;
@@ -73,7 +70,7 @@ namespace VORBS.Utils
         /// <param name="toAddress">E-Mail address of who will be recieving the email</param>
         /// <param name="subject">Subject line for E-Mail</param>
         /// <param name="body">Body of E-Mail (html-enabled)</param>
-        public static void SendEmail(string fromAddress, string toAddress, string subject, string body, bool bcc = true)
+        public void SendEmail(string fromAddress, string toAddress, string subject, string body, bool bcc = true)
         {
             SendEmail(fromAddress, null, toAddress, subject, body, bcc);
         }
@@ -84,7 +81,7 @@ namespace VORBS.Utils
         /// <param name="viewName">Name of view to get markup for</param>
         /// <param name="model">Model to pass to view</param>
         /// <returns>HTML un-encoded markup of view</returns>
-        public static string GetEmailMarkup(string viewName, object model)
+        public string GetEmailMarkup(string viewName, object model)
         {
             ControllerContext controller = GetFakeContext();
 

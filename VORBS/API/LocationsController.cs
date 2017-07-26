@@ -28,12 +28,12 @@ namespace VORBS.API
         private ILocationRepository _locationRepository;
         private IBookingRepository _bookingRepository;
 
-        public LocationsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IDirectoryService directoryService)
+        public LocationsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IDirectoryService directoryService, EmailHelper emailHelper)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
-            _locationService = new LocationsService(_logger, locationRepository, bookingRepository, directoryService);
+            _locationService = new LocationsService(_logger, locationRepository, bookingRepository, directoryService, emailHelper);
 
             _locationRepository = locationRepository;
             _bookingRepository = bookingRepository;

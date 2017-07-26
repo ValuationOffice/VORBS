@@ -11,6 +11,7 @@ using VORBS.Models;
 using VORBS.Models.DTOs;
 using VORBS.Services;
 using VORBS.Utils;
+using VORBS.Utils.interfaces;
 using static VORBS.Services.RoomService;
 
 namespace VORBS.API
@@ -27,12 +28,12 @@ namespace VORBS.API
         private ILocationRepository _locationRepository;
         private IBookingRepository _bookingRepository;
 
-        public RoomsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IRoomRepository roomRepository, IDirectoryService directoryService)
+        public RoomsController(IBookingRepository bookingRepository, ILocationRepository locationRepository, IRoomRepository roomRepository, IDirectoryService directoryService, EmailHelper emailHelper)
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
-            _roomService = new RoomService(_logger, locationRepository, roomRepository, bookingRepository, directoryService);
+            _roomService = new RoomService(_logger, locationRepository, roomRepository, bookingRepository, directoryService, emailHelper);
 
             _locationRepository = locationRepository;
             _roomRepository = roomRepository;

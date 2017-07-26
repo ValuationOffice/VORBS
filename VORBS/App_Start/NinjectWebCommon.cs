@@ -15,6 +15,8 @@ namespace VORBS.App_Start
     using DAL;
     using DAL.Repositories;
     using Services;
+    using VORBS.Utils.interfaces;
+    using VORBS.Utils;
 
     public static class NinjectWebCommon 
     {
@@ -77,6 +79,9 @@ namespace VORBS.App_Start
 
             //Services
             kernel.Bind<IDirectoryService>().To<StubbedDirectoryService>();
+            kernel.Bind<EmailHelper>().To<EmailHelper>()
+                .WithConstructorArgument("mailClient", new EmailClient());
+                
         }        
     }
 }

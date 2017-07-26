@@ -15,10 +15,12 @@ namespace VORBS.Services
         IDirectoryService _directoryService;
 
         NLog.Logger _logger;
+        Utils.EmailHelper _emailHelper;
 
-        public LocationsService(NLog.Logger logger, ILocationRepository locationRepository, IBookingRepository bookingRepository, IDirectoryService directoryService)
+        public LocationsService(NLog.Logger logger, ILocationRepository locationRepository, IBookingRepository bookingRepository, IDirectoryService directoryService, Utils.EmailHelper emailHelper)
         {
             _logger = logger;
+            _emailHelper = emailHelper;
             _locationRepository = locationRepository;
             _bookingRepository = bookingRepository;
             _directoryService = directoryService;
@@ -97,10 +99,10 @@ namespace VORBS.Services
             try
             {
                 string toEmail = _directoryService.GetUser(new User.Pid(ownerBookings[0].PID)).EmailAddress;
-                string body = Utils.EmailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
+                string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
-                    Utils.EmailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                    _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
                 else
                     throw new Exception("Body or To-Email is null.");
             }
