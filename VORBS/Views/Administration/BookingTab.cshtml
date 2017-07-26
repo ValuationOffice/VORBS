@@ -58,9 +58,9 @@
             <td ng-if="booking.recurrenceId != null"><span class="glyphicon glyphicon-refresh" title="Is part of a recurrence"></span></td>
             <td ng-if="booking.recurrenceId == null">&nbsp;</td>
             <td>{{ booking.location.name}}</td>
-            <td>{{ booking.roomNameFormatted() }}</td>
-            <td>{{ booking.DateFormatted() }}</td>
-            <td>{{ booking.startTimeFormatted() }} - {{ booking.endTimeFormatted() }}</td>
+            <td>{{ booking.room.roomName }}</td>
+            <td>{{ booking.start.date }}</td>
+            <td>{{ booking.start.time }} - {{ booking.end.time }}</td>
             <td id="subjectInfo" data-toggle="tooltip" data-placement="bottom" title="{{ booking.subject }}">{{ booking.subject }}</td>
             <td>{{ booking.owner }}</td>
             <td><span data-toggle="modal" data-target="#editModal" ng-click="LoadEditBooking(booking.id)" class="btn glyphicon glyphicon-edit" title="Edit Booking"></span></td>

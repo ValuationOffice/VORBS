@@ -3,9 +3,9 @@
     angular.module('vorbs.admin')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$http', '$resource'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService'];
 
-    function MyBookingsController($scope, $http, $resource) {
+    function MyBookingsController($scope, $resource, BookingsService) {
 
         CreateBookingServices($resource);
 
@@ -14,10 +14,18 @@
 
         $scope.bookingId = 0;
 
+        $scope.currentBookingToModify = null;
+
         $scope.SetBookingId = function (id) {
             $scope.bookingId = id;
-            $scope.currentBookingToModify = Booking.query({
+
+            BookingsService.getByID({
                 bookingId: id
+            }).$promise.then(function (response) {
+                $scope.currentBookingToModify = response;
+            }, function (error) {
+                //TODO: Error Handler
+                $scope.currentBookingToModify = null;
             });
         }
 
@@ -60,40 +68,43 @@
             ResetExternalNamesUI();
             SetEditActiveTab('editBooking');
 
-            $scope.SetBookingId(bookingId);
+            $scope.bookingId = bookingId;
 
-            $scope.editBooking = Booking.query({
-                bookingId: $scope.bookingId
-            },
-                function (sucess) {
-                    $scope.newBooking.Room.RoomName = $scope.editBooking.room.roomName.replace('_', '.');
-                    $scope.newBooking.Subject = $scope.editBooking.subject;
-                    $scope.newBooking.FlipChart = $scope.editBooking.flipchart;
-                    $scope.newBooking.Projector = $scope.editBooking.projector;
-                    $scope.newBooking.RoomID = $scope.editBooking.room.id;
+            BookingsService.getByID({
+                bookingId: bookingId
+            }).$promise.then(function (response) {
 
-                    if ($scope.editBooking.externalAttendees !== null) {
-                        $scope.booking.externalAttendees = $scope.editBooking.externalAttendees;//.split(';');
-                    }
-                    else {
-                        $scope.booking.externalAttendees = []; //Reset External Name List
-                    }
+                $scope.newBooking.Room.RoomName = response.room.roomName;
+                $scope.newBooking.Subject = response.subject;
+                $scope.newBooking.FlipChart = response.flipchart;
+                $scope.newBooking.Projector = response.projector;
+                $scope.newBooking.RoomID = response.room.id;
 
-                    $scope.booking.numberOfAttendees = $scope.editBooking.numberOfAttendees;
-                    $scope.booking.startTime = FormatTimeDate($scope.editBooking.startDate, false);
-                    $scope.booking.endTime = FormatTimeDate($scope.editBooking.endDate, false);
-                    $scope.booking.date = FormatTimeDate($scope.editBooking.startDate, true);
-
-                    //Store the vital existing booking data
-                    $scope.existingBooking.numberOfAttendees = $scope.booking.numberOfAttendees;
-                    $scope.existingBooking.startTime = $scope.booking.startTime;
-                    $scope.existingBooking.endTime = $scope.booking.endTime;
-                    $scope.existingBooking.date = $scope.booking.date;
-
-                    $scope.$apply();
-                    $("#editModal #bookingDate").datepicker('update');
+                if (response.externalAttendees !== null) {
+                    $scope.booking.externalAttendees = response.externalAttendees;
                 }
-            )
+                else {
+                    $scope.booking.externalAttendees = []; //Reset External Name List
+                }
+
+                $scope.booking.numberOfAttendees = response.numberOfAttendees;
+                $scope.booking.startTime = FormatTimeDate(response.startDate, false);
+                $scope.booking.endTime = FormatTimeDate(response.endDate, false);
+                $scope.booking.date = FormatTimeDate(response.startDate, true);
+
+                //Store the vital existing booking data
+                $scope.existingBooking.numberOfAttendees = $scope.booking.numberOfAttendees;
+                $scope.existingBooking.startTime = $scope.booking.startTime;
+                $scope.existingBooking.endTime = $scope.booking.endTime;
+                $scope.existingBooking.date = $scope.booking.date;
+
+                $("#editModal #bookingDate").datepicker('update');
+
+                $scope.editBooking = response;
+
+            }, function (error) {
+                $scope.editBooking = null;
+            });
         }
 
         $scope.CheckEditBooking = function () {
@@ -140,7 +151,7 @@
                 //Validate if Date/Time/Attendees has changed
                 if (($scope.booking.numberOfAttendees === $scope.existingBooking.numberOfAttendees) && ($scope.booking.date === $scope.existingBooking.date) &&
                     ($scope.booking.startTime === $scope.existingBooking.startTime) && ($scope.booking.endTime === $scope.existingBooking.endTime)) {
-                    SaveEditBooking($scope.bookingId, $scope.newBooking);
+                    saveBooking($scope.bookingId, $scope.newBooking);
                 }
                 else {
                     $scope.availableRooms = Available.query({
@@ -157,7 +168,7 @@
                                 SetModalErrorMessage('No rooms avaiLable using the below Date/Time/Attendees.');
                             }
                             else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
-                                SaveEditBooking($scope.bookingId, $scope.newBooking);
+                                saveBooking($scope.bookingId, $scope.newBooking);
                             }
                             else {
                                 EnableAcceptBookingButton();
@@ -181,11 +192,33 @@
             $("#confirmBookingConfirmButton").html('Editing Booking. Please wait..');
 
             $scope.newBooking.RoomID = $scope.currentRoom.id;
-            SaveEditBooking($scope.bookingId, $scope.newBooking);
+            saveBooking($scope.bookingId, $scope.newBooking);
 
             //Disabled as the page refresh after save render the page with button enabled. By activating it here, there is a brief period where the user can select
             //the button twice, and give a false positive for a secondary failure of the same save
             //EnableConfirmBookingButton();
+        }
+
+        function saveBooking(id, booking) {
+            BookingsService.update({
+                existingId: id,
+                recurrence: booking.recurrence || false
+            }, booking).$promise.then(function (response) {
+
+                alert('Booking Updated Successfully.');
+                ReloadThisPage("bookings");
+
+            }, function (error) {
+                //Server Conflict
+                if (error.status == 406) {
+                    alert("Simultaneous booking conflict. Please try again.");
+                    ReloadThisPage("bookings");
+                }
+                else {
+                    alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
+                }
+                EnableEditBookingButton();
+            });
         }
 
         $scope.modifyBookingOptions = resetModifyBookingOptions();
@@ -202,17 +235,15 @@
             $("#deleteBookingConfirmButton").html('Deleting booking. Please wait..');
 
             try {
-                Booking.remove(
+                BookingsService.remove(
                     {
                         bookingId: $scope.bookingId,
                         recurrence: $scope.modifyBookingOptions.deleteAllInRecurrence
-                    },
-                    function (success) {
+                    }).$promise.then(function (success) {
                         $('#deleteModal').modal('hide');
                         $scope.SearchBooking();
                         EnableDeleteBookingButton();
-                    },
-                    function (error) {
+                    }, function (error) {
                         alert('Unable to delete the booking. Please try again or contact ITSD. ' + error.responseText);
                         EnableDeleteBookingButton();
                     });
@@ -230,16 +261,17 @@
                 return;
             }
 
-            $scope.bookings = GetBookings.query({
+            BookingsService.search({
                 location: $scope.bookingFilter.location.id,
                 room: $scope.bookingFilter.room,
                 owner: $('#fullNameTextBox').typeahead('val'),
                 start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + "12:00", 'MM-DD-YYYY', true, true)
-            },
-                function (success) {
-                    if (success.length === 0) {
-                        SetAdminBookingErrorMessage('No bookings found.');
-                    }
+            }).$promise.then(function (success) {
+                if (success.length === 0) {
+                    SetAdminBookingErrorMessage('No bookings found.');
+                }
+
+                $scope.bookings = success;
                 });
         }
 
@@ -295,26 +327,6 @@
         Available.prototype = {
             roomNameFormatted: function () { return this.roomName.replace('_', '.'); }
         };
-
-
-        GetBookings = $resource('/api/bookings/search', {},
-
-            {
-                query: { method: 'GET', isArray: true }
-            });
-
-        GetBookings.prototype = {
-            DateFormatted: function () { return moment(this.startDate).format("DD/MM/YYYY"); },
-            startTimeFormatted: function () { return moment(this.startDate).format("H:mm"); },
-            endTimeFormatted: function () { return moment(this.endDate).format("H:mm"); },
-            roomNameFormatted: function () { return this.room.roomName.replace('_', '.'); }
-        };
-
-        Booking = $resource('/api/bookings/:bookingId', { bookingId: 'bookingId' },
-            {
-                query: { method: 'GET' },
-                remove: { method: 'DELETE' }
-            });
 
         Owner = $resource('/api/admin', {},
             {
