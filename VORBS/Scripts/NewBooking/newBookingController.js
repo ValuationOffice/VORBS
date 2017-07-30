@@ -483,14 +483,12 @@
                     switch (error.status) {
                         case 409:
                             //conflict in recurrance booking(s)
-                            $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
-                            $scope.$apply();
+                            $scope.clashedBookings = JSON.parse(error.data.message);
                             $("#meetingClashSelection").modal('show');
                             break;
                         case 502:
                             //no smart rooms avalible
-                            $scope.clashedBookings = JSON.parse(JSON.parse(error.responseText).message);
-                            $scope.$apply();
+                            $scope.clashedBookings = JSON.parse(error.data.message);
                             $("#smartMeetingClashSelection").modal('show');
                             break;
                         case 406:
@@ -500,7 +498,7 @@
                             $("#confirmModal").modal('hide');
                             break;
                         default:
-                            alert('Unable to Book Meeting Room. ' + error.responseText);
+                            alert('Unable to Book Meeting Room.');
                             break;
                     }
                     $scope.ResetConflictAction();

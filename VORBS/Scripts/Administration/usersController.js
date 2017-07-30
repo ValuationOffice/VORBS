@@ -64,7 +64,7 @@
                         SetAdminErrorMessage('Administrator already exists.');
                     }
                     else {
-                        alert('Unable to Add Admin. Please Contact ITSD. ' + error.message);
+                        alert('Unable to Add Admin. Please Contact ITSD.');
                     }
                 }
             });
@@ -124,7 +124,7 @@
                         $('#editAdminModal').modal('hide');
                     },
                     error: function (error) {
-                        alert('Unable to edit the admin. Please try again or contact ITSD. ' + error.message);
+                        alert('Unable to edit the admin. Please try again or contact ITSD.');
                     }
                 });
             } catch (e) {
@@ -143,7 +143,7 @@
                     $('#deleteAdminModal').modal('hide');
                 },
                 function (error) {
-                    alert('Unable to delete the admin. Please try again or contact ITSD. ' + error.message); //TODO:Log Error
+                    alert('Unable to delete the admin. Please try again or contact ITSD.'); //TODO:Log Error
                 })
         };
 

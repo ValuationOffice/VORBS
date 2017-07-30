@@ -247,7 +247,7 @@
                         },
                         function (error) {
                             EnableAcceptBookingButton();
-                            alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
+                            alert('Unable to Edit. Please Try Again or Contact ITSD.');
                         });
                 }
 
@@ -285,7 +285,7 @@
                     ReloadThisPage("bookings");
                 }
                 else {
-                    alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
+                    alert('Unable to edit meeting room. Please contact ITSD.');
                 }
                 EnableEditBookingButton();
             });
@@ -315,7 +315,7 @@
                         EnableDeleteBookingButton();
                     },
                     function (error) {
-                        alert('Unable to delete booking. Please try again or contact ITSD. ' + error.message);
+                        alert('Unable to delete booking. Please try again or contact ITSD.');
                         EnableDeleteBookingButton();
                     });
 

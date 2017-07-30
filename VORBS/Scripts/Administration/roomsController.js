@@ -134,7 +134,7 @@
                 ReloadRooms(null);
             },
             error: function (error) {
-                alert('Unable to create new room. Please contact ITSD. ' + error.responseText);
+                alert('Unable to create new room. Please contact ITSD.');
             }
         });
     }
@@ -155,7 +155,7 @@
                 ReloadRooms("editRoomModal");
             },
             error: function (error) {
-                alert('Unable to edit room. ' + error.responseJSON.message);
+                alert('Unable to edit room.');
             }
         });
     }
@@ -206,10 +206,10 @@
             error: function (error) {
                 EnableModalButton(active);
                 if (active) {
-                    alert('Unable to enable room. Please contact ITSD. ' + error.responseJSON.message);
+                    alert('Unable to enable room. Please contact ITSD.');
                 }
                 else {
-                    alert('Unable to disable room. Please contact ITSD. ' + error.responseJSON.message);
+                    alert('Unable to disable room. Please contact ITSD.');
                 }
             }
         });
