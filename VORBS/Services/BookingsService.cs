@@ -166,7 +166,7 @@ namespace VORBS.Services
             else if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
                 ProcessSmartLocations(ref newBooking, ref clashedBookings, ref bookingsToCreate);
             else
-                bookingsToCreate.Add(newBooking);
+                ProcessSingularBooking(ref newBooking, ref clashedBookings, ref bookingsToCreate);
 
             //Reset  Room as we dont want to create another room
             bookingsToCreate.ForEach(x => x.Room = null);
@@ -197,6 +197,16 @@ namespace VORBS.Services
                 SendEmailToSecurityForCreate(fromEmail, newBooking, bookingsLocation);
             if (newBooking.DssAssist)
                 SendEmailToDSSForCreate(fromEmail, newBooking, bookingsLocation);
+        }
+
+        private void ProcessSingularBooking(ref Booking newBooking, ref List<Booking> clashedBookings, ref List<Booking> bookingsToCreate)
+        {
+            bool clashed = _availabilityService.DoesMeetingClash(newBooking, out clashedBookings);
+
+            if (clashed)
+                throw new ClashedBookingsException(clashedBookings);
+
+            bookingsToCreate.Add(newBooking);
         }
 
         private void ProcessSmartLocations(ref Booking newBooking, ref List<Booking> clashedBookings, ref List<Booking> bookingsToCreate)

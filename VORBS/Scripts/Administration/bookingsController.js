@@ -178,7 +178,7 @@
                         },
                         function (error) {
                             EnableAcceptBookingButton();
-                            alert('Unable to Edit. Please Try Again or Contact ITSD. ' + error.message);
+                            alert('Unable to Edit. Please Try Again or Contact ITSD.');
                         });
                 }
             } catch (e) {
@@ -215,7 +215,7 @@
                     ReloadThisPage("bookings");
                 }
                 else {
-                    alert('Unable to edit meeting room. Please contact ITSD. ' + error.message);
+                    alert('Unable to edit meeting room. Please contact ITSD.');
                 }
                 EnableEditBookingButton();
             });
@@ -244,7 +244,7 @@
                         $scope.SearchBooking();
                         EnableDeleteBookingButton();
                     }, function (error) {
-                        alert('Unable to delete the booking. Please try again or contact ITSD. ' + error.responseText);
+                        alert('Unable to delete the booking. Please try again or contact ITSD.');
                         EnableDeleteBookingButton();
                     });
             } catch (e) {

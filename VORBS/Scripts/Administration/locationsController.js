@@ -276,12 +276,12 @@
                 },
                 error: function (error) {
                     if (active) {
-                        alert('Unable to enable location. Please contact ITSD. ' + error.responseJSON.message);
+                        alert('Unable to enable location. Please contact ITSD.');
                         $("#enableLocationConfirmButton").prop('disabled', '');
                         $("#enableLocationConfirmButton").html('Enable Location');
                     }
                     else {
-                        alert('Unable to disable location. Please contact ITSD. ' + error.responseJSON.message);
+                        alert('Unable to disable location. Please contact ITSD.');
                         $("#disableLocationConfirmButton").prop('disabled', '');
                         $("#disableLocationConfirmButton").html('Disable Location');
                     }
