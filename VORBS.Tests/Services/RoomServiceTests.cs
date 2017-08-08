@@ -18,26 +18,8 @@ using static VORBS.Services.RoomService;
 namespace VORBS.Tests.Services
 {
     [TestClass]
-    public class RoomServiceTests
+    public class RoomServiceTests : BaseServiceTestSetup
     {
-        Mock<NLog.Logger> logger = new Mock<NLog.Logger>();
-        Mock<ILocationRepository> mockLocationRepository = new Mock<ILocationRepository>();
-        Mock<IRoomRepository> mockRoomRepository = new Mock<IRoomRepository>();
-        Mock<IDirectoryService> mockDirectoryRepository = new Mock<IDirectoryService>();
-        Mock<IBookingRepository> mockBookingRepository = new Mock<IBookingRepository>();
-
-        Mock<EmailHelper> mockEmailHelper;
-    
-        [TestInitialize]
-        public void InitTest()
-        {
-            Mock<ISmtpClient> smtpMock = new Mock<ISmtpClient>();
-            Mock<HttpContextBase> contextMock = new Mock<HttpContextBase>();
-            mockEmailHelper = new Mock<EmailHelper>(MockBehavior.Strict, new object[] { smtpMock.Object, contextMock.Object });
-        }
-
-
-
         [TestMethod]
         public void EditRoom_Should_ThrowException_If_RoomExist()
         {

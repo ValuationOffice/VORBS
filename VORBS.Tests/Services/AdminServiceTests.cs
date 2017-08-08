@@ -13,7 +13,7 @@ using static VORBS.Services.AdminService;
 namespace VORBS.Tests.Services
 {
     [TestClass]
-    public class AdminServiceTests
+    public class AdminServiceTests : BaseServiceTestSetup
     {
         Admin exampleAdmin = new Admin()
         {
@@ -31,41 +31,38 @@ namespace VORBS.Tests.Services
         [TestMethod]
         public void AddNewAdmin_Should_AddAdmin_If_DoesNotExist()
         {
-            var mockRepo = new Mock<IAdminRepository>();
-            mockRepo.Setup(x => x.GetAdminByPid(exampleAdmin.PID))
+            mockAdminRepository.Setup(x => x.GetAdminByPid(exampleAdmin.PID))
                 .Returns((Admin)null);
 
-            AdminService service = new AdminService(logger.Object, mockRepo.Object);
+            AdminService service = new AdminService(logger.Object, mockAdminRepository.Object);
 
             service.AddNewAdmin(exampleAdmin);
-            mockRepo.Verify(m => m.SaveNewAdmin(exampleAdmin), Times.Once);
+            mockAdminRepository.Verify(m => m.SaveNewAdmin(exampleAdmin), Times.Once);
         }
 
         [TestMethod]
         public void AddNewAdmin_Should_ThrowException_When_Exists()
         {
-            var mockRepo = new Mock<IAdminRepository>();
-            mockRepo.Setup(x => x.GetAdminByPid(exampleAdmin.PID))
+            mockAdminRepository.Setup(x => x.GetAdminByPid(exampleAdmin.PID))
                 .Returns(exampleAdmin);
 
-            AdminService service = new AdminService(logger.Object, mockRepo.Object);
+            AdminService service = new AdminService(logger.Object, mockAdminRepository.Object);
 
             Assert.ThrowsException<AdminExistsException>(() => service.AddNewAdmin(exampleAdmin));
-            
-            mockRepo.Verify(m => m.SaveNewAdmin(exampleAdmin), Times.Never);
+
+            mockAdminRepository.Verify(m => m.SaveNewAdmin(exampleAdmin), Times.Never);
         }
 
         [TestMethod]
         public void DeleteExistingAdmin_Should_DeleteAdmin()
         {
-            var mockRepo = new Mock<IAdminRepository>();
-            mockRepo.Setup(x => x.DeleteAdmin(exampleAdmin));
+            mockAdminRepository.Setup(x => x.DeleteAdmin(exampleAdmin));
 
-            AdminService service = new AdminService(logger.Object, mockRepo.Object);
+            AdminService service = new AdminService(logger.Object, mockAdminRepository.Object);
 
             service.DeleteExistingAdmin(exampleAdmin);
 
-            mockRepo.Verify(m => m.DeleteAdmin(exampleAdmin), Times.Once);
+            mockAdminRepository.Verify(m => m.DeleteAdmin(exampleAdmin), Times.Once);
         }
 
         [TestMethod]
@@ -82,13 +79,12 @@ namespace VORBS.Tests.Services
                 LocationID = 2
             };
 
-            var mockRepo = new Mock<IAdminRepository>();
-            mockRepo.Setup(x => x.UpdateAdmin(updateAdmin));
+            mockAdminRepository.Setup(x => x.UpdateAdmin(updateAdmin));
 
-            AdminService service = new AdminService(logger.Object, mockRepo.Object);
+            AdminService service = new AdminService(logger.Object, mockAdminRepository.Object);
             service.EditExistingAdmin(exampleAdmin, updateAdmin);
 
-            mockRepo.Verify(m => m.UpdateAdmin(exampleAdmin), Times.Once);
+            mockAdminRepository.Verify(m => m.UpdateAdmin(exampleAdmin), Times.Once);
         }
     }
 }

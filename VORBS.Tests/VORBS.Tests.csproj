@@ -58,6 +58,8 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\BaseServiceTestSetup.cs" />
+    <Compile Include="Services\LocationsServiceTests.cs" />
     <Compile Include="Services\AdminServiceTests.cs" />
     <Compile Include="Services\RoomServiceTests.cs" />
     <Compile Include="Utils\EmailHelperTests.cs" />
