@@ -30,7 +30,7 @@ namespace VORBS.Utils
         /// <param name="toAddress">E-Mail address of who will be recieving the email</param>
         /// <param name="subject">Subject line for E-Mail</param>
         /// <param name="body">Body of E-Mail (html-enabled)</param>
-        public void SendEmail(string fromAddress, string onBehalfOf, string toAddress, string subject, string body, bool bcc = true)
+        public virtual void SendEmail(string fromAddress, string onBehalfOf, string toAddress, string subject, string body, bool bcc = true)
         {   
             MailMessage message = new MailMessage();
             message.From = new MailAddress(fromAddress);
@@ -70,7 +70,7 @@ namespace VORBS.Utils
         /// <param name="toAddress">E-Mail address of who will be recieving the email</param>
         /// <param name="subject">Subject line for E-Mail</param>
         /// <param name="body">Body of E-Mail (html-enabled)</param>
-        public void SendEmail(string fromAddress, string toAddress, string subject, string body, bool bcc = true)
+        public virtual void SendEmail(string fromAddress, string toAddress, string subject, string body, bool bcc = true)
         {
             SendEmail(fromAddress, null, toAddress, subject, body, bcc);
         }
@@ -81,7 +81,7 @@ namespace VORBS.Utils
         /// <param name="viewName">Name of view to get markup for</param>
         /// <param name="model">Model to pass to view</param>
         /// <returns>HTML un-encoded markup of view</returns>
-        public string GetEmailMarkup(string viewName, object model)
+        public virtual string GetEmailMarkup(string viewName, object model)
         {
             ControllerContext controller = GetFakeContext();
 

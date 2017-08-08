@@ -57,12 +57,12 @@ namespace VORBS.Services
                 List<Booking> bookings = _bookingRepository.GetByDateAndRoom(DateTime.Now, room)
                                                     .OrderBy(b => b.Owner)
                                                     .ToList();
-                _bookingRepository.Delete(bookings);
-
-                string fromEmail = appSettings["fromEmail"];
-
                 if (bookings.Count() > 0)
                 {
+                    _bookingRepository.Delete(bookings);
+
+                    string fromEmail = appSettings["fromEmail"];
+
                     List<Booking> ownerBookings = new List<Booking>();
 
                     string currentOwner = bookings[0].Owner;
