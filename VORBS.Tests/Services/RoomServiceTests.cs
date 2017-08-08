@@ -150,7 +150,7 @@ namespace VORBS.Tests.Services
         }
 
         [TestMethod]
-        public void ToggleRoomActive_Should_Update_When_False_And_HasExistingBookings()
+        public void ToggleRoomActive_Should_Update_When_False_And_HasExistingBooking()
         {
             List<Booking> existingBookings = new List<Booking>()
             {
@@ -183,6 +183,43 @@ namespace VORBS.Tests.Services
             mockRoomRepository.Verify(m => m.EditRoom(existingRoom), Times.Once);
             mockBookingRepository.Verify(m => m.Delete(It.IsAny<List<Booking>>()), Times.Once);
             mockEmailHelper.Verify(m => m.SendEmail(fakeFromEmailAddress, fakeToEmailAddress, It.IsAny<string>(), fakeBody, It.IsAny<bool>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void ToggleRoomActive_Should_Update_When_False_And_HasExistingBookings()
+        {
+            List<Booking> existingBookings = new List<Booking>()
+            {
+                new Booking(){ ID = 1, PID = "1234", Owner = "Reece" },
+                new Booking(){ ID = 1, PID = "5678", Owner = "Charlie" },
+            };
+
+            Room existingRoom = new Room()
+            {
+                Active = true,
+                ID = 1,
+                RoomName = "Room1",
+            };
+
+            mockBookingRepository.Setup(m => m.GetByDateAndRoom(It.IsAny<DateTime>(), existingRoom)).Returns(existingBookings);
+
+            mockDirectoryRepository.Setup(m => m.GetUser(It.Is<Pid>(x => x.Identity == "1234"))).Returns(new User() { EmailAddress = "Reece@email.com" });
+            mockDirectoryRepository.Setup(m => m.GetUser(It.Is<Pid>(x => x.Identity == "5678"))).Returns(new User() { EmailAddress = "Charlie@email.com" });
+
+            string fakeFromEmailAddress = "vorbs@email.com";
+            string fakeBody = "Some Body Contents";
+            mockEmailHelper.Setup(m => m.GetEmailMarkup(It.IsAny<string>(), It.IsAny<List<Booking>>())).Returns(fakeBody);
+            mockEmailHelper.Setup(m => m.SendEmail(fakeFromEmailAddress, It.IsAny<string>(), It.IsAny<string>(), fakeBody, It.IsAny<bool>()));
+
+            NameValueCollection appSettings = new NameValueCollection();
+            appSettings.Add("fromEmail", fakeFromEmailAddress);
+
+            RoomService service = new RoomService(logger.Object, mockLocationRepository.Object, mockRoomRepository.Object, mockBookingRepository.Object, mockDirectoryRepository.Object, mockEmailHelper.Object);
+            service.ToggleRoomActive(existingRoom, false, appSettings);
+
+            mockRoomRepository.Verify(m => m.EditRoom(existingRoom), Times.Once);
+            mockBookingRepository.Verify(m => m.Delete(It.IsAny<List<Booking>>()), Times.Once);
+            mockEmailHelper.Verify(m => m.SendEmail(fakeFromEmailAddress, It.IsAny<string>(), It.IsAny<string>(), fakeBody, It.IsAny<bool>()), Times.Exactly(existingBookings.Count));
         }
     }
 }
