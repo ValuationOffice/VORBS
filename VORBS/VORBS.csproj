@@ -277,6 +277,7 @@
     <Content Include="Scripts\Help Page\help.module.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.min.js" />
+    <Content Include="Scripts\Services\Availability.js" />
     <Content Include="Scripts\Services\Bookings.js" />
     <Content Include="Scripts\Services\services.module.js" />
     <Content Include="Scripts\Shared Functions\bookingFunctions.js" />
@@ -317,7 +318,9 @@
     <Content Include="Scripts\MyBookings\myBookingsController.js" />
     <Content Include="Scripts\NewBooking\newBooking.module.js" />
     <Content Include="Scripts\NewBooking\newBookingController.js" />
+    <Content Include="Scripts\Tests\Data\availabilityMockData.js" />
     <Content Include="Scripts\Tests\Data\bookingMockData.js" />
+    <Content Include="Scripts\Tests\Services\Availability.spec.js" />
     <Content Include="Scripts\Tests\Services\Bookings.spec.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
