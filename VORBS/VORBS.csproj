@@ -231,6 +231,8 @@
     <Compile Include="Services\StubbedDirectoryService.cs" />
     <Compile Include="Utils\CustomHelpers.cs" />
     <Compile Include="Utils\EmailHelper.cs" />
+    <Compile Include="Utils\interfaces\ISmtpClient.cs" />
+    <Compile Include="Utils\EmailClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
