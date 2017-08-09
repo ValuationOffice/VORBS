@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -17,10 +17,10 @@ using static VORBS.Services.RoomService;
 
 namespace VORBS.Tests.Services
 {
-    [TestClass]
+    [TestFixture]
     public class RoomServiceTests : BaseServiceTestSetup
     {
-        [TestMethod]
+        [Test]
         public void EditRoom_Should_ThrowException_If_RoomExist()
         {
             Room existingRoom = new Room()
@@ -61,12 +61,12 @@ namespace VORBS.Tests.Services
 
             RoomService service = new RoomService(logger.Object, mockLocationRepository.Object, mockRoomRepository.Object, mockBookingRepository.Object, mockDirectoryRepository.Object, mockEmailHelper.Object);
 
-            Assert.ThrowsException<RoomExistsException>(() => service.EditRoom(existingRoom, edittedRoom));
+            Assert.Throws<RoomExistsException>(() => service.EditRoom(existingRoom, edittedRoom));
 
             mockRoomRepository.Verify(m => m.EditRoom(It.IsAny<Room>()), Times.Never);
         }
 
-        [TestMethod]
+        [Test]
         public void EditRoom_Should_Edit()
         {
             Room existingRoom = new Room()
@@ -108,7 +108,7 @@ namespace VORBS.Tests.Services
             mockRoomRepository.Verify(m => m.EditRoom(edittedRoom), Times.Once);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleRoomActive_Should_Update_When_True()
         {
             Room existingRoom = new Room()
@@ -127,7 +127,7 @@ namespace VORBS.Tests.Services
             mockRoomRepository.Verify(m => m.EditRoom(existingRoom), Times.Once);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleRoomActive_Should_Update_When_False_And_NoExistingBookings()
         {
             Room existingRoom = new Room()
@@ -149,7 +149,7 @@ namespace VORBS.Tests.Services
             mockBookingRepository.Verify(m => m.Delete(It.IsAny<List<Booking>>()), Times.Never);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleRoomActive_Should_Update_When_False_And_HasExistingBooking()
         {
             List<Booking> existingBookings = new List<Booking>()
@@ -185,7 +185,7 @@ namespace VORBS.Tests.Services
             mockEmailHelper.Verify(m => m.SendEmail(fakeFromEmailAddress, fakeToEmailAddress, It.IsAny<string>(), fakeBody, It.IsAny<bool>()), Times.Once);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleRoomActive_Should_Update_When_False_And_HasExistingBookings()
         {
             List<Booking> existingBookings = new List<Booking>()

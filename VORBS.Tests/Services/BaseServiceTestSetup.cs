@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace VORBS.Tests.Services
 
         protected Mock<EmailHelper> mockEmailHelper;
 
-        [TestInitialize]
+        [SetUp]
         public void InitTest()
         {
             logger = new Mock<NLog.Logger>();
