@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -15,10 +15,10 @@ using static VORBS.Services.LocationsService;
 
 namespace VORBS.Tests.Services
 {
-    [TestClass]
+    [TestFixture]
     public class LocationsServiceTests : BaseServiceTestSetup
     {
-        [TestMethod]
+        [Test]
         public void EditLocation_Should_Edit()
         {
             Location existingLocation = new Location()
@@ -45,7 +45,7 @@ namespace VORBS.Tests.Services
             mockLocationRepository.Verify(m => m.UpdateLocation(edittedLocation), Times.Once);
         }
 
-        [TestMethod]
+        [Test]
         public void EditLocation_Should_ThrowException_If_LocationExists()
         {
             Location existingLocation = new Location()
@@ -69,12 +69,12 @@ namespace VORBS.Tests.Services
 
             LocationsService locationService = new LocationsService(logger.Object, mockLocationRepository.Object, mockBookingRepository.Object, mockDirectoryRepository.Object, mockEmailHelper.Object);
 
-            Assert.ThrowsException<LocationExistsException>(() => locationService.EditLocation(existingLocation, edittedLocation));
+            Assert.Throws<LocationExistsException>(() => locationService.EditLocation(existingLocation, edittedLocation));
 
             mockLocationRepository.Verify(m => m.UpdateLocation(edittedLocation), Times.Never);
         }
 
-        [TestMethod]
+        [Test]
         public void SaveNewLocation_Should_SaveLocation()
         {
             Location newLocation = new Location()
@@ -94,7 +94,7 @@ namespace VORBS.Tests.Services
             mockLocationRepository.Verify(m => m.SaveNewLocation(newLocation), Times.Once);
         }
 
-        [TestMethod]
+        [Test]
         public void SaveNewLocation_Should_ThrowException_When_LocationExists()
         {
             Location newLocation = new Location()
@@ -109,12 +109,12 @@ namespace VORBS.Tests.Services
             mockLocationRepository.Setup(m => m.SaveNewLocation(newLocation));
 
             LocationsService locationService = new LocationsService(logger.Object, mockLocationRepository.Object, mockBookingRepository.Object, mockDirectoryRepository.Object, mockEmailHelper.Object);
-            Assert.ThrowsException<LocationExistsException>(() => locationService.SaveNewLocation(newLocation));
+            Assert.Throws<LocationExistsException>(() => locationService.SaveNewLocation(newLocation));
 
             mockLocationRepository.Verify(m => m.SaveNewLocation(newLocation), Times.Never);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleLocationActive_Should_Update_When_True()
         {
             Location existingLocation = new Location()
@@ -136,7 +136,7 @@ namespace VORBS.Tests.Services
             mockEmailHelper.Verify(m => m.SendEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleLocationActive_Should_Update_When_False_And_NoExistingBookings()
         {
             Location existingLocation = new Location()
@@ -160,7 +160,7 @@ namespace VORBS.Tests.Services
             mockEmailHelper.Verify(m => m.SendEmail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleLocationActive_Should_Update_When_False_And_HasExistingBooking()
         {
             List<Booking> existingBookings = new List<Booking>()
@@ -197,7 +197,7 @@ namespace VORBS.Tests.Services
             mockEmailHelper.Verify(m => m.SendEmail(fakeFromEmailAddress, fakeToEmailAddress, It.IsAny<string>(), fakeBody, It.IsAny<bool>()), Times.Once);
         }
 
-        [TestMethod]
+        [Test]
         public void ToggleLocationActive_Should_Update_When_False_And_HasExistingBookings()
         {
             List<Booking> existingBookings = new List<Booking>()
