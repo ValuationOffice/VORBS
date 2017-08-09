@@ -1,4 +1,5 @@
-VORBS
+VORBS 
+[![Build status](https://ci.appveyor.com/api/projects/status/7njtwuy10v6ac93f?svg=true)](https://ci.appveyor.com/project/reecebedding/vorbs)
 =======
 
 Room booking mangement system.
