@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VORBS;
 using Moq;
 using System.Net.Mail;
@@ -7,13 +6,14 @@ using System.Web;
 using VORBS.Utils;
 using VORBS.Utils.interfaces;
 using System.IO;
+using NUnit.Framework;
 
 namespace VORBS.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class EmailHelperTests
     {
-        [TestMethod]
+        [Test]
         public void ShouldSendDirectMail()
         {
             var smtpMock = new Mock<ISmtpClient>();
@@ -51,7 +51,7 @@ namespace VORBS.Tests
             Assert.AreEqual(body, result.Body);
         }
 
-        [TestMethod]
+        [Test]
         public void ShouldSendOnbehalfOfMail()
         {
             var smtpMock = new Mock<ISmtpClient>();
