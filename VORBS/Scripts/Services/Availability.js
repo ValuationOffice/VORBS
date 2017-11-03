@@ -6,22 +6,16 @@
     AvailabilityService.$inject = ['$resource'];
 
     function AvailabilityService($resource) {
-        return $resource('/api/availability/:location/:start/:smartRoom', { location: '@location', start: '@start', smartRoom: '@smartRoom' }, {
-            allRoomBookingsForLocation: {
-                method: 'GET',
-                isArray: true
-            },
-            roomsForLocation: {
-                method: 'GET',
-                isArray: true,
-                params: {
-                    end: '@end',
-                    numberOfPeople: '@numberOfPeople',
-                    existingBookingId: '@existingBookingId' 
-                },
-                url: '/api/availability/:location/:start/:end/:numberOfPeople/:smartRoom/:existingBookingId'
-            }
-        });
+        return $resource('/api/availability/:location/:start/:smartRoom/:end/:numberOfPeople/:existingBookingId',
+            {
+                location: '@location', start: '@start', smartRoom: '@smartRoom', end: '@end',
+                numberOfPeople: '@numberOfPeople', existingBookingId: '@existingBookingId'
+            }, {
+                get: {
+                    method: 'GET',
+                    isArray: true
+                }
+            });
     }
 
 })();

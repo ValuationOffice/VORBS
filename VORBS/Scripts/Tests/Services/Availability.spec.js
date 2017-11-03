@@ -19,10 +19,10 @@
         expect(AvailabilityService).toBeDefined();
     });
 
-    describe('allRoomBookingsForLocation method', function () {
+    describe('get method', function () {
         it('should exist', function () {
-            expect(AvailabilityService.allRoomBookingsForLocation).not.toEqual(null);
-            expect(AvailabilityService.allRoomBookingsForLocation).toBeDefined();
+            expect(AvailabilityService.get).not.toEqual(null);
+            expect(AvailabilityService.get).toBeDefined();
         });
 
         it('should return an array of room objects', function () {
@@ -34,7 +34,7 @@
             $httpBackend.expectGET('/api/availability/' + locationName + '/' + queryDate +'/' + smartRoom)
                 .respond(200, availableRooms);
 
-            var result = AvailabilityService.allRoomBookingsForLocation({
+            var result = AvailabilityService.get({
                 location: locationName,
                 start: queryDate,
                 smartRoom: smartRoom
@@ -46,14 +46,6 @@
             expect(result instanceof Array).toBeTruthy();
             expect(result.length).toEqual(2);
         });
-    });
-
-    describe('roomsForLocation method', function () {
-
-        it('should exist', function () {
-            expect(AvailabilityService.roomsForLocation).not.toEqual(null);
-            expect(AvailabilityService.roomsForLocation).toBeDefined();
-        });
 
         it('should return a filtered array of room objects', function () {
 
@@ -63,10 +55,10 @@
             var numberOfPeople = 5;
             var smartRoom = false;
 
-            $httpBackend.expectGET('/api/availability/' + locationName + '/' + queryStartDate + '/' + queryEndDate + '/' + numberOfPeople + '/' + smartRoom)
+            $httpBackend.expectGET('/api/availability/' + locationName + '/' + queryStartDate + '/' + smartRoom + '/' + queryEndDate + '/' + numberOfPeople)
                 .respond(200, availableRooms);
 
-            var result = AvailabilityService.roomsForLocation({
+            var result = AvailabilityService.get({
                 location: locationName,
                 start: queryStartDate,
                 end: queryEndDate,
