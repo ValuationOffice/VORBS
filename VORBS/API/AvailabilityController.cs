@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using VORBS.Models;
 using VORBS.DAL;
 using VORBS.Models.DTOs;
-using VORBS.Utils;
-using System.Data.Entity.Core.Objects;
 using VORBS.Services;
 using VORBS.DAL.Repositories;
 
@@ -91,108 +87,8 @@ namespace VORBS.API
         }
 
         [HttpGet]
-        [Route("{location}/{start:DateTime}/{end:DateTime}")]
-        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end)
-        {
-
-            List<RoomDTO> rooms = new List<RoomDTO>();
-
-            if (location == null)
-                return new List<RoomDTO>();
-
-            List<Room> roomData = new List<Room>();
-
-            try
-            {
-                var availableRooms = db.Rooms.Where(x =>
-                    x.Location.Name == location
-                ).ToList();
-
-                roomData.AddRange(availableRooms);
-
-                roomData.ForEach(x => rooms.Add(new RoomDTO()
-                {
-                    ID = x.ID,
-                    RoomName = x.RoomName,
-                    PhoneCount = x.PhoneCount,
-                    ComputerCount = x.ComputerCount,
-                    SmartRoom = x.SmartRoom,
-                    SeatCount = x.SeatCount,
-                    Bookings = x.Bookings.Where(b => b.StartDate.Date == start.Date).Select(b =>
-                    {
-                        BookingDTO bDto = new BookingDTO()
-                        {
-                            ID = b.ID,
-                            Owner = b.Owner,
-                            StartDate = b.StartDate,
-                            EndDate = b.EndDate,
-                            IsSmartMeeting = b.IsSmartMeeting
-                        };
-                        return bDto;
-                    }).ToList()
-                }));
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
-            }
-            return rooms;
-        }
-
-
-        [HttpGet]
-        [Route("{location}/{start:DateTime}/{numberOfPeople:int}/{smartRoom:bool}")]
-        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, int numberOfPeople, bool smartRoom)
-        {
-            List<RoomDTO> rooms = new List<RoomDTO>();
-
-            if (location == null)
-                return new List<RoomDTO>();
-
-            List<Room> roomData = new List<Room>();
-
-            try
-            {
-                var locationRooms = db.Rooms.Where(x => x.Location.Name == location && x.SeatCount >= numberOfPeople).ToList();
-                var availableRooms = db.Rooms.Where(x =>
-                    x.Location.Name == location
-                    && x.SeatCount >= numberOfPeople
-                ).ToList();
-
-                roomData.AddRange(availableRooms);
-
-                roomData.ForEach(x => rooms.Add(new RoomDTO()
-                {
-                    ID = x.ID,
-                    RoomName = x.RoomName,
-                    PhoneCount = x.PhoneCount,
-                    ComputerCount = x.ComputerCount,
-                    SmartRoom = x.SmartRoom,
-                    Bookings = x.Bookings.Select(b =>
-                    {
-                        BookingDTO bDto = new BookingDTO()
-                        {
-                            ID = b.ID,
-                            Owner = b.Owner,
-                            StartDate = b.StartDate,
-                            EndDate = b.EndDate,
-                            IsSmartMeeting = b.IsSmartMeeting
-                        };
-                        return bDto;
-                    }).ToList()
-                }));
-
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
-            }
-            return rooms;
-        }
-
-        [HttpGet]
-        [Route("{location}/{start:DateTime}/{end:DateTime}/{numberOfPeople:int}/{smartRoom:bool}")]
-        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom)
+        [Route("{location}/{start:DateTime}/{smartRoom:bool}/{end:DateTime}/{numberOfPeople:int}")]
+        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, bool smartRoom, DateTime end, int numberOfPeople)
         {
             List<RoomDTO> rooms = new List<RoomDTO>();
 
@@ -243,8 +139,8 @@ namespace VORBS.API
         }
 
         [HttpGet]
-        [Route("{location}/{start:DateTime}/{end:DateTime}/{numberOfPeople:int}/{smartRoom:bool}/{existingBookingId:int}")]
-        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, DateTime end, int numberOfPeople, bool smartRoom, int existingBookingId)
+        [Route("{location}/{start:DateTime}/{smartRoom:bool}/{end:DateTime}/{numberOfPeople:int}/{existingBookingId:int}")]
+        public List<RoomDTO> GetAvailableRoomsForLocation(string location, DateTime start, bool smartRoom, DateTime end, int numberOfPeople, int existingBookingId)
         {
             List<RoomDTO> rooms = new List<RoomDTO>();
 
