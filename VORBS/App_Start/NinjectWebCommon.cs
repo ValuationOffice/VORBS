@@ -70,6 +70,7 @@ namespace VORBS.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<VORBSContext>().To<VORBSContext>();
+            kernel.Bind<HttpContextBase>().ToMethod(ctx => new HttpContextWrapper(HttpContext.Current)).InRequestScope();
 
             //Repositories
             kernel.Bind<IBookingRepository>().To<EFBookingRepository>();
