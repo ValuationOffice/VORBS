@@ -29,6 +29,7 @@
     <RestorePackages>true</RestorePackages>
     <UseGlobalApplicationHostFile />
     <TypeScriptToolsVersion>2.1</TypeScriptToolsVersion>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -279,6 +280,7 @@
     <Content Include="Scripts\Help Page\help.module.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.min.js" />
+    <Content Include="Scripts\Services\Availability.js" />
     <Content Include="Scripts\Services\Bookings.js" />
     <Content Include="Scripts\Services\services.module.js" />
     <Content Include="Scripts\Shared Functions\bookingFunctions.js" />
@@ -302,10 +304,7 @@
     <Content Include="package.json" />
     <Content Include="package-lock.json" />
     <Content Include=".eslintrc" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\FullCalandar\fullcalendar.min.js" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery-2.1.4.intellisense.js" />
     <Content Include="Scripts\jquery-2.1.4.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -319,7 +318,9 @@
     <Content Include="Scripts\MyBookings\myBookingsController.js" />
     <Content Include="Scripts\NewBooking\newBooking.module.js" />
     <Content Include="Scripts\NewBooking\newBookingController.js" />
+    <Content Include="Scripts\Tests\Data\availabilityMockData.js" />
     <Content Include="Scripts\Tests\Data\bookingMockData.js" />
+    <Content Include="Scripts\Tests\Services\Availability.spec.js" />
     <Content Include="Scripts\Tests\Services\Bookings.spec.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">

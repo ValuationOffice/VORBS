@@ -2,9 +2,9 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService'];
+    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService'];
 
-    function NewBookingController($scope, $http, $resource, BookingsService) {
+    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService) {
         CreateServices($resource);
 
         $scope.locations = Locations.query({ status: true, extraInfo: true });
@@ -47,9 +47,9 @@
                 var formattedDate = new moment($scope.bookingFilter.startDate, ['DD-MM-YYYY']).format('dddd Do MMMM');
                 $("#searchedDate").text(formattedDate);
                 if (viewAll === true) {
-                    $scope.roomBookings = Available.query({
+                    $scope.roomBookings = AvailabilityService.get({
                         location: $scope.bookingFilter.location.name,
-                        startDate: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, true),
+                        start: FormatDateTimeForURL($scope.bookingFilter.startDate, 'MM-DD-YYYY', false, true),
                         smartRoom: false
                     }, function (success) {
                         roomResults = success;
@@ -61,25 +61,26 @@
 
                     var queryParams = {};
                     if (advancedSearchActive) {
-                        queryParams = {
+                        $scope.roomBookings = AvailabilityService.get({
                             location: $scope.bookingFilter.location.name,
-                            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
-                            endDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
                             smartRoom: $scope.bookingFilter.smartRoom,
-                            numberOfAttendees: $scope.bookingFilter.numberOfAttendees
-                        };
+                            end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                            numberOfPeople: $scope.bookingFilter.numberOfAttendees                            
+                        }, function (success) {
+                            roomResults = success;
+                            $scope.RenderBookings(roomResults);
+                        });
                     } else {
-                        queryParams = {
+                        $scope.roomBookings = AvailabilityService.get({
                             location: $scope.bookingFilter.location.name,
-                            startDate: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
+                            start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
                             smartRoom: $scope.bookingFilter.smartRoom
-                        };
+                        }, function (success) {
+                            roomResults = success;
+                            $scope.RenderBookings(roomResults);
+                        });
                     }
-
-                    $scope.roomBookings = Available.query(queryParams, function (success) {
-                        roomResults = success;
-                        $scope.RenderBookings(roomResults);
-                    });
                     $("#newSearchResults").css('display', 'block');
                 }
 
@@ -758,6 +759,20 @@
 
         $scope.bookingFilter.endTime = IncrementCurrentTime(30);
 
+        var advancedSearchActive = false;
+        $scope.ToggleAdvancedSearch = function () {
+            if (advancedSearchActive) {
+                $("#advancedSearch").hide();
+                $("#toggleAdvancedSearchLink").text('Advanced Search');
+                $("#viewAllRoomsLink").hide();
+            } else {
+                $("#advancedSearch").show();
+                $("#toggleAdvancedSearchLink").text('Hide Advanced Search');
+                $("#viewAllRoomsLink").show();
+            }
+            advancedSearchActive = !advancedSearchActive;
+        }
+
         $("#newBookingRecurrenceModal").on("show.bs.modal", function () {
             //$scope.newBooking.Recurrence.Frequency = 'daily';
             if ($scope.newBooking.Recurrence.WeeklyDay == '') {
@@ -774,20 +789,6 @@
         Locations = $resource('/api/locations/:status/:extraInfo', { status: 'active', extraInfo: 'extraInfo' }, {
             query: { method: 'GET', isArray: true }
         });
-
-        Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
-            {
-                query: {
-                    method: 'GET', isArray: true
-                }
-            });
-
-        Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom',
-            {
-                query: {
-                    method: 'GET', isArray: true
-                }
-            });
 
         Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
             query: { method: 'GET', cache: false }
@@ -1006,31 +1007,11 @@
         document.getElementById('isSmartRoom').innerText = message;
     }
 
-    var advancedSearchActive = false;
-    function ToggleAdvancedSearch() {
-        if (advancedSearchActive) {
-            $("#advancedSearch").hide();
-            $("#toggleAdvancedSearchLink").text('Advanced Search');
-            $("#viewAllRoomsLink").hide();
-        } else {
-            $("#advancedSearch").show();
-            $("#toggleAdvancedSearchLink").text('Hide Advanced Search');
-            $("#viewAllRoomsLink").show();
-        }
-        advancedSearchActive = !advancedSearchActive;
-    }
-
     $(document).ready(function () {
         $("#onBehlafOfTextBox").keydown(function (e) {
             if (e.key !== "Tab") {
                 e.preventDefault();
             }
-        });
-
-        $('.touchSpinControl').TouchSpin({
-            verticalbuttons: true,
-            min: 1,
-            initval: 1
         });
     });
     ///////////////////////////////////////////////////////////////////

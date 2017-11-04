@@ -3,9 +3,9 @@
     angular.module('vorbs.admin')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService', 'AvailabilityService'];
 
-    function MyBookingsController($scope, $resource, BookingsService) {
+    function MyBookingsController($scope, $resource, BookingsService, AvailabilityService) {
 
         CreateBookingServices($resource);
 
@@ -154,31 +154,32 @@
                     saveBooking($scope.bookingId, $scope.newBooking);
                 }
                 else {
-                    $scope.availableRooms = Available.query({
+                    $scope.availableRooms = AvailabilityService.get({
                         location: $scope.editBooking.location.name,
-                        startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
-                        endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                        start: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
                         smartRoom: false,
-                        numberOfAttendees: $scope.booking.numberOfAttendees,
+                        end: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                        numberOfPeople: $scope.booking.numberOfAttendees,
                         existingBookingId: $scope.bookingId
+                    }).$promise.then(function (success) {
+
+                        $scope.availableRooms = success;
+                        if ($scope.availableRooms.length === 0) {
+                            EnableAcceptBookingButton();
+                            SetModalErrorMessage('No rooms avaiLable using the below Date/Time/Attendees.');
+                        }
+                        else if ($scope.availableRooms[0].roomName === $scope.newBooking.Room.RoomName) {
+                            saveBooking($scope.bookingId, $scope.newBooking);
+                        }
+                        else {
+                            EnableAcceptBookingButton();
+                            SetEditActiveTab('confirmEditBooking');
+                            $scope.currentRoom = $scope.availableRooms[0];
+                        }
                     },
-                        function (success) {
-                            if ($scope.availableRooms.length === 0) {
-                                EnableAcceptBookingButton();
-                                SetModalErrorMessage('No rooms avaiLable using the below Date/Time/Attendees.');
-                            }
-                            else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
-                                saveBooking($scope.bookingId, $scope.newBooking);
-                            }
-                            else {
-                                EnableAcceptBookingButton();
-                                SetEditActiveTab('confirmEditBooking');
-                                $scope.currentRoom = $scope.availableRooms[0];
-                            }
-                        },
                         function (error) {
                             EnableAcceptBookingButton();
-                            alert('Unable to Edit. Please Try Again or Contact ITSD.');
+                            alert('Unable to Edit. Please Try Again or Contact ITSD.');                          
                         });
                 }
             } catch (e) {
@@ -272,7 +273,7 @@
                 }
 
                 $scope.bookings = success;
-                });
+            });
         }
 
         $scope.newBooking = {
@@ -316,17 +317,6 @@
         }, {
                 query: { method: 'GET', isArray: true }
             });
-
-        Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom/:existingBookingId', {
-            location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom', existingBookingId: 'existingBookingId'
-        },
-            {
-                query: { method: 'GET', isArray: true }
-            });
-
-        Available.prototype = {
-            roomNameFormatted: function () { return this.roomName.replace('_', '.'); }
-        };
 
         Owner = $resource('/api/admin', {},
             {

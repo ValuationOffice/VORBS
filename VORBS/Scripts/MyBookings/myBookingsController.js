@@ -3,9 +3,9 @@
     angular.module('vorbs.myBookings')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService', 'AvailabilityService'];
 
-    function MyBookingsController($scope, $resource, BookingsService) {
+    function MyBookingsController($scope, $resource, BookingsService, AvailabilityService) {
 
         CreateServices($resource);
 
@@ -155,8 +155,8 @@
                     $("#additionalEquipmentCont").css("display", "block");
                     $("#additionalEquipmentContWarning").css("display", "none");
                 }
-                $("#editModal #bookingDate").datepicker('update');               
-                $scope.editBooking = response;            
+                $("#editModal #bookingDate").datepicker('update');
+                $scope.editBooking = response;
             }, function (error) {
                 // TODO: Error Handler
                 $scope.editBooking = null;
@@ -212,15 +212,16 @@
                     saveBooking($scope.bookingId, $scope.newBooking);
                 }
                 else {
-                    $scope.availableRooms = Available.query({
+                    $scope.availableRooms = AvailabilityService.get({
                         location: $scope.editBooking.location.name,
-                        startDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
-                        endDate: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                        start: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.startTime, 'MM-DD-YYYY-HHmm', true, true),
                         smartRoom: $scope.newBooking.IsSmartMeeting,
-                        numberOfAttendees: $scope.booking.numberOfAttendees,
+                        end: FormatDateTimeForURL($scope.booking.date + ' ' + $scope.booking.endTime, 'MM-DD-YYYY-HHmm', true, true),
+                        numberOfPeople: $scope.booking.numberOfAttendees,
                         existingBookingId: $scope.bookingId
-                    },
-                        function (success) {
+                    }).$promise.then(function (success) {
+
+                            $scope.availableRooms = success;
 
                             if ($scope.availableRooms.length === 0) {
                                 EnableAcceptBookingButton();
@@ -229,7 +230,7 @@
                             else if ($scope.availableRooms.length === 1 && $scope.availableRooms[0].roomName == $scope.newBooking.Room.RoomName) {
                                 saveBooking($scope.bookingId, $scope.newBooking);
                             }
-                            else if ($scope.availableRooms[0].roomName.replace('_', '.') === $scope.newBooking.Room.RoomName) {
+                            else if ($scope.availableRooms[0].roomName === $scope.newBooking.Room.RoomName) {
                                 saveBooking($scope.bookingId, $scope.newBooking);
                             }
                             else {
@@ -375,23 +376,5 @@
         }, {
                 query: { method: 'GET', isArray: true }
             });
-
-        Available = $resource('/api/availability/:location/:startDate/:endDate/:numberOfAttendees/:smartRoom/:existingBookingId', {
-            location: 'location', startDate: 'startDate', endDate: 'endDate', numberOfAttendees: 'numberOfAttendees', smartRoom: 'smartRoom', existingBookingId: 'existingBookingId'
-        },
-            {
-                query: { method: 'GET', isArray: true }
-            });
-
-        Available.prototype = {
-            roomNameFormatted: function () { return this.roomName.replace('_', '.') },
-            smartRoomFormatted: function () {
-                if (this.smartRoom) {
-                    return "Yes";
-                } else {
-                    return "No";
-                }
-            }
-        };
     }
 })();
