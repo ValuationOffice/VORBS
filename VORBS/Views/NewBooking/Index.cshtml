@@ -59,7 +59,7 @@
                         <label class="control-label">&nbsp;</label>
                         <div class="divider"></div><br />
                         <input id="searchButton" type="button" class="button button-start" ng-click="SearchBookings(false)" value="Search" />
-                        <p><a href="#" id="toggleAdvancedSearchLink" onclick="ToggleAdvancedSearch();">Advanced Search</a></p>
+                        <p><a href="#" id="toggleAdvancedSearchLink" ng-click="ToggleAdvancedSearch();">Advanced Search</a></p>
                     </div>
                 </div>
             </div>
@@ -137,6 +137,7 @@
 
 @section scripts{
     <script src="~/Scripts/Services/Bookings.js"></script>
+    <script src="~/Scripts/Services/Availability.js"></script>
     <script src="~/Scripts/FullCalandar/fullcalendar.min.js"></script>
     <script src="~/Scripts/NewBooking/newBookingController.js"></script>
     <script src="~/Scripts/Shared Functions/bookingFunctions.js"></script>

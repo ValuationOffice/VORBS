@@ -3,7 +3,7 @@
     <h4 class="modal-title" id="myModalLabel">Confirm Edit Booking</h4>
 </div>
 <div class="modal-body">
-    <p>You meeting room has changed to <b>{{currentRoom.roomNameFormatted()}}</b> please confirm that you are happy with this selection ?</p>
+    <p>Your meeting room has changed to <b>{{currentRoom.roomName}}</b>. Please confirm that you are happy with this selection.</p>
 
     <table>
         <tr>
@@ -16,7 +16,7 @@
             <td><span class="glyphicon glyphicon-earphone badge" title="Telephones"> {{currentRoom.phoneCount}}</span> Telephones</td>
         </tr>
         <tr>
-            <td><span class="glyphicon glyphicon-facetime-video badge" title="Is SMART room"> </span> {{ currentRoom.smartRoomFormatted() }}</td>
+            <td><span class="glyphicon glyphicon-facetime-video badge" title="Is SMART room"> </span> {{ currentRoom.smartRoom ? 'Yes' : 'No' }}</td>
         </tr>
     </table>
 
@@ -25,7 +25,7 @@
 
         <p>Alternatively, please select a meeting room from the dropdown:</p>
 
-        <select class="form-control" ng-options="room.roomNameFormatted() for room in availableRooms" ng-model="currentRoom"></select>
+        <select class="form-control" ng-options="room.roomName for room in availableRooms" ng-model="currentRoom"></select>
     </div>
 </div>
 <div class="modal-footer">
