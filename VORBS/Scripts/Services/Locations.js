@@ -34,10 +34,17 @@
                 update: {
                     method: 'PUT',
                     params: {
-                        locationId: '@locationId',
+                        id: '@id'
+                    },
+                    url: '/api/locations/:id'
+                },
+                updateStatus: {
+                    method: 'PATCH',
+                    params: {
+                        id: '@id',
                         status: '@status'
                     },
-                    url: '/api/locations/:locationId/:status'
+                    url: '/api/locations/:id/:status'
                 }
             });
     }

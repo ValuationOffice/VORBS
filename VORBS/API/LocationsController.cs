@@ -284,14 +284,14 @@ namespace VORBS.API
             }
         }
 
-        [HttpPost]
-        [Route("{locationId:Int}/{active:bool}")]
+        [HttpPatch]
+        [Route("{id:Int}/{active:bool}")]
         [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
-        public HttpResponseMessage EnableDisableLocation(int locationId, bool active)
+        public HttpResponseMessage EnableDisableLocation(int id, bool active)
         {
             try
             {
-                Location location = _locationRepository.GetLocationById(locationId);
+                Location location = _locationRepository.GetLocationById(id);
 
                 _locationService.ToggleLocationActive(location, active, ConfigurationManager.AppSettings);
                 return Request.CreateResponse(HttpStatusCode.OK);

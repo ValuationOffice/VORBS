@@ -123,23 +123,6 @@
             expect(LocationsService.update).toBeDefined();
         });
 
-        it('should update an existing location status', function () {
-
-            var location = locationMockData.getSingleMockLocation,
-                locationStatus = false;
-
-            $httpBackend.expectPUT('/api/locations/' + location.id + '/' + locationStatus)
-                .respond(200);
-
-            LocationsService.update({
-                locationId: location.id,
-                status: locationStatus
-            });
-
-            expect($httpBackend.flush).not.toThrow();
-
-        });
-
         it('should update an existing location object', function () {
 
             var location = locationMockData.getSingleMockLocation;
@@ -148,8 +131,32 @@
                 .respond(200);
 
             LocationsService.update({
-                locationId: location.id
+                id: location.id
             }, location);
+
+            expect($httpBackend.flush).not.toThrow();
+        });
+    });
+
+    describe('updateStatus method', function () {
+
+        it('should exist', function () {
+            expect(LocationsService.updateStatus).not.toEqual(null);
+            expect(LocationsService.updateStatus).toBeDefined();
+        });
+
+        it('should update an existing location status', function () {
+
+            var location = locationMockData.getSingleMockLocation,
+                locationStatus = false;
+
+            $httpBackend.expectPATCH('/api/locations/' + location.id + '/' + locationStatus)
+                .respond(200);
+
+            LocationsService.updateStatus({
+                id: location.id,
+                status: locationStatus
+            });
 
             expect($httpBackend.flush).not.toThrow();
 
