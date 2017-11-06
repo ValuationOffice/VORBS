@@ -3,13 +3,15 @@
     angular.module('vorbs.admin')
         .controller('UsersController', UsersController);
 
-    UsersController.$inject = ['$scope', '$http', '$resource'];
+    UsersController.$inject = ['$scope', '$http', '$resource', 'LocationsService'];
 
-    function UsersController($scope, $http, $resource) {
+    function UsersController($scope, $http, $resource, LocationsService) {
 
         CreateUserAdminServices($resource);
 
-        $scope.Locations = Locations.query({});
+        $scope.Locations = LocationsService.query().$promise.then(function (resp) {
+            $scope.Locations = resp;
+        });
         $scope.admins = Admins.getAll({});
         $scope.adminId = 0;
 
@@ -212,10 +214,6 @@
         Admins.prototype = {
             permissionLevelText: function () { return GetPermissionText(this.permissionLevel); }
         };
-
-        Locations = $resource('/api/locations', {}, {
-            query: { method: 'GET', isArray: true }
-        });
 
         AdUsers = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
             {

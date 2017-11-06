@@ -3,13 +3,14 @@
     angular.module('vorbs.admin')
         .controller('RoomsController', RoomsController);
 
-    RoomsController.$inject = ['$scope', '$http', '$resource'];
+    RoomsController.$inject = ['$scope', '$http', '$resource', 'LocationsService'];
 
-    function RoomsController($scope, $http, $resource) {
+    function RoomsController($scope, $http, $resource, LocationsService) {
         CreateRoomAdminServices($resource);
 
-        $scope.Locations = Locations.query({},
-            function (success) {
+        $scope.Locations = LocationsService.query().$promise.then(
+            function (resp) {
+                $scope.Locations = resp;
                 $scope.currentLocation = $scope.Locations[0];
             });
 
@@ -88,10 +89,6 @@
     }
 
     function CreateRoomAdminServices($resource) {
-        Locations = $resource('/api/locations', {}, {
-            query: { method: 'GET', isArray: true }
-        });
-
         GetRoomById = $resource('/api/room/:roomId', { roomId: "roomId" }, {
             query: { method: 'GET' }
         });
