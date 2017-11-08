@@ -3,33 +3,38 @@
         .controller('HelpController', HelpController);
 
 
-    HelpController.$inject = ['$scope', '$http', '$resource'];
+    HelpController.$inject = ['$scope', 'LocationsService'];
 
-    function HelpController($scope, $http, $resource) {
-        CreateHelpServices($resource);
+    function HelpController($scope, LocationsService) {
 
-        $scope.locations = Locations.query({ status: true, extraInfo: true },
-            function (success) {
+        $scope.locationCredentials = {
+            facilities: {
+                phoneNumber: '',
+                email: ''
+            },
+            dss: {
+                phoneNumber: '',
+                email: ''
+            }
+        };
+
+        $scope.locations = LocationsService.getByStatus({ status: true, extraInfo: true }).$promise.then(
+            function (resp) {
+                $scope.locations = resp;
                 $scope.currentLocation = $scope.locations[0];
-            });
+                $scope.getHelpData();
+            }
+        );
 
-    }
+        $scope.getHelpData = function () {
+            $scope.locationCredentials.facilities = $scope.currentLocation.locationCredentials.filter(function (value) {
+                return value.department == 'facilities';
+            })[0];
 
-    function CreateHelpServices($resource) {
-        Locations = $resource('/api/locations/:status/:extraInfo', { status: 'active', extraInfo: 'extraInfo' }, {
-            query: { method: 'GET', isArray: true }
-        });
-
-        Locations.prototype =
-            {
-                GetContactDetail: function (name) {
-                    for (var i = 0; i < this.locationCredentials.length; i++) {
-                        if (this.locationCredentials[i].department == name) {
-                            return this.locationCredentials[i];
-                        }
-                    }
-                }
-            };
+            $scope.locationCredentials.dss = $scope.currentLocation.locationCredentials.filter(function (value) {
+                return value.department == 'dss';
+            })[0];
+        }
     }
 
 })();

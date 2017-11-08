@@ -38,7 +38,7 @@
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse">
                             <div class="panel-body">
-                                Contact your facilities rep on {{ currentLocation.GetContactDetail('facilities').phoneNumber }} or {{ currentLocation.GetContactDetail('facilities').email }}
+                                Contact your facilities rep on {{ locationCredentials.facilities.phoneNumber }} or {{ locationCredentials.facilities.email }}
                             </div>
                         </div>
                     </div>
@@ -92,7 +92,7 @@
                         </div>
                         <div id="collapseSix" class="panel-collapse collapse">
                             <div class="panel-body">
-                                If you require help setting up a SMART Room booking, please contact DSS Team on {{ currentLocation.GetContactDetail('dss').phoneNumber }} or {{ currentLocation.GetContactDetail('dss').email }}
+                                If you require help setting up a SMART Room booking, please contact DSS Team on {{ locationCredentials.dss.phoneNumber }} or {{ locationCredentials.dss.email }}
                             </div>
                         </div>
                     </div>
@@ -105,15 +105,15 @@
                 </p>
                 <div class="input-group" id="searchLocation">
                     <label class="col-sm-2 control-label">Location</label>
-                    <select class="form-control" ng-options="location.name for location in locations" ng-model="currentLocation" ng-change="GetHelpData()">
+                    <select class="form-control" ng-options="location.name for location in locations" ng-model="currentLocation" ng-change="getHelpData()">
                         <option value="" selected disabled>Select a location...</option>
                     </select>
                 </div>
                 <div>
                     <h4>Facilities:</h4>
-                    Phone: {{ currentLocation.GetContactDetail('facilities').phoneNumber }}
+                    Phone: {{ locationCredentials.facilities.phoneNumber }}
                     <br />
-                    Email: {{ currentLocation.GetContactDetail('facilities').email }}
+                    Email: {{ locationCredentials.facilities.email }}
                 </div>
             </div>
         </section>
@@ -122,4 +122,5 @@
 
 @section scripts{    
     <script src="~/Scripts/Help Page/helpController.js"></script>
+    <script src="~/Scripts/Services/Locations.js"></script>
 }
