@@ -3,16 +3,17 @@
     angular.module('vorbs.myBookings')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService', 'AvailabilityService'];
+    MyBookingsController.$inject = ['$scope', 'BookingsService', 'AvailabilityService', 'LocationsService'];
 
-    function MyBookingsController($scope, $resource, BookingsService, AvailabilityService) {
-
-        CreateServices($resource);
+    function MyBookingsController($scope, BookingsService, AvailabilityService, LocationsService) {
 
         $scope.orderByField = 'date';
         $scope.reverseSort = false;
 
-        $scope.locations = Locations.query({ status: true, extraInfo: false });
+        $scope.locations = LocationsService.getByStatus({ status: true, extraInfo: false })
+            .$promise.then(function (resp) {
+                $scope.locations = resp;
+            });
         $scope.bookingFilter = {
             location: { name: '', id: 0 },
             room: '',
@@ -366,15 +367,5 @@
             date: new Date(),
             numberOfAttendees: 0
         }
-    }
-
-
-    function CreateServices($resource) {
-
-        Locations = $resource('/api/locations/:status/:extraInfo', {
-            status: 'active', extraInfo: 'extraInfo'
-        }, {
-                query: { method: 'GET', isArray: true }
-            });
     }
 })();
