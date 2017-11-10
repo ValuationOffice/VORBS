@@ -3,13 +3,17 @@
     angular.module('vorbs.admin')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService', 'AvailabilityService'];
+    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService'];
 
-    function MyBookingsController($scope, $resource, BookingsService, AvailabilityService) {
+    function MyBookingsController($scope, $resource, BookingsService, AvailabilityService, LocationsService) {
 
         CreateBookingServices($resource);
 
-        $scope.locations = Locations.query({ status: true, extraInfo: false });
+        $scope.locations = LocationsService.getByStatus({ status: true, extraInfo: false })
+            .$promise.then(function (resp) {
+                $scope.locations = resp;
+            });
+
         $scope.owners = Owner.getAll({});
 
         $scope.bookingId = 0;
@@ -179,7 +183,7 @@
                     },
                         function (error) {
                             EnableAcceptBookingButton();
-                            alert('Unable to Edit. Please Try Again or Contact ITSD.');                          
+                            alert('Unable to Edit. Please Try Again or Contact ITSD.');
                         });
                 }
             } catch (e) {
@@ -312,16 +316,9 @@
     }
 
     function CreateBookingServices($resource) {
-        Locations = $resource('/api/locations/:status/:extraInfo', {
-            status: 'active', extraInfo: 'extraInfo'
-        }, {
-                query: { method: 'GET', isArray: true }
-            });
-
-        Owner = $resource('/api/admin', {},
-            {
-                getAll: { method: 'GET', isArray: true }
-            });
+        Owner = $resource('/api/admin', {}, {
+            getAll: { method: 'GET', isArray: true }
+        });
     }
 
     function SetAdminBookingErrorMessage(message) {

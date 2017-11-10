@@ -3,13 +3,13 @@
     angular.module('vorbs.admin')
         .controller('LocationsController', LocationsController);
 
-    LocationsController.$inject = ['$scope', '$http', '$resource'];
+    LocationsController.$inject = ['$scope', 'LocationsService'];
 
-    function LocationsController($scope, $http, $resource) {
+    function LocationsController($scope, LocationsService) {
 
-        CreateLocationAdminServices($resource);
-
-        $scope.Locations = Locations.query({});
+        $scope.Locations = LocationsService.query().$promise.then(function (resp) {
+            $scope.Locations = resp;
+        });
 
         $scope.locationId = 0;
 
@@ -28,22 +28,19 @@
 
         $scope.GetLocationsByStatus = function () {
             if ($scope.selectedItem.type === "all") {
-                $scope.Locations = Locations.query({
+                $scope.Locations = LocationsService.query().$promise.then(function (resp) {
+                    $scope.Locations = resp;
                 });
-            }
-            if ($scope.selectedItem.type === "enabled") {
-                $scope.Locations = LocationsByStatus.query({
-                    status: true,
-                    extraInfo: true
-                });
-            }
-            if ($scope.selectedItem.type === "disabled") {
-                $scope.Locations = LocationsByStatus.query({
-                    status: false,
-                    extraInfo: true
-                });
-            }
+            } else {
+                var status = $scope.selectedItem.type === "enabled" ? true : false;
 
+                $scope.Locations = LocationsService.getByStatus({
+                    status: status,
+                    extraInfo: true
+                }).$promise.then(function (resp) {
+                    $scope.Locations = resp;
+                });
+            }
         }
 
         $scope.locationStatuses = [
@@ -130,34 +127,21 @@
                 var isValid = ValidateNewLocation($scope.newLocation.Name, locations, emails);
 
                 if (isValid) {
-                    //$scope.Locations.push({ 'name': $scope.newLocation.Name, 'rooms': [], 'active': $scope.newLocation.Active });
 
-                    // Writing to the server
-                    var res = $http.post('api/locations', $scope.newLocation);
-
-                    //$.ajax({
-                    //    type: "POST",
-                    //    data: JSON.stringify($scope.newLocation),
-                    //    url: "api/locations",
-                    //    contentType: "application/json",
-
-
-                    res.success(function (data, status) {
-                        //alert('New Location Added.');
+                    LocationsService.create({}, $scope.newLocation).$promise.then(function (success) {
                         $('#newLocationModal').modal('hide');
-                        $scope.Locations = Locations.query({});
-
                         var $roomScope = angular.element($("#roomControllerDiv")).scope();
 
-                        $roomScope.Locations = Locations.query({},
-                            function (success) {
-                                $roomScope.currentLocation = $roomScope.Locations[0];
-                            });
+                        $scope.Locations = LocationsService.query().$promise.then(function (resp) {
+                            $scope.Locations = resp;
+                            $roomScope.Locations = resp;
+                            $roomScope.currentLocation = $roomScope.Locations[0];
 
-                        $roomScope.$digest();
+                        }).finally(function () {
+                            $roomScope.$digest();
+                        });
 
-                    });
-                    res.error(function (error) {
+                    }, function (error) {
                         alert('Unable to create new Location.');
                         $('#confirmLocationBtn').prop('disabled', '');
                         $('#confirmLocationBtn').html('Confirm Location');
@@ -173,7 +157,7 @@
         }
 
         $scope.SetNewEditLocation = function (_id) {
-            $scope.NewEditLocation = LocationById.query({ id: _id }, function (success) {
+            $scope.NewEditLocation = LocationsService.getByID({ id: _id }).$promise.then(function (success) {
                 $scope.NewEditLocation = success;
 
                 var newLoc = success;
@@ -212,7 +196,7 @@
 
                 $scope.NewEditLocation.locationCredentials = credentials;
 
-                LocationById.edit({ id: $scope.OriginalEditLocation.id }, $scope.NewEditLocation, function (success) {
+                LocationsService.update({ id: $scope.OriginalEditLocation.id }, $scope.NewEditLocation).$promise.then(function (success) {
                     $scope.GetLocationsByStatus();
 
                     $("#editLocationConfirm").prop('disabled', '');
@@ -248,67 +232,42 @@
                 $("#disableLocationConfirmButton").html('Disabling Location. Please wait..');
             }
 
-            // Writing to the server
-            // var res = $http.post('api/locations/' + locationid + '/' + active, $scope.pickedLocation);
+            LocationsService.updateStatus({
+                id: locationid,
+                status: active
+            }).$promise.then(function () {
 
-            $.ajax({
-                type: "POST",
-                url: "api/locations/" + locationid + "/" + active,
-                contentType: "application/json",
-                success: function (data, status) {
-                    if (active) {
-                        $('#enableLocationModal').modal('hide');
-                        $("#enableLocationConfirmButton").prop('disabled', '');
-                        $("#enableLocationConfirmButton").html('Enable Location');
-                    }
-                    else {
-                        $('#disableLocationModal').modal('hide');
-                        $("#disableLocationConfirmButton").prop('disabled', '');
-                        $("#disableLocationConfirmButton").html('Disable Location');
-                    }
-                    $scope.GetLocationsByStatus();
-                    $("#location-success-alert").alert();
-                    $("#location-success-alert p").text('Location Status has been updated.');
-                    $("#location-success-alert").fadeTo(5000, 500).slideUp(500, function () {
-                        $("#location-success-alert").hide();
-                    });
+                if (active) {
+                    $('#enableLocationModal').modal('hide');
+                    $("#enableLocationConfirmButton").prop('disabled', '');
+                    $("#enableLocationConfirmButton").html('Enable Location');
+                }
+                else {
+                    $('#disableLocationModal').modal('hide');
+                    $("#disableLocationConfirmButton").prop('disabled', '');
+                    $("#disableLocationConfirmButton").html('Disable Location');
+                }
+                $scope.GetLocationsByStatus();
+                $("#location-success-alert").alert();
+                $("#location-success-alert p").text('Location Status has been updated.');
+                $("#location-success-alert").fadeTo(5000, 500).slideUp(500, function () {
+                    $("#location-success-alert").hide();
+                });
 
-                },
-                error: function (error) {
-                    if (active) {
-                        alert('Unable to enable location. Please contact ITSD.');
-                        $("#enableLocationConfirmButton").prop('disabled', '');
-                        $("#enableLocationConfirmButton").html('Enable Location');
-                    }
-                    else {
-                        alert('Unable to disable location. Please contact ITSD.');
-                        $("#disableLocationConfirmButton").prop('disabled', '');
-                        $("#disableLocationConfirmButton").html('Disable Location');
-                    }
+            }, function (error) {
+
+                if (active) {
+                    alert('Unable to enable location. Please contact ITSD.');
+                    $("#enableLocationConfirmButton").prop('disabled', '');
+                    $("#enableLocationConfirmButton").html('Enable Location');
+                }
+                else {
+                    alert('Unable to disable location. Please contact ITSD.');
+                    $("#disableLocationConfirmButton").prop('disabled', '');
+                    $("#disableLocationConfirmButton").html('Disable Location');
                 }
             });
         }
-
-    }
-
-    function CreateLocationAdminServices($resource) {
-
-        Locations = $resource('/api/locations', {}, {
-            query: { method: 'GET', isArray: true }
-        });
-
-        LocationsByStatus = $resource('/api/locations/:status/:extraInfo', { status: 'status', extraInfo: 'extraInfo' }, {
-            query: { method: 'GET', isArray: true }
-        });
-
-        LocationById = $resource('/api/locations/:id', {}, {
-            query: {
-                method: 'GET'
-            },
-            edit: {
-                method: 'PUT'
-            }
-        });
 
     }
 

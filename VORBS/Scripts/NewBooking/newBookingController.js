@@ -2,12 +2,12 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService'];
+    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService'];
 
-    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService) {
+    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService, LocationsService) {
         CreateServices($resource);
 
-        $scope.locations = Locations.query({ status: true, extraInfo: true });
+        $scope.locations = [];
         $scope.clashedBookings = [];
 
         $scope.externalFullNameTextBox = '';
@@ -66,7 +66,7 @@
                             start: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.startTime, 'MM-DD-YYYY-HHmm', true, true),
                             smartRoom: $scope.bookingFilter.smartRoom,
                             end: FormatDateTimeForURL($scope.bookingFilter.startDate + ' ' + $scope.bookingFilter.endTime, 'MM-DD-YYYY-HHmm', true, true),
-                            numberOfPeople: $scope.bookingFilter.numberOfAttendees                            
+                            numberOfPeople: $scope.bookingFilter.numberOfAttendees
                         }, function (success) {
                             roomResults = success;
                             $scope.RenderBookings(roomResults);
@@ -773,6 +773,17 @@
             advancedSearchActive = !advancedSearchActive;
         }
 
+        function getLocations() {
+            LocationsService.getByStatus({ status: true, extraInfo: true })
+                .$promise.then(function (resp) {
+                    $scope.locations = resp;
+                }, function (error) {
+                    console.error(error);
+                });
+        }
+
+        getLocations();
+
         $("#newBookingRecurrenceModal").on("show.bs.modal", function () {
             //$scope.newBooking.Recurrence.Frequency = 'daily';
             if ($scope.newBooking.Recurrence.WeeklyDay == '') {
@@ -786,9 +797,6 @@
 
 
     function CreateServices($resource) {
-        Locations = $resource('/api/locations/:status/:extraInfo', { status: 'active', extraInfo: 'extraInfo' }, {
-            query: { method: 'GET', isArray: true }
-        });
 
         Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
             query: { method: 'GET', cache: false }
