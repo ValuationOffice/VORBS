@@ -504,8 +504,10 @@
                     }
                     $scope.ResetConflictAction();
                     EnableNewBookingButton();
-                });
-                $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
+                    }).finally(function () {
+                        $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
+                    });
+                
             } catch (e) {
                 EnableNewBookingButton();
             }
