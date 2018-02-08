@@ -102,7 +102,7 @@
             <td>{{ room.computerCount }}</td>
             <td>{{ room.phoneCount }}</td>
             <td>{{ room.seatCount}}</td>
-            <td>{{ room.smartRoomFormatted()}}</td>
+            <td>{{ room.smartRoom == true ? 'Yes' : 'No' }}</td>
             <td><span data-toggle="modal" data-target="#editRoomModal" ng-click="GetRoom(room.id)" class="btn glyphicon glyphicon-edit" title="Edit Room"></span></td>
             <td ng-show="{{ room.active }}"><span data-toggle="modal" data-target="#disableRoomModal" ng-click="SetRoomId(room.id)" class="btn glyphicon glyphicon-remove-sign" title="Disable Room"></span></td>
             <td ng-show="{{ room.active != true }}"><span data-toggle="modal" data-target="#enableRoomModal" ng-click="SetRoomId(room.id)" class="btn glyphicon glyphicon-ok-sign" title="Enable Room"></span></td>
