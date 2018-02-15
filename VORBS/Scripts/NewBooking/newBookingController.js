@@ -2,9 +2,9 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService'];
+    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService', 'UsersService'];
 
-    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService, LocationsService) {
+    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService, LocationsService, UsersService) {
         CreateServices($resource);
 
         $scope.locations = [];
@@ -268,13 +268,15 @@
 
         $scope.GetAdNames = function () {
             if ($scope.emailVal === undefined || $scope.emailVal.trim() === "") {
-                $scope.adAdminUsers = Users.queryAll({
-                    allUsers: true
-                })
+                UsersService.query().$promise.then(function (resp) {
+                    $scope.adAdminUsers = resp;
+                });
             }
             else {
-                $scope.adAdminUsers = Users.querySurname({
-                    allUsers: $scope.emailVal
+                UsersService.get({
+                    name: $scope.emailVal
+                }).$promise.then(function (resp) {
+                    $scope.adAdminUsers = resp;
                 });
             }
         }
@@ -504,10 +506,10 @@
                     }
                     $scope.ResetConflictAction();
                     EnableNewBookingButton();
-                    }).finally(function () {
-                        $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
-                    });
-                
+                }).finally(function () {
+                    $scope.newBooking.Recurrence.EndDate = originalRecurrenceEndDate;
+                });
+
             } catch (e) {
                 EnableNewBookingButton();
             }
@@ -803,18 +805,6 @@
         Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
             query: { method: 'GET', cache: false }
         });
-
-        Users = $resource('/api/users/:allUsers', {
-            allUsers: 'allUsers'
-        },
-            {
-                queryAll: {
-                    method: 'GET', isArray: true
-                },
-                querySurname: {
-                    method: 'GET', isArray: true
-                }
-            });
     }
 
     function ResetSearchFilterErrorList() {
