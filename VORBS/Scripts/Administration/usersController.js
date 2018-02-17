@@ -3,9 +3,9 @@
     angular.module('vorbs.admin')
         .controller('UsersController', UsersController);
 
-    UsersController.$inject = ['$scope', '$http', '$resource', 'LocationsService'];
+    UsersController.$inject = ['$scope', '$http', '$resource', 'LocationsService', 'UsersService'];
 
-    function UsersController($scope, $http, $resource, LocationsService) {
+    function UsersController($scope, $http, $resource, LocationsService, UsersService) {
 
         CreateUserAdminServices($resource);
 
@@ -155,13 +155,15 @@
 
         $scope.GetAdNames = function () {
             if ($scope.emailVal === undefined || $scope.emailVal.trim() === "") {
-                $scope.adAdminUsers = AdUsers.queryAll({
-                    allUsers: true
-                })
+                UsersService.query().$promise.then(function (resp) {
+                    $scope.adAdminUsers = resp;
+                });
             }
             else {
-                $scope.adAdminUsers = AdUsers.querySurname({
-                    allUsers: $scope.emailVal
+                UsersService.get({
+                    name: $scope.emailVal
+                }).$promise.then(function (resp) {
+                    $scope.adAdminUsers = resp;
                 });
             }
         }
@@ -214,12 +216,6 @@
         Admins.prototype = {
             permissionLevelText: function () { return GetPermissionText(this.permissionLevel); }
         };
-
-        AdUsers = $resource('/api/users/:allUsers', { allUsers: 'allUsers' },
-            {
-                queryAll: { method: 'GET', isArray: true },
-                querySurname: { method: 'GET', isArray: true }
-            });
     }
 
     function EnableEditAdminButton() {

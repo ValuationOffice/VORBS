@@ -25,7 +25,6 @@ namespace VORBS.API
             _directoryService = directoryService;
         }
 
-        [Route("{allUsers:bool}")]
         [HttpGet]
         public List<UserDTO> GetAllUsers()
         {

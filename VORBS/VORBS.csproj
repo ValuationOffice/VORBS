@@ -285,6 +285,7 @@
     <Content Include="Scripts\Services\Locations.js" />
     <Content Include="Scripts\Services\Rooms.js" />
     <Content Include="Scripts\Services\services.module.js" />
+    <Content Include="Scripts\Services\Users.js" />
     <Content Include="Scripts\Shared Functions\bookingFunctions.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -324,9 +325,11 @@
     <Content Include="Scripts\Tests\Data\bookingMockData.js" />
     <Content Include="Scripts\Tests\Data\locationsMockData.js" />
     <Content Include="Scripts\Tests\Data\roomMockData.js" />
+    <Content Include="Scripts\Tests\Data\usersMockData.js" />
     <Content Include="Scripts\Tests\Services\Availability.spec.js" />
     <Content Include="Scripts\Tests\Services\Bookings.spec.js" />
     <Content Include="Scripts\Tests\Services\Locations.spec.js" />
+    <Content Include="Scripts\Tests\Services\Users.spec.js" />
     <Content Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
