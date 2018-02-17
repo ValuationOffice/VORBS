@@ -2,10 +2,9 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService', 'UsersService'];
+    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService', 'RoomsService', 'UsersService'];
 
-    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService, LocationsService, UsersService) {
-        CreateServices($resource);
+    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService, LocationsService, RoomsService, UsersService) {
 
         $scope.locations = [];
         $scope.clashedBookings = [];
@@ -185,17 +184,17 @@
                             return;
                         }
 
-                        var room = Room.query({
+                        var room = RoomsService.getByName({
                             locationId: $scope.bookingFilter.location.id,
                             roomName: this.title
-                        }, function (success) {
-                            if (!room.smartRoom || !$scope.bookingFilter.smartRoom) {
+                        }).$promise.then(function (success) {
+                            if (!success.smartRoom || !$scope.bookingFilter.smartRoom) {
                                 $("#dssAssistChoice").css('display', 'none');
                                 $("#dssAssistChoiceContainer").css('display', 'none');
                                 $("#dssAssistContWarning").css("display", "none");
                             } else {
                                 $("#dssAssistChoiceContainer").css('display', 'block');
-                                var dssDetails = GetLocationCredentialsFromList(dssCredentialsName, room.location.locationCredentials);
+                                var dssDetails = GetLocationCredentialsFromList(dssCredentialsName, success.location.locationCredentials);
                                 if (!dssDetails || dssDetails.email === "") {
                                     $("#dssAssistChoice").css('display', 'none');
                                     $("#dssAssistContWarning").css("display", "block");
@@ -205,25 +204,13 @@
                                 }
                             }
 
-                            var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, room.location.locationCredentials);
-                            //if (!securityDetails || securityDetails.email === "") {
-                            //Overrided existing security department check, as users need to be available to add guests but will be sent an email personally to inform security.
-                            if (false) {
-                                $("#externalAttendeesCont").css("display", "none");
+                            var securityDetails = GetLocationCredentialsFromList(securityCredentialsName, success.location.locationCredentials);
 
-                                var message = "This location does not have a dedicated security desk.";
-                                var facilities = GetLocationCredentialsFromList(facilitiesCredentialsName, room.location.locationCredentials);
-                                if (facilities) {
-                                    message = message + " Please contact the local facilities officer at " + facilities.email + " for visitory access protocols.";
-                                }
-                                $("#externalAttendeesContWarning").text(message);
-                                $("#externalAttendeesContWarning").css("display", "block");
-                            } else {
-                                $("#externalAttendeesCont").css("display", "block");
-                                $("#externalAttendeesContWarning").css("display", "none");
-                            }
+                            $("#externalAttendeesCont").css("display", "block");
+                            $("#externalAttendeesContWarning").css("display", "none");
 
-                            var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, room.location.locationCredentials);
+
+                            var facilitiesDetails = GetLocationCredentialsFromList(facilitiesCredentialsName, success.location.locationCredentials);
                             if (!facilitiesDetails || facilitiesDetails.email === "") {
                                 $("#additionalEquipmentCont").css("display", "none");
                                 $("#additionalEquipmentContWarning").css("display", "block");
@@ -232,19 +219,17 @@
                                 $("#additionalEquipmentContWarning").css("display", "none");
                             }
 
-                            $scope.newBooking.Room = room;
-                            $scope.newBooking.Room.RoomName = room.roomName;
+                            $scope.newBooking.Room = success;
+                            $scope.newBooking.Room.RoomName = success.roomName;
+                        }).finally(function () {
+                            $scope.booking.StartTime = start.utc().format('H:mm');
+                            $scope.booking.EndTime = end.utc().format('H:mm');
+
+                            $("#confirmModal #bookingModalStartTime").timepicker('setTime', start.utc().format('H:mm'));
+                            $("#confirmModal #bookingModalEndTime").timepicker('setTime', end.utc().format('H:mm'));
+
+                            $("#confirmModal").modal('show');
                         });
-
-                        $scope.booking.StartTime = start.utc().format('H:mm');
-                        $scope.booking.EndTime = end.utc().format('H:mm');
-
-                        $scope.$digest();
-
-                        $("#confirmModal #bookingModalStartTime").timepicker('setTime', start.utc().format('H:mm'));
-                        $("#confirmModal #bookingModalEndTime").timepicker('setTime', end.utc().format('H:mm'));
-
-                        $("#confirmModal").modal('show');
                     },
                     eventSources: [
                         {
@@ -797,14 +782,6 @@
             //$scope.newBooking.Recurrence.EndDate = $scope.bookingFilter.startDate;
             $scope.$apply();
         })
-    }
-
-
-    function CreateServices($resource) {
-
-        Room = $resource('/api/room/:locationId/:roomName', { locationId: 'locationId', roomName: 'roomName' }, {
-            query: { method: 'GET', cache: false }
-        });
     }
 
     function ResetSearchFilterErrorList() {

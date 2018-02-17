@@ -283,6 +283,7 @@
     <Content Include="Scripts\Services\Availability.js" />
     <Content Include="Scripts\Services\Bookings.js" />
     <Content Include="Scripts\Services\Locations.js" />
+    <Content Include="Scripts\Services\Rooms.js" />
     <Content Include="Scripts\Services\services.module.js" />
     <Content Include="Scripts\Services\Users.js" />
     <Content Include="Scripts\Shared Functions\bookingFunctions.js" />
@@ -323,6 +324,7 @@
     <Content Include="Scripts\Tests\Data\availabilityMockData.js" />
     <Content Include="Scripts\Tests\Data\bookingMockData.js" />
     <Content Include="Scripts\Tests\Data\locationsMockData.js" />
+    <Content Include="Scripts\Tests\Data\roomMockData.js" />
     <Content Include="Scripts\Tests\Data\usersMockData.js" />
     <Content Include="Scripts\Tests\Services\Availability.spec.js" />
     <Content Include="Scripts\Tests\Services\Bookings.spec.js" />
@@ -384,6 +386,7 @@
     <Content Include="Views\EmailTemplates\DSSDeletedBooking.cshtml" />
     <Content Include="Views\Shared\_EmailLayout.cshtml" />
     <Content Include="Views\EmailTemplates\SecurityNewBookingBookersCopy.cshtml" />
+    <Content Include="Scripts\Tests\Services\Rooms.spec.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
