@@ -208,6 +208,13 @@ namespace VORBS.Services
 
             string fromEmail = appSettings["fromEmail"];
 
+            if (string.IsNullOrEmpty(fromEmail))
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newBooking, user, appSettings));
+                _logger.Debug("FromEmail is empty. Skipping email sending");
+                return;
+            }
+
             if (deletedBookings.Count > 0)
                 SendEmailToOwnerForAdminOverwriteWithMessage(fromEmail, deletedBookings, newBooking, clashedBookings);
 

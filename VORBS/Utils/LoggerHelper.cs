@@ -19,22 +19,29 @@ namespace VORBS.Utils
             MethodBase method = new StackTrace().GetFrame(1).GetMethod();
             return () => $"Executed {method}";
         }
-        
+
 
         public static NLog.LogMessageGenerator InitializeClassMessage(params string[] additionalMessages)
         {
             MethodBase method = new StackTrace().GetFrame(1).GetMethod();
             return delegate ()
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append($"Initialized {method.GetType().FullName} ");
-
-                foreach (string message in additionalMessages)
+                try
                 {
-                    stringBuilder.Append($"| {message} ");
-                }
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append($"Initialized {method.GetType().FullName} ");
 
-                return stringBuilder.ToString();
+                    foreach (string message in additionalMessages)
+                    {
+                        stringBuilder.Append($"| {message} ");
+                    }
+
+                    return stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    return $"Class: LoggerHelper, Method: {MethodBase.GetCurrentMethod().Name} An error occured generating log: Message:{ex.Message}, InnerMessage: {ex.InnerException?.Message}";
+                }
             };
         }
 
@@ -43,12 +50,19 @@ namespace VORBS.Utils
             MethodBase method = new StackTrace().GetFrame(1).GetMethod();
             return delegate ()
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                try
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
 
-                if (parameters.Length > 0)
-                    stringBuilder.Append($"with params: {GetInfoOnParams(parameters)}");
+                    if (parameters.Length > 0)
+                        stringBuilder.Append($"with params: {GetInfoOnParams(parameters)}");
 
-                return stringBuilder.ToString();
+                    return stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    return $"Class: LoggerHelper, Method: {MethodBase.GetCurrentMethod().Name} An error occured generating log: Message:{ex.Message}, InnerMessage: {ex.InnerException?.Message}";
+                }
             };
         }
 
@@ -57,13 +71,20 @@ namespace VORBS.Utils
             MethodBase method = new StackTrace().GetFrame(1).GetMethod();
             return delegate ()
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append($"Executed {method} ");
-                if (result != null)
-                    stringBuilder.Append($"with result: {GetInfoOnObject(result)} ");
-                if (parameters.Length > 0)
-                    stringBuilder.Append($"with params: {GetInfoOnParams(parameters)}");
-                return stringBuilder.ToString();
+                try
+                {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.Append($"Executed {method} ");
+                    if (result != null)
+                        stringBuilder.Append($"with result: {GetInfoOnObject(result)} ");
+                    if (parameters.Length > 0)
+                        stringBuilder.Append($"with params: {GetInfoOnParams(parameters)}");
+                    return stringBuilder.ToString();
+                }
+                catch (Exception ex)
+                {
+                    return $"Class: LoggerHelper, Method: {MethodBase.GetCurrentMethod().Name} An error occured generating log: Message:{ex.Message}, InnerMessage: {ex.InnerException?.Message}";
+                }
             };
         }
 
