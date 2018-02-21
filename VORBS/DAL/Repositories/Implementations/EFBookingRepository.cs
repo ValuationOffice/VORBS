@@ -8,6 +8,7 @@ using VORBS.API;
 using VORBS.DAL;
 using VORBS.Models;
 using VORBS.Services;
+using VORBS.Utils;
 
 namespace VORBS.DAL.Repositories
 {
@@ -33,24 +34,34 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                     .Where(x => x.StartDate >= startDate && x.Room.Location.ID == location.ID)
                     .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, location));
+
             return bookings;
         }
 
         public List<Booking> GetByDateAndRoom(DateTime startDate, Room room)
         {
             List<Booking> bookings = db.Bookings
-                    .Where(x => x.StartDate >= startDate && x.Room.ID== room.ID)
+                    .Where(x => x.StartDate >= startDate && x.Room.ID == room.ID)
                     .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, room));
+
             return bookings;
         }
 
         public List<Booking> GetByDateOnlyAndRoom(DateTime dateOnly, Room room)
         {
-            return db.Bookings
+            List<Booking> bookings = db.Bookings
                     //Bookings only for this room
                     .Where(x => x.RoomID == room.ID)
                     //Only bookings on the certain days that we want to book for
                     .Where(y => dateOnly.Date == EntityFunctions.TruncateTime(y.StartDate)).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, dateOnly, room));
+
+            return bookings;
         }
 
         public List<Booking> GetByDateAndLocation(DateTime startDate, DateTime endDate, Location location)
@@ -58,6 +69,9 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                     .Where(x => x.StartDate >= startDate && x.EndDate <= endDate && x.Room.Location.ID == location.ID)
                     .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, endDate, location));
+
             return bookings;
         }
 
@@ -66,6 +80,9 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                 .Where(x => x.StartDate >= startDate && x.PID == pid)
                 .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, pid));
+
             return bookings;
         }
 
@@ -74,6 +91,9 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                 .Where(x => x.StartDate >= startDate && x.Owner == owner)
                 .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, owner));
+
             return bookings;
         }
 
@@ -82,6 +102,9 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                    .Where(x => x.StartDate >= startDate && x.EndDate <= endDate && x.Room.ID == room.ID)
                    .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, endDate, room));
+
             return bookings;
         }
 
@@ -90,6 +113,9 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                    .Where(x => x.Owner == owner && x.StartDate >= startDate && x.EndDate <= endDate && x.Room.ID == room.ID)
                    .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, endDate, room, owner));
+
             return bookings;
         }
 
@@ -132,8 +158,12 @@ namespace VORBS.DAL.Repositories
                 queryExpression += (!smartRoom.Value) ? "" : (queryExpression.Length > 0) ? " AND IsSmartMeeting = " + smartRoom.Value : "IsSmartMeeting = " + smartRoom.Value;
             }
 
+            _logger.Debug($"Executing query: {queryExpression}");
 
             var bookings = db.Bookings.Where(queryExpression).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, endDate, owner, smartRoom, room, location));
+
             return bookings;
         }
 
@@ -142,6 +172,9 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookings = db.Bookings
                    .Where(x => x.PID == pid && x.StartDate >= startDate && x.EndDate <= endDate && x.Room.ID == room.ID)
                    .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, endDate, room, pid));
+
             return bookings;
         }
 
@@ -183,7 +216,12 @@ namespace VORBS.DAL.Repositories
                 queryExpression += (!smartRoom.Value) ? "" : (queryExpression.Length > 0) ? " AND IsSmartMeeting = " + smartRoom.Value : "IsSmartMeeting = " + smartRoom.Value;
             }
 
+            _logger.Debug($"Executing query: {queryExpression}");
+
             var bookings = db.Bookings.Where(queryExpression).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, startDate, endDate, Pid, smartRoom, room, location));
+
             return bookings;
         }
 
@@ -196,6 +234,9 @@ namespace VORBS.DAL.Repositories
                 .Where(x => x.PID == pid && x.EndDate >= startDate && x.EndDate <= endDuration).ToList()
                 .OrderBy(x => x.StartDate)
                 .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, period, pid, startDate));
+
             return bookings;
         }
 
@@ -208,28 +249,46 @@ namespace VORBS.DAL.Repositories
                 .Where(x => x.Owner == owner && x.EndDate >= startDate && x.EndDate <= endDuration).ToList()
                 .OrderBy(x => x.StartDate)
                 .ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, period, owner, startDate));
+
             return bookings;
         }
 
         public Booking GetById(int id)
         {
             Booking booking = db.Bookings.Single(b => b.ID == id);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(booking, id));
+
             return booking;
         }
 
         public List<Booking> GetById(List<int> ids)
         {
-            return db.Bookings.Where(x => ids.Contains(x.ID)).ToList();
+            List<Booking> booking = db.Bookings.Where(x => ids.Contains(x.ID)).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(booking, ids));
+
+            return booking;
         }
 
         public List<Booking> GetByOwner(string owner)
         {
-            return db.Bookings.Where(x => x.Owner == owner).ToList();
+            List<Booking> bookings = db.Bookings.Where(x => x.Owner == owner).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, owner));
+
+            return bookings;
         }
 
         public List<string> GetDistinctListOfOwners()
         {
-            return db.Bookings.Select(x => x.Owner).Distinct().ToList();
+            List<string> owners = db.Bookings.Select(x => x.Owner).Distinct().ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(owners));
+
+            return owners;
         }
 
         public Booking UpdateExistingBooking(Booking existingBooking, Booking editBooking)
@@ -254,13 +313,21 @@ namespace VORBS.DAL.Repositories
                 }
 
                 db.SaveChanges(editBooking, false);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, existingBooking, editBooking));
             }
             catch (Exception e)
             {
                 _logger.Error($"Unable to edit existing booking: ID {existingBooking.ID}. An error occured: {e.Message}");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, existingBooking, editBooking));
                 return null;
             }
-            return GetById(editBooking.ID);
+
+
+            Booking result = GetById(editBooking.ID);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, existingBooking, editBooking));
+
+            return result;
         }
 
         public List<Booking> UpdateExistingBookings(List<Booking> existingBookings, List<Booking> editBookings)
@@ -286,6 +353,7 @@ namespace VORBS.DAL.Repositories
                         db.ExternalAttendees.AddRange(editBooking.ExternalAttendees);
                     }
                     bookingsToSave.Add(editBooking);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, existingBookings, editBookings));
                 }
                 catch (Exception e)
                 {
@@ -300,24 +368,32 @@ namespace VORBS.DAL.Repositories
                 {
                     db.SaveChanges(bookingsToSave, false);
                     List<int> editBookingIds = editBookings.Select(x => x.ID).ToList();
-                    return db.Bookings.Where(x => editBookingIds.Contains(x.ID)).ToList();
+
+                    List<Booking> bookings = db.Bookings.Where(x => editBookingIds.Contains(x.ID)).ToList();
+
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, existingBookings, editBookings));
+
+                    return bookings;
                 }
-                catch(BookingConflictException ex)
+                catch (BookingConflictException ex)
                 {
                     _logger.Error($"Unable to edit existing booking(s): {String.Join(", ", editBookings.Select(x => x.ID))}. An error occured: {ex.Message}");
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, existingBookings, editBookings));
                     throw ex;
                 }
                 catch (Exception ex)
                 {
                     _logger.Error($"Unable to edit existing booking(s): {String.Join(", ", editBookings.Select(x => x.ID))}. An error occured: {ex.Message}");
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, existingBookings, editBookings));
                     return null;
                 }
             }
             else
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, existingBookings, editBookings));
                 return null;
             }
-            
+
         }
 
         public void SaveNewBookings(List<Booking> bookings, bool checkForClash = true)
@@ -326,13 +402,14 @@ namespace VORBS.DAL.Repositories
             {
                 db.Bookings.AddRange(bookings);
                 db.SaveChanges(bookings, !checkForClash);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, bookings, checkForClash));
             }
             catch (Exception exn)
             {
                 _logger.Error($"Unable to create new bookings.: {String.Join(", ", bookings.Select(x => x.ID))}. An error occured: {exn.Message}");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, bookings, checkForClash));
                 throw exn;
             }
-            
         }
 
         public bool DeleteById(int Id)
@@ -343,11 +420,14 @@ namespace VORBS.DAL.Repositories
                 db.Bookings.Remove(booking);
                 db.SaveChanges();
 
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(true, Id));
+
                 return true;
             }
             catch (Exception e)
             {
                 _logger.Error($"Unable to delete booking: ID {Id}. An error occured: {e.Message}");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(false, Id));
                 return false;
             }
         }
@@ -373,14 +453,18 @@ namespace VORBS.DAL.Repositories
                 try
                 {
                     db.SaveChanges();
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(true, bookings));
                     return true;
                 }
                 catch (Exception)
                 {
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(false, bookings));
                     return false;
                 }
-            }else
+            }
+            else
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(false, bookings));
                 return false;
             }
         }
@@ -394,7 +478,11 @@ namespace VORBS.DAL.Repositories
 
             //Return true so we can handle the orginial error
             if (editBooking == null || existingBooking == null)
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(true, editBooking, existingBooking));
                 return true;
+            }
+
 
             if (editBooking.StartDate == existingBooking.StartDate && editBooking.EndDate == existingBooking.EndDate &&
                 editBooking.NumberOfAttendees == existingBooking.NumberOfAttendees && editBooking.Subject == existingBooking.Subject &&
@@ -403,10 +491,18 @@ namespace VORBS.DAL.Repositories
             {
                 //External Attendess had multiply possible values
                 if ((editBooking.ExternalAttendees == null && existingBooking.ExternalAttendees.Count == 0))
+                {
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(false, editBooking, existingBooking));
                     return false;
+                }
+
 
                 if (existingBooking.ExternalAttendees.Count() != editBooking.ExternalAttendees.Count())
+                {
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(true, editBooking, existingBooking));
                     return true;
+                }
+
 
                 List<ExternalAttendees> existingAttendees = existingBooking.ExternalAttendees.ToList();
                 List<ExternalAttendees> newAttendees = editBooking.ExternalAttendees.ToList();
@@ -416,13 +512,14 @@ namespace VORBS.DAL.Repositories
                     if (existingAttendees[i].FullName != newAttendees[i].FullName || existingAttendees[i].CompanyName != newAttendees[i].CompanyName ||
                         existingAttendees[i].PassRequired != newAttendees[i].PassRequired)
                     {
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(true, editBooking, existingBooking));
                         return true;
                     }
                 }
-
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(false, editBooking, existingBooking));
                 return false;
             }
-
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(true, editBooking, existingBooking));
             return true;
         }
 
@@ -437,7 +534,7 @@ namespace VORBS.DAL.Repositories
             DateTime endDate = new DateTime(recurringDate.Year, recurringDate.Month, recurringDate.Day);
             endDate = endDate + endTime;
 
-            return new Booking()
+            Booking booking = new Booking()
             {
                 DssAssist = newBooking.DssAssist,
                 ExternalAttendees = newBooking.ExternalAttendees,
@@ -453,6 +550,10 @@ namespace VORBS.DAL.Repositories
                 EndDate = endDate,
                 IsSmartMeeting = newBooking.IsSmartMeeting
             };
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(booking, recurringDate, newBooking));
+
+            return booking;
         }
 
         protected internal List<Booking> GetBookingsForRecurringDates(List<DateTime> recurringDates, Booking newBooking)
@@ -460,6 +561,8 @@ namespace VORBS.DAL.Repositories
             List<Booking> bookingsToCreate = new List<Booking>();
 
             recurringDates.ForEach(x => bookingsToCreate.Add(GetBookingForRecurringDate(x, newBooking)));
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsToCreate, recurringDates, newBooking));
 
             return bookingsToCreate;
         }
@@ -471,8 +574,8 @@ namespace VORBS.DAL.Repositories
             List<int> smartRoomIds = new List<int>();
 
             smartRoomIds.Add(newBooking.RoomID);
-            
-            AvailabilityService aC = new AvailabilityService(this, _roomRepository, _locationRepository);
+
+            AvailabilityService aC = new AvailabilityService(_logger, this, _roomRepository, _locationRepository);
 
             foreach (var smartLoc in newBooking.SmartLoactions)
             {
@@ -526,6 +629,9 @@ namespace VORBS.DAL.Repositories
             }
 
             clashedBookings = clashedBs;
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsToCreate, clashedBookings));
+
             return bookingsToCreate;
         }
 
@@ -534,6 +640,9 @@ namespace VORBS.DAL.Repositories
             Func<Booking, bool> query = x => x.RecurrenceId == recurrenceId;
 
             List<Booking> result = noTracking ? db.Bookings.AsNoTracking().Where(query).ToList() : db.Bookings.Where(query).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, recurrenceId, noTracking));
+
             return result;
         }
 
@@ -544,6 +653,9 @@ namespace VORBS.DAL.Repositories
             int? currentRecurringLinkId = db2.Bookings.Where(x => x.RecurrenceId != null).ToList().Select(x => x.RecurrenceId).Max();
             //nextRecurringLinkid = current +1 or 1 if null (no bookings)
             int nextRecurringLinkid = (currentRecurringLinkId == null) ? 1 : currentRecurringLinkId.Value + 1;
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(nextRecurringLinkid));
+
             return nextRecurringLinkid;
         }
     }

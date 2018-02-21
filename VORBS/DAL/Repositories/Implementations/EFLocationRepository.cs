@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using VORBS.DAL;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.DAL.Repositories
 {
@@ -19,33 +20,62 @@ namespace VORBS.DAL.Repositories
 
         public List<Location> GetLocationsByStatus(bool status)
         {
-            return db.Locations.Where(x => x.Active == status).ToList();
+            List<Location> locations = db.Locations.Where(x => x.Active == status).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locations, status));
+
+            return locations;
         }
 
         public List<Location> GetLocationsWithSmartRooms()
         {
-            return db.Locations.Where(x => x.Active == true && x.Rooms.Where(r => r.SmartRoom == true && r.LocationID == x.ID).Count() > 0).ToList();
+            List<Location> locations = db.Locations.Where(x => x.Active == true && x.Rooms.Where(r => r.SmartRoom == true && r.LocationID == x.ID).Count() > 0).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locations));
+
+            return locations;
         }
 
         public List<Location> GetAllLocations()
         {
-            return db.Locations.ToList();
+            List<Location> locations = db.Locations.ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locations));
+
+            return locations;
         }
 
         public Location GetLocationByName(string name)
         {
-            return db.Locations.Where(x => x.Name == name).FirstOrDefault();
+            Location location = db.Locations.Where(x => x.Name == name).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(location, name));
+
+            return location;
         }
 
         public Location GetLocationById(int id)
         {
-            return db.Locations.Where(x => x.ID == id).FirstOrDefault();
+            Location location = db.Locations.Where(x => x.ID == id).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(location, id));
+
+            return location;
         }
 
         public void SaveNewLocation(Location location)
         {
-            db.Locations.Add(location);
-            db.SaveChanges();
+            try
+            {
+                db.Locations.Add(location);
+                db.SaveChanges();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(typeof(void), location));
+            }
+            catch (Exception exn)
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, location));
+                throw exn;
+            }
         }
 
         public void UpdateLocation(Location location)
@@ -61,6 +91,7 @@ namespace VORBS.DAL.Repositories
             db.LocationCredentials.AddRange(location.LocationCredentials);
 
             db.SaveChanges();
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location));
         }
     }
 }
