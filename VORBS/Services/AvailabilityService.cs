@@ -1,10 +1,12 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Web;
 using VORBS.DAL.Repositories;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.Services
 {
@@ -13,12 +15,17 @@ namespace VORBS.Services
         private IBookingRepository _bookingRepository;
         private IRoomRepository _roomRepository;
         private ILocationRepository _locationRepository;
+        private ILogger _logger;
 
-        public AvailabilityService(IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository)
+        public AvailabilityService(ILogger logger, IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository)
         {
             _bookingRepository = bookingRepository;
             _roomRepository = roomRepository;
             _locationRepository = locationRepository;
+
+            _logger = logger;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         /// <summary>
@@ -35,7 +42,11 @@ namespace VORBS.Services
                 .Where(b => (originalBooking.StartDate <= b.StartDate && originalBooking.EndDate > b.StartDate) || (originalBooking.StartDate >= b.StartDate && originalBooking.StartDate < b.EndDate))
                 .ToList();
 
-            return clashedBookings.Count > 0;
+            bool result = clashedBookings.Count > 0;
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, originalBooking, clashedBookings));
+
+            return result;
 
         }
 
@@ -57,14 +68,17 @@ namespace VORBS.Services
                     //Only bookings on the days that intersect our given time period
                     .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second)
                  || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))
-                .ToList(); // bug fix
+                .ToList();
 
-            clashedBookings = totalBookingsClashed; // WORKING
-            return totalBookingsClashed.Count > 0;
+            clashedBookings = totalBookingsClashed;
+            bool result = totalBookingsClashed.Count > 0;
 
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, room, startTime, endTime, date, clashedBookings));
+
+            return result;
         }
 
-       public bool DoMeetingsClashRecurringly(List<Room> rooms, TimeSpan startTime, TimeSpan endTime, List<DateTime> dates, out List<Booking> allClashedBookings)
+        public bool DoMeetingsClashRecurringly(List<Room> rooms, TimeSpan startTime, TimeSpan endTime, List<DateTime> dates, out List<Booking> allClashedBookings)
         {
             List<Booking> currentClashedBookings = new List<Booking>();
             IEnumerable<Booking> clashedBookings;
@@ -84,6 +98,9 @@ namespace VORBS.Services
             }
 
             allClashedBookings = currentClashedBookings;
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(clashed, rooms, startTime, endTime, dates, allClashedBookings));
+
             return clashed;
         }
 
@@ -96,28 +113,39 @@ namespace VORBS.Services
 
 
             availableRooms = (orderAsc) ? availableRooms.OrderBy(r => r.SeatCount) : availableRooms.OrderByDescending(r => r.SeatCount);
+            Room alternateRoom  = availableRooms.FirstOrDefault();
 
-            return availableRooms.FirstOrDefault();
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(alternateRoom, startTime, endTime, numberOfAttendees, locationId, orderAsc));
+
+            return alternateRoom;
         }
 
         protected internal Room GetAlternateSmartRoom(int bookingRoomId, DateTime startDate, DateTime endDate, int locationId)
         {
             Location location = _locationRepository.GetLocationById(locationId);
-            var availableRooms =  _roomRepository.GetByLocationAndSmartRoom(location, true).Where(x => x.ID != bookingRoomId &&
-                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
+            var availableRooms = _roomRepository.GetByLocationAndSmartRoom(location, true).Where(x => x.ID != bookingRoomId &&
+                                   (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
                                  .OrderByDescending(r => r.SeatCount);
 
-            return availableRooms.FirstOrDefault();
+            Room alternateRoom = availableRooms.FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(alternateRoom, bookingRoomId, startDate, endDate, location));
+
+            return alternateRoom;
         }
 
         protected internal Room GetAlternateSmartRoom(IEnumerable<int> bookingRoomIds, DateTime startDate, DateTime endDate, int locationId)
         {
             Location location = _locationRepository.GetLocationById(locationId);
-            var availableRooms = _roomRepository.GetByLocationAndSmartRoom(location, true).Where( x=> !bookingRoomIds.Contains(x.ID) &&
-                                    (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
+            var availableRooms = _roomRepository.GetByLocationAndSmartRoom(location, true).Where(x => !bookingRoomIds.Contains(x.ID) &&
+                                   (x.Bookings.Where(b => startDate <= b.StartDate && endDate >= b.StartDate)).Count() == 0)
                                  .OrderByDescending(r => r.SeatCount);
 
-            return availableRooms.FirstOrDefault();
+            Room alternateRoom = availableRooms.FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(alternateRoom, bookingRoomIds, startDate, endDate, locationId));
+
+            return alternateRoom;
         }
     }
 }

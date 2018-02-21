@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using VORBS.DAL.Repositories;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.Services
 {
@@ -27,6 +28,8 @@ namespace VORBS.Services
             _roomRepository = roomRepository;
             _bookingRepository = bookingRepository;
             _directoryService = directoryService;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public void EditRoom(Room existingRoom, Room editRoom)
@@ -38,12 +41,19 @@ namespace VORBS.Services
                 bool isDuplicate = _roomRepository.GetByLocationAndName(location, editRoom.RoomName) != null;
 
                 if (isDuplicate)
-                    throw new RoomExistsException();
+                {
+                    RoomExistsException exn = new RoomExistsException();
+
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, existingRoom, editRoom));
+
+                    throw exn;
+                }
             }
 
             editRoom.LocationID = existingRoom.LocationID;
 
             _roomRepository.EditRoom(editRoom);
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, existingRoom, editRoom));
             _logger.Info("Room successfully Edited: " + editRoom.ID);
         }
 
@@ -63,26 +73,32 @@ namespace VORBS.Services
 
                     string fromEmail = appSettings["fromEmail"];
 
-                    List<Booking> ownerBookings = new List<Booking>();
-
-                    string currentOwner = bookings[0].Owner;
-                    
-                    //Iterate around each booking until we hit a new subset belonging to a different owner. Then email that batch.
-                    foreach (var booking in bookings)
+                    if (!string.IsNullOrEmpty(fromEmail))
                     {
-                        if (booking.Owner != currentOwner)
-                        {
-                            SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
 
-                            ownerBookings = new List<Booking>();
-                            currentOwner = booking.Owner;
+                        List<Booking> ownerBookings = new List<Booking>();
+
+                        string currentOwner = bookings[0].Owner;
+
+                        //Iterate around each booking until we hit a new subset belonging to a different owner. Then email that batch.
+                        foreach (var booking in bookings)
+                        {
+                            if (booking.Owner != currentOwner)
+                            {
+                                SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
+
+                                ownerBookings = new List<Booking>();
+                                currentOwner = booking.Owner;
+                            }
+
+                            ownerBookings.Add(booking);
                         }
 
-                        ownerBookings.Add(booking);
+                        //Final Send the last owner bookings
+                        SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
                     }
-
-                    //Final Send the last owner bookings
-                    SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
+                    else
+                        _logger.Debug("FromEmail is empty - Skipping email sending");
                 }
             }
         }
@@ -95,12 +111,16 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, ownerBookings));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, ownerBookings));
                 _logger.ErrorException("Unable to send admin multiple bookings email.", ex);
             }
         }

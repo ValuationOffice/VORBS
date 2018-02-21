@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using VORBS.DAL.Repositories;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.Services
 {
@@ -17,6 +18,8 @@ namespace VORBS.Services
         {
             _logger = logger;
             _adminRepository = adminRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public void AddNewAdmin(Admin newAdmin)
@@ -26,6 +29,8 @@ namespace VORBS.Services
 
             _adminRepository.SaveNewAdmin(newAdmin);
             _logger.Info("Admin successfully added: " + newAdmin.PID);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newAdmin));
         }
 
         public void EditExistingAdmin(Admin existingAdmin, Admin newAdmin)
@@ -35,6 +40,8 @@ namespace VORBS.Services
             _adminRepository.UpdateAdmin(existingAdmin);
 
             _logger.Info("Admin successfully Edited: " + newAdmin.PID);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, existingAdmin, newAdmin));
         }
 
         public void DeleteExistingAdmin(Admin admin)
@@ -42,6 +49,8 @@ namespace VORBS.Services
             _adminRepository.DeleteAdmin(admin);
 
             _logger.Info("Admin successfully deleted: " + admin.ID);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, admin));
         }
 
         public class AdminExistsException : Exception { }

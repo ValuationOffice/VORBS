@@ -19,6 +19,24 @@ namespace VORBS.Utils
             MethodBase method = new StackTrace().GetFrame(1).GetMethod();
             return () => $"Executed {method}";
         }
+        
+
+        public static NLog.LogMessageGenerator InitializeClassMessage(params string[] additionalMessages)
+        {
+            MethodBase method = new StackTrace().GetFrame(1).GetMethod();
+            return delegate ()
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append($"Initialized {method.GetType().FullName} ");
+
+                foreach (string message in additionalMessages)
+                {
+                    stringBuilder.Append($"| {message} ");
+                }
+
+                return stringBuilder.ToString();
+            };
+        }
 
         public static NLog.LogMessageGenerator ExecutedFunctionMessage(params object[] parameters)
         {
