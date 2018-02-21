@@ -15,6 +15,8 @@ namespace VORBS.DAL.Repositories
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public List<Admin> GetAll()

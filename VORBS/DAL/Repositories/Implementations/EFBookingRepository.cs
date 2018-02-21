@@ -27,6 +27,8 @@ namespace VORBS.DAL.Repositories
 
             _locationRepository = locationRepository;
             _roomRepository = roomRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public List<Booking> GetByDateAndLocation(DateTime startDate, Location location)

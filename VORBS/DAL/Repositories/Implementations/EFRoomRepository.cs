@@ -16,6 +16,8 @@ namespace VORBS.DAL.Repositories
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public Room GetByLocationAndName(Location location, string name)
