@@ -46,6 +46,8 @@ namespace VORBS.API
             _bookingsRepository = bookingRepository;
             _locationsRepository = locationRepository;
             _roomsRepository = roomsRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         [Route("{location}/{start:DateTime}/{end:DateTime}/")]
@@ -53,7 +55,13 @@ namespace VORBS.API
         public List<BookingDTO> GetRoomBookingsForLocation(string location, DateTime start, DateTime end)
         {
             if (location == null)
-                return new List<BookingDTO>();
+            {
+                List<BookingDTO> bookings = new List<BookingDTO>();
+                _logger.Debug("Location is null");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, location, start, end));
+                return bookings;
+            }
+
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
 
@@ -94,6 +102,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get bookings for location: " + location, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, location, start, end));
             return bookingsDTO;
         }
 
@@ -102,7 +111,11 @@ namespace VORBS.API
         public List<BookingDTO> GetRoomBookingsForRoom(string location, DateTime start, DateTime end, string room)
         {
             if (location == null || room == null)
-                return new List<BookingDTO>();
+            {
+                var bookings = new List<BookingDTO>();
+                _logger.Debug($"Location or room is null. Location:{location == null}, Room:{room == null}");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, location, start, end, room));
+            }
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
 
@@ -148,6 +161,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get bookings for room: " + location + "/" + room, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, location, start, end, room));
             return bookingsDTO;
         }
 
@@ -156,7 +170,13 @@ namespace VORBS.API
         public List<BookingDTO> GetRoomBookingsForRoomAndPerson(string location, DateTime start, DateTime end, string room, string person)
         {
             if (location == null || room == null || person == null)
-                return new List<BookingDTO>();
+            {
+                var bookings = new List<BookingDTO>();
+                _logger.Debug($"Location,Room or Person is null. Location:{location == null}, Room:{room == null}, Person:{person == null}");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, location, start, end, room, person));
+                return bookings;
+            }
+
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();
 
@@ -200,6 +220,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get bookings for room and person: " + location + "/" + room + "/" + person, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, location, start, end, room, person));
             return bookingsDTO;
         }
 
@@ -212,7 +233,7 @@ namespace VORBS.API
             try
             {
                 string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
-
+                _logger.Debug($"CurrentUser: {currentPid}");
                 List<Booking> bookings = _bookingsRepository.GetByDateAndPid(start, currentPid);
 
                 bookings.ForEach(x => bookingsDTO.Add(new BookingDTO()
@@ -256,6 +277,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get bookings for current user", ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, start, person));
             return bookingsDTO;
         }
 
@@ -310,13 +332,14 @@ namespace VORBS.API
                         SeatCount = booking.Room.SeatCount
                     }
                 };
-
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, bookingId));
                 return bookingsDTO;
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get booking by id :" + bookingId, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, bookingId));
             return bookingsDTO;
         }
 
@@ -326,6 +349,7 @@ namespace VORBS.API
             try
             {
                 User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
+                _logger.Debug($"CurrentUser: {currentUser?.FullName}");
                 if (currentUser == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
@@ -368,6 +392,7 @@ namespace VORBS.API
             try
             {
                 User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
+                _logger.Debug($"CurrentUser: {currentUser?.FullName}");
                 if (currentUser == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
@@ -399,6 +424,7 @@ namespace VORBS.API
                 Booking booking = _bookingsRepository.GetById(bookingId);
 
                 User currentUser = _directoryService.GetCurrentUser(User.Identity.Name);
+                _logger.Debug($"CurrentUser: {currentUser?.FullName}");
                 if (currentUser == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound, "User not found in Active Directory. " + User.Identity.Name);
 
@@ -460,7 +486,7 @@ namespace VORBS.API
                 },
                 Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
             }));
-
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, start, owner, room, location));
             return bookingsDTO;
         }
 
@@ -473,6 +499,7 @@ namespace VORBS.API
             try
             {
                 string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+                _logger.Debug($"CurrentPID: {currentPid}");
 
                 List<Booking> bookings = _bookingsRepository.GetByDateAndPidForPeriod(period, currentPid, startDate);
 
@@ -509,6 +536,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get bookings for current user", ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, startDate, period));
             return bookingsDTO;
         }
 
@@ -525,6 +553,7 @@ namespace VORBS.API
         public IEnumerable<BookingDTO> GetBookingsFilterSearch(int? locationId, DateTime? startDate, string room, bool smartRoom)
         {
             string currentPid = User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1);
+            _logger.Debug($"CurrentPID: {currentPid}");
 
             Location searchLocation = null;
             if (locationId != null && locationId != 0)
@@ -565,7 +594,7 @@ namespace VORBS.API
                 },
                 Room = new RoomDTO() { ID = x.Room.ID, RoomName = x.Room.RoomName, ComputerCount = x.Room.ComputerCount, PhoneCount = x.Room.PhoneCount, SmartRoom = x.Room.SmartRoom }
             }));
-
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookingsDTO, locationId, startDate, room, smartRoom));
             return bookingsDTO;
         }
 

@@ -45,27 +45,6 @@ namespace VORBS.Utils
             };
         }
 
-        public static NLog.LogMessageGenerator ExecutedFunctionMessage(params object[] parameters)
-        {
-            MethodBase method = new StackTrace().GetFrame(1).GetMethod();
-            return delegate ()
-            {
-                try
-                {
-                    StringBuilder stringBuilder = new StringBuilder();
-
-                    if (parameters.Length > 0)
-                        stringBuilder.Append($"with params: {GetInfoOnParams(parameters)}");
-
-                    return stringBuilder.ToString();
-                }
-                catch (Exception ex)
-                {
-                    return $"Class: LoggerHelper, Method: {MethodBase.GetCurrentMethod().Name} An error occured generating log: Message:{ex.Message}, InnerMessage: {ex.InnerException?.Message}";
-                }
-            };
-        }
-
         public static NLog.LogMessageGenerator ExecutedFunctionMessage(object result, params object[] parameters)
         {
             MethodBase method = new StackTrace().GetFrame(1).GetMethod();

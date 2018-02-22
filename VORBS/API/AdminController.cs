@@ -9,6 +9,7 @@ using VORBS.DAL.Repositories;
 using VORBS.Models;
 using VORBS.Models.DTOs;
 using VORBS.Services;
+using VORBS.Utils;
 using static VORBS.Services.AdminService;
 
 namespace VORBS.API
@@ -30,6 +31,8 @@ namespace VORBS.API
 
             _adminRepository = adminRepository;
             _bookingRepository = bookingRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         [HttpGet]

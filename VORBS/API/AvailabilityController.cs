@@ -7,6 +7,7 @@ using VORBS.DAL;
 using VORBS.Models.DTOs;
 using VORBS.Services;
 using VORBS.DAL.Repositories;
+using VORBS.Utils;
 
 namespace VORBS.API
 {
@@ -33,6 +34,8 @@ namespace VORBS.API
             _bookingRepository = bookingRepository;
             _locationRepository = locationRepository;
             _roomsRepository = roomsRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         [HttpGet]
@@ -42,7 +45,13 @@ namespace VORBS.API
             List<RoomDTO> rooms = new List<RoomDTO>();
 
             if (location == null)
-                return new List<RoomDTO>();
+            {
+                List<RoomDTO> result = new List<RoomDTO>();
+                _logger.Debug("Location is null");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location, start, smartRoom));
+                return result;
+            }
+                
 
             List<Room> roomData = new List<Room>();
 
@@ -83,6 +92,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, location, start, smartRoom));
             return rooms;
         }
 
@@ -93,8 +103,13 @@ namespace VORBS.API
             List<RoomDTO> rooms = new List<RoomDTO>();
 
             if (location == null)
-                return new List<RoomDTO>();
-
+            {
+                List<RoomDTO> result = new List<RoomDTO>();
+                _logger.Debug("Location is null");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location, start, smartRoom, end, numberOfPeople));
+                return result;
+            }
+                
             List<Room> roomData = new List<Room>();
 
             try
@@ -135,6 +150,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, location, start, smartRoom, end, numberOfPeople));
             return rooms;
         }
 
@@ -145,7 +161,12 @@ namespace VORBS.API
             List<RoomDTO> rooms = new List<RoomDTO>();
 
             if (location == null)
-                return new List<RoomDTO>();
+            {
+                List<RoomDTO> result = new List<RoomDTO>();
+                _logger.Debug("Location is null");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, location, start, smartRoom, end, numberOfPeople, existingBookingId));
+                return result;
+            }
 
             List<Room> roomData = new List<Room>();
 
@@ -200,6 +221,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get available rooms for location: " + location, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, location, start, smartRoom, end, numberOfPeople, existingBookingId));
             return rooms;
         }
     }

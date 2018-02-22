@@ -38,6 +38,8 @@ namespace VORBS.API
             _locationRepository = locationRepository;
             _roomRepository = roomRepository;
             _bookingRepository = bookingRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         [HttpGet]
@@ -65,13 +67,15 @@ namespace VORBS.API
                     SmartRoom = x.SmartRoom,
                     Active = x.Active
                 }));
-
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(roomDTOs));
                 return roomDTOs;
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get rooms.", ex);
-                return new List<RoomDTO>();
+                var result = new List<RoomDTO>();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result));
+                return result;
             }
         }
 
@@ -100,13 +104,15 @@ namespace VORBS.API
                     SmartRoom = room.SmartRoom,
                     Active = room.Active
                 };
-
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(roomDTO, roomId));
                 return roomDTO;
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get room using roomid: " + roomId, ex);
-                return new RoomDTO();
+                var result = new RoomDTO();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, roomId));
+                return result;
             }
         }
 
@@ -137,13 +143,15 @@ namespace VORBS.API
                     SmartRoom = room.SmartRoom,
                     Active = room.Active
                 };
-
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(roomDTO, locationId, roomName));
                 return roomDTO;
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get room using room name: " + roomName, ex);
-                return new RoomDTO();
+                var result = new RoomDTO();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, locationId, roomName));
+                return result;
             }
         }
 
@@ -157,6 +165,9 @@ namespace VORBS.API
 
                 List<RoomDTO> roomDTOs = new List<RoomDTO>();
                 List<Room> rooms = new List<Room>();
+
+                if (locationName == "location")
+                    _logger.Debug("LocationName is \"Location\"");
 
                 if (status < 0)
                     if (locationName == "location")
@@ -189,13 +200,15 @@ namespace VORBS.API
                     SmartRoom = x.SmartRoom,
                     Active = x.Active
                 }));
-
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(roomDTOs, locationName, status));
                 return roomDTOs;
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get rooms.", ex);
-                return new List<RoomDTO>();
+                var results = new List<RoomDTO>();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(results, locationName, status));
+                return results;
             }
         }
 
