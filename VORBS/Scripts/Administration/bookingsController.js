@@ -14,6 +14,16 @@
 
         $scope.owners = BookingsService.query().$promise.then(function (resp) {
             $scope.owners = resp;
+        }).finally(function () {
+            $('#fullNameTextBox').typeahead({
+                hint: false,
+                highlight: true,
+                minLength: 3
+            },
+                {
+                    name: 'owners',
+                    source: SubstringMatcher($scope.owners)
+                });
         });
 
         $scope.bookingId = 0;
@@ -46,16 +56,6 @@
         $scope.externalFullNameTextBox = '';
         $scope.externalCompanyNameTextBox = '';
         $scope.externalPassRequired = false;
-
-        $('#fullNameTextBox').typeahead({
-            hint: false,
-            highlight: true,
-            minLength: 3
-        },
-            {
-                name: 'owners',
-                source: SubstringMatcher($scope.owners)
-            });
 
         $scope.FormatPassRequired = function (required) {
             if (required) {
