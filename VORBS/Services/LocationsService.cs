@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using VORBS.DAL.Repositories;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.Services
 {
@@ -24,6 +25,8 @@ namespace VORBS.Services
             _locationRepository = locationRepository;
             _bookingRepository = bookingRepository;
             _directoryService = directoryService;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public void EditLocation(Location originalLocation, Location editLocation)
@@ -32,12 +35,19 @@ namespace VORBS.Services
             {
                 bool exists = _locationRepository.GetLocationByName(editLocation.Name) != null;
                 if (exists)
-                    throw new LocationExistsException();
+                {
+                    LocationExistsException exn = new LocationExistsException();
+
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, originalLocation, editLocation));
+
+                    throw exn;
+                }
             }
 
             editLocation.ID = originalLocation.ID;
 
             _locationRepository.UpdateLocation(editLocation);
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, originalLocation, editLocation));
             _logger.Info(string.Format("Location {0} successfully editted", originalLocation.ID));
         }
 
@@ -47,17 +57,22 @@ namespace VORBS.Services
             if (existingLocation == null)
             {
                 _locationRepository.SaveNewLocation(newLocation);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newLocation));
                 _logger.Info("New location successfully added: " + newLocation.Name + "/" + newLocation.ID);
             }
             else
-                throw new LocationExistsException();
+            {
+                LocationExistsException exn = new LocationExistsException();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, newLocation));
+                throw exn;
+            }
         }
 
         public void ToggleLocationActive(Location location, bool active, NameValueCollection appSettings)
         {
             location.Active = active;
             _locationRepository.UpdateLocation(location);
-            
+
             if (!active)
             {
                 List<Booking> bookings = _bookingRepository.GetByDateAndLocation(DateTime.Now, location)
@@ -70,28 +85,34 @@ namespace VORBS.Services
 
                     string fromEmail = appSettings["fromEmail"];
 
-                    List<Booking> ownerBookings = new List<Booking>();
-                    
-                    string owner = bookings[0].Owner;
-
-                    //Iterate around each booking until we hit a new subset belonging to a different owner. Then email that batch.
-                    foreach (var booking in bookings)
+                    if (!string.IsNullOrEmpty(fromEmail))
                     {
-                        if (booking.Owner != owner)
-                        {
-                            SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
+                        List<Booking> ownerBookings = new List<Booking>();
 
-                            ownerBookings = new List<Booking>();
-                            owner = booking.Owner;
+                        string owner = bookings[0].Owner;
+
+                        //Iterate around each booking until we hit a new subset belonging to a different owner. Then email that batch.
+                        foreach (var booking in bookings)
+                        {
+                            if (booking.Owner != owner)
+                            {
+                                SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
+
+                                ownerBookings = new List<Booking>();
+                                owner = booking.Owner;
+                            }
+
+                            ownerBookings.Add(booking);
                         }
 
-                        ownerBookings.Add(booking);
+                        //Final Send the last owner bookings
+                        SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
                     }
-
-                    //Final Send the last owner bookings
-                    SendEmailToOwnerForMultiDelete(fromEmail, ownerBookings);
+                    else
+                        _logger.Debug("From email is empty. - Skipping email sending");
                 }
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location, active, appSettings));
         }
 
 
@@ -103,12 +124,16 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBooking.cshtml", ownerBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, ownerBookings));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, ownerBookings));
                 _logger.ErrorException("Unable to send admin multiple bookings email.", ex);
             }
         }

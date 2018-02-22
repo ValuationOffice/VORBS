@@ -37,6 +37,8 @@ namespace VORBS.API
 
             _locationRepository = locationRepository;
             _bookingRepository = bookingRepository;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         [HttpGet]
@@ -85,6 +87,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get list of locations: ", ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locationsDTO));
             return locationsDTO;
         }
 
@@ -125,12 +128,15 @@ namespace VORBS.API
                         }; return lcDto;
                     }).ToList()
                 };
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locationDto, id));
                 return locationDto;
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get a location by id: " + id, ex);
-                return new LocationDTO();
+                var result = new LocationDTO();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, id));
+                return result;
             }
         }
 
@@ -161,6 +167,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get list of smart locations", ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locationNames, searchLoaction));
             return locationNames;
         }
 
@@ -227,7 +234,9 @@ namespace VORBS.API
                                 SmartRoom = r.SmartRoom,
                                 SeatCount = r.SeatCount,
                                 Active = r.Active
-                            }; return rDto;
+                            };
+                            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rDto, status, extraInfo));
+                            return rDto;
                         }).ToList()
                     }));
                 }
@@ -236,7 +245,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get list of locations", ex);
             }
-
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(locationsDTO, status, extraInfo));
             return locationsDTO;
         }
 

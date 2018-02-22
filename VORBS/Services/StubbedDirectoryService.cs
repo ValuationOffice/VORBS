@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.Services
 {
     public class StubbedDirectoryService : IDirectoryService
     {
+        public StubbedDirectoryService()
+        {
+            NLog.LogManager.GetCurrentClassLogger().Trace(LoggerHelper.InitializeClassMessage());
+            NLog.LogManager.GetCurrentClassLogger().Warn("Stub Directory Service is being used!");
+        }
 
         private List<User> stubbedUsers
         {

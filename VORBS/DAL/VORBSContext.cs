@@ -10,6 +10,8 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Transactions;
 using VORBS.Services;
 using VORBS.DAL.Repositories;
+using NLog;
+using VORBS.Utils;
 
 namespace VORBS.DAL
 {
@@ -19,11 +21,17 @@ namespace VORBS.DAL
         private IBookingRepository _bookingRepository;
         private IRoomRepository _roomRepository;
 
+        private ILogger _logger;
+
         public VORBSContext() : base("VORBSContext")
         {
+            _logger = NLog.LogManager.GetCurrentClassLogger();
+
             _bookingRepository = new EFBookingRepository(this, _locationRepository, _roomRepository);
             _locationRepository = new EFLocationRepository(this);
             _roomRepository = new EFRoomRepository(this);
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public virtual DbSet<Location> Locations { get; set; }

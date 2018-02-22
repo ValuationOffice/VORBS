@@ -7,6 +7,7 @@ using VORBS.Models;
 using VORBS.Models.DTOs;
 using VORBS.Models.ViewModels;
 using VORBS.Security;
+using VORBS.Utils;
 using static VORBS.Models.User;
 
 namespace VORBS.Services
@@ -24,8 +25,10 @@ namespace VORBS.Services
 
         private NLog.Logger _logger;
 
-        public BookingsService(NLog.Logger logger, IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository, IDirectoryService directoryService, Utils.EmailHelper emailHelper)
+        public BookingsService(IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository, IDirectoryService directoryService, Utils.EmailHelper emailHelper)
         {
+            _logger = NLog.LogManager.GetCurrentClassLogger();
+
             _bookingsRepository = bookingRepository;
             _roomsRepository = roomRepository;
             _locationsRepository = locationRepository;
@@ -33,9 +36,9 @@ namespace VORBS.Services
             _directoryService = directoryService;
             _availabilityService = new AvailabilityService(_bookingsRepository, _roomsRepository, _locationsRepository);
 
-            _logger = logger;
-
             _emailHelper = emailHelper;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public void DeleteExistingBooking(Booking booking, bool? recurrence, User user, NameValueCollection appSettings)
@@ -53,7 +56,12 @@ namespace VORBS.Services
                 _logger.Info("Booking(s) successfully cancelled: " + String.Join(", ", allBookings.Select(x => x.ID)));
 
             if (!bool.Parse(appSettings["sendEmails"].ToString()))
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, booking, recurrence, user, appSettings));
+                _logger.Debug($"SendEmails setting is false or empty - Skipping email sending");
                 return;
+            }
+
             string fromEmail = appSettings["fromEmail"];
 
             Room locationRoom = _roomsRepository.GetRoomById(booking.RoomID);
@@ -67,6 +75,8 @@ namespace VORBS.Services
                 SendEmailToFacilitiesForDelete(fromEmail, booking, allBookings);
             if (booking.DssAssist)
                 SendEmailToDSSForDelete(fromEmail, booking, allBookings);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, booking, recurrence, user, appSettings));
         }
 
         public void EditExistingBooking(Booking existingBooking, Booking editBooking, bool? recurrence, User user, NameValueCollection appSettings)
@@ -77,6 +87,8 @@ namespace VORBS.Services
 
             List<Booking> allBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value);
             List<Booking> originalBookings = (recurringBookingId == null) ? new List<Booking> { existingBooking } : _bookingsRepository.GetBookingsInRecurrence(recurringBookingId.Value, true);
+
+            _logger.Debug($"AllBookings count: {allBookings.Count()}, OriginalBookings count: {originalBookings.Count()}");
 
             List<Booking> editBookings = new List<Booking>();
 
@@ -106,19 +118,29 @@ namespace VORBS.Services
                 currentBooking.Subject = editBooking.Subject;
 
                 editBookings.Add(currentBooking);
+                _logger.Debug($"Added booking: {currentBooking.ID} to list of Editbookings");
             }
 
             var updatedBookings = _bookingsRepository.UpdateExistingBookings(allBookings, editBookings);
             if (updatedBookings == null)
             {
+                _logger.Debug("UpdatedBookings from repository is null");
                 _logger.Fatal("Unable to edit booking(s): " + editBooking.ID);
-                throw new UnableToEditBookingException();
+
+                UnableToEditBookingException exn = new UnableToEditBookingException();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, existingBooking, editBooking, recurrence, user, appSettings));
+                throw exn;
             }
             else
                 _logger.Info("Booking(s) successfully editted: " + String.Join(", ", editBookings.Select(x => x.ID)));
 
             if (!bool.Parse(appSettings["sendEmails"].ToString()))
+            {
+                _logger.Debug("SendEmails config is false or empty - Skipping email sending");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, existingBooking, editBooking, recurrence, user, appSettings));
                 return;
+            }
+
             string fromEmail = appSettings["fromEmail"];
 
             if (
@@ -179,8 +201,19 @@ namespace VORBS.Services
 
 
             if (!bool.Parse(appSettings["sendEmails"].ToString()))
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newBooking, user, appSettings));
                 return;
+            }
+
             string fromEmail = appSettings["fromEmail"];
+
+            if (string.IsNullOrEmpty(fromEmail))
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newBooking, user, appSettings));
+                _logger.Debug("FromEmail is empty. Skipping email sending");
+                return;
+            }
 
             if (deletedBookings.Count > 0)
                 SendEmailToOwnerForAdminOverwriteWithMessage(fromEmail, deletedBookings, newBooking, clashedBookings);
@@ -200,6 +233,8 @@ namespace VORBS.Services
                 SendEmailToSecurityForCreate(fromEmail, newBooking, bookingsLocation);
             if (newBooking.DssAssist)
                 SendEmailToDSSForCreate(fromEmail, newBooking, bookingsLocation);
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newBooking, user, appSettings));
         }
 
         private void ProcessSingularBooking(ref Booking newBooking, ref List<Booking> clashedBookings, ref List<Booking> bookingsToCreate)
@@ -207,9 +242,17 @@ namespace VORBS.Services
             bool clashed = _availabilityService.DoesMeetingClash(newBooking, out clashedBookings);
 
             if (clashed)
-                throw new ClashedBookingsException(clashedBookings);
+            {
+                ClashedBookingsException exn = new ClashedBookingsException(clashedBookings);
+                _logger.Debug("Booking clashed with an existing booking");
+
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, newBooking, clashedBookings, bookingsToCreate));
+                throw exn;
+            }
 
             bookingsToCreate.Add(newBooking);
+            _logger.Debug($"Adding {newBooking} to list of bookings to create");
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newBooking, clashedBookings, bookingsToCreate));
         }
 
         private void ProcessSmartLocations(ref Booking newBooking, ref List<Booking> clashedBookings, ref List<Booking> bookingsToCreate)
@@ -218,12 +261,26 @@ namespace VORBS.Services
 
             //No Rooms available;
             if (clashedBookings.Count() > 0)
-                throw new ClashedBookingsException(clashedBookings);
+            {
+                _logger.Debug("Booking clashed with an existing booking");
+                ClashedBookingsException exn = new ClashedBookingsException(clashedBookings);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, newBooking, clashedBookings, bookingsToCreate));
+                throw exn;
+            }
 
             newBooking.IsSmartMeeting = true;
 
             bookingsToCreate.Add(newBooking);
             bookingsToCreate.AddRange(smartBookings);
+
+            _logger.Debug($"Adding {newBooking} to list of bookings to create");
+            string ids = "";
+            foreach (Booking smartBooking in smartBookings)
+            {
+                ids += smartBooking.ID + ", ";
+            }
+            _logger.Debug($"Adding {smartBookings.Count} smart bookings to list of bookings to create: IDs:  {ids}");
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, newBooking, clashedBookings, bookingsToCreate));
         }
 
         private void ProcessRecurringBookings(User user, ref Booking newBooking, ref List<Booking> clashedBookings, ref List<Booking> bookingsToCreate, ref List<Booking> deletedBookings)
@@ -236,9 +293,12 @@ namespace VORBS.Services
             {
                 var smartBookings = _bookingsRepository.GetAvailableSmartRoomBookings(newBooking, out clashedBookings);
 
-                //No Rooms available
                 if (clashedBookings.Count() > 0)
-                    throw new ClashedBookingsException(clashedBookings);
+                {
+                    ClashedBookingsException exn = new ClashedBookingsException(clashedBookings);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, user, newBooking, clashedBookings, bookingsToCreate, deletedBookings));
+                    throw exn;
+                }
 
                 newBooking.IsSmartMeeting = true;
                 smartBookings.Add(newBooking);
@@ -255,10 +315,13 @@ namespace VORBS.Services
 
             if (doMeetingsClash)
             {
+                _logger.Debug($"Meetings clash");
+
                 if (newBooking.Recurrence.SkipClashes)
                 {
                     List<Booking> clashedBookingsCopy = clashedBookings;
                     bookingsToCreate.RemoveAll(x => clashedBookingsCopy.Select(c => c.StartDate.ToShortDateString()).Contains(x.StartDate.ToShortDateString()));
+                    _logger.Debug("Skipping clashes");
                 }
 
                 else if (newBooking.Recurrence.AutoAlternateRoom)
@@ -266,7 +329,7 @@ namespace VORBS.Services
                     foreach (var cB in clashedBookings)
                     {
                         Room newRoom;
-                        if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom) //TODO: Change when we introduce new validation check in UI
+                        if (newBooking.SmartLoactions.Count() > 0 && newBooking.Room.SmartRoom)
                         {
                             var unAvaliableRooms = bookingsToCreate.Where(y => cB.Room.LocationID == y.Room.LocationID && y.RoomID != cB.RoomID).Select(x => x.RoomID).Distinct();
                             newRoom = _availabilityService.GetAlternateSmartRoom(unAvaliableRooms, cB.StartDate, cB.EndDate, cB.Room.LocationID);
@@ -280,7 +343,14 @@ namespace VORBS.Services
                         }
 
                         if (newRoom == null)
-                            throw new ClashedBookingsException(new List<Booking>() { cB });
+                        {
+                            ClashedBookingsException exn = new ClashedBookingsException(new List<Booking>() { cB });
+
+                            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, user, newBooking, clashedBookings, bookingsToCreate, deletedBookings));
+
+                            throw exn;
+                        }
+
 
                         Booking newClashedBooking = bookingsToCreate.First(x => x.RoomID == cB.RoomID && cB.StartDate == x.StartDate && cB.EndDate == x.EndDate);
 
@@ -293,12 +363,15 @@ namespace VORBS.Services
                     //checking they are still admin
                     if (VorbsAuthorise.IsUserAuthorised(user.PayId, 1))
                     {
+                        _logger.Debug("Overwriting bookings");
                         try
                         {
                             List<int> ids = clashedBookings.Select(x => x.ID).ToList();
                             var entityClashedBookings = _bookingsRepository.GetById(ids);
                             _bookingsRepository.Delete(entityClashedBookings);
                             deletedBookings.AddRange(clashedBookings);
+
+                            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, user, newBooking, clashedBookings, bookingsToCreate, deletedBookings));
                         }
                         catch (Exception exn)
                         {
@@ -306,10 +379,23 @@ namespace VORBS.Services
                         }
                     }
                     else
-                        throw new UnauthorisedOverwriteException();
+                    {
+                        UnauthorisedOverwriteException exn = new UnauthorisedOverwriteException();
+
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, user, newBooking, clashedBookings, bookingsToCreate, deletedBookings));
+
+                        throw exn;
+                    }
+
                 }
                 else
-                    throw new BookingConflictException(clashedBookings);
+                {
+                    BookingConflictException exn = new BookingConflictException(clashedBookings);
+
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, user, newBooking, clashedBookings, bookingsToCreate, deletedBookings));
+
+                    throw exn;
+                }
             }
         }
 
@@ -321,12 +407,17 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminCancelledBooking.cshtml", allBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, user, allBookings));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
+
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, user, allBookings));
                 _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -339,12 +430,17 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/CancelledBooking.cshtml", allBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, user, allBookings));
+                }
+
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, user, allBookings));
                 _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -359,12 +455,17 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesDeletedBooking.cshtml", allBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room equipment cancellation for booking(s)", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, allBookings));
+                }
+
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, allBookings));
                 _logger.ErrorException("Unable to send email to facilities for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -379,12 +480,17 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSDeletedBooking.cshtml", allBookings);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking cancellation(s)", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, allBookings));
+                }
+
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, allBookings));
                 _logger.ErrorException("Unable to send email to dss for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -398,13 +504,18 @@ namespace VORBS.Services
                 string subject = "Meeting room edit confirmation";
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, subject, body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, existingBooking, editBookings));
+                }
+
                 else
                     throw new Exception("Body or To-Email is null.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), e);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, existingBooking, editBookings));
+                _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
 
@@ -415,18 +526,22 @@ namespace VORBS.Services
             try
             {
                 string toEmail = _directoryService.GetUser(new Pid(existingBooking.PID)).EmailAddress;
-
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/EdittedBooking.cshtml", editBookings);
                 string subject = "Meeting room booking confirmation";
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, existingBooking, editBookings, user));
                     _emailHelper.SendEmail(fromEmail, toEmail, subject, body);
+                }
+
                 else
                     throw new Exception("Body or To-Email is null.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), e);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, existingBooking, editBookings, user));
+                _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
 
@@ -454,18 +569,21 @@ namespace VORBS.Services
                 if (securityViewModels.Count > 0)
                 {
                     string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.security.ToString()).Select(x => x.Email).FirstOrDefault();
-
                     string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityEdittedBooking.cshtml", securityViewModels);
                     if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    {
                         _emailHelper.SendEmail(fromEmail, toEmail, "(Updated) External guests notification", body);
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
+                    }
                     else
                         throw new Exception("Body or To-Email is null.");
 
                 }
             }
-            catch (Exception exn)
+            catch (Exception ex)
             {
-                _logger.ErrorException("Unable to retrieve security email markup for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), exn);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
+                _logger.ErrorException("Unable to retrieve security email markup for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
 
@@ -491,13 +609,17 @@ namespace VORBS.Services
                     string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSEdittedBooking.cshtml", dssEditBookings);
 
                     if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    {
                         _emailHelper.SendEmail(fromEmail, toEmail, "(Updated) SMART room set up support", body);
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
+                    }
                     else
                         throw new Exception("Body or To-Email is null.");
                 }
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
                 _logger.ErrorException("Unable to retrieve E-Mail markup for DSS for new booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
@@ -543,14 +665,18 @@ namespace VORBS.Services
                     string toEmail = bookingsLocation.LocationCredentials.Where(x => x.Department == LocationCredentials.DepartmentNames.facilities.ToString()).Select(x => x.Email).FirstOrDefault();
                     string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesEdittedBooking.cshtml", facilitiesViewModels);
                     if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    {
                         _emailHelper.SendEmail(fromEmail, toEmail, "(Updated) Meeting room equipment for booking(s)", body);
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
+                    }
                     else
                         throw new Exception("Body or To-Email is null.");
                 }
             }
-            catch (Exception exn)
+            catch (Exception ex)
             {
-                _logger.ErrorException("Unable to retrieve email markup for facilities for editted booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), exn);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
+                _logger.ErrorException("Unable to retrieve email markup for facilities for editted booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
 
@@ -565,13 +691,17 @@ namespace VORBS.Services
                     string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/AdminMultiCancelledBookingWithMessage.cshtml", new Models.ViewModels.AdminMultiCancelledBookingWithMessage(clashedBookings.Where(x => x.PID == owner), errorMessage));
 
                     if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    {
                         _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking(s) cancellation", body);
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, deletedBookings, newBooking, clashedBookings));
+                    }
                     else
                         throw new Exception("Body or To-Email is null.");
                 }
-                catch (Exception exn)
+                catch (Exception ex)
                 {
-                    _logger.ErrorException("Unable to send personal email for booking deletions by admin. Owner: " + owner, exn);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, deletedBookings, newBooking, clashedBookings));
+                    _logger.ErrorException("Unable to send personal email for booking deletions by admin. Owner: " + owner, ex);
                 }
 
             }
@@ -585,12 +715,16 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/DSSNewBooking.cshtml", newBooking);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, string.Format("SMART room set up support on {0}", newBooking.StartDate.ToShortDateString()), body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
                 _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + newBooking.ID, ex);
             }
         }
@@ -605,12 +739,16 @@ namespace VORBS.Services
                     string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBooking.cshtml", newBooking);
 
                     if (!string.IsNullOrEmpty(body))
+                    {
                         _emailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests notifcation for {0}", newBooking.StartDate.ToShortDateString()), body);
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
+                    }
                     else
                         throw new Exception("Body is null.");
                 }
                 catch (Exception ex)
                 {
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
                     _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
                 }
             }
@@ -622,12 +760,16 @@ namespace VORBS.Services
                     string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/SecurityNewBookingBookersCopy.cshtml", newBooking);
 
                     if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                    {
                         _emailHelper.SendEmail(fromEmail, toEmail, string.Format("External guests security information for {0}", newBooking.StartDate.ToShortDateString()), body);
+                        _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
+                    }
                     else
                         throw new Exception("Body or To-Email is null.");
                 }
                 catch (Exception ex)
                 {
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
                     _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
                 }
             }
@@ -641,12 +783,16 @@ namespace VORBS.Services
                 string body = _emailHelper.GetEmailMarkup("~/Views/EmailTemplates/FacilitiesNewBooking.cshtml", newBooking);
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, string.Format("Meeting room equipment booking on {0}", newBooking.StartDate.ToShortDateString()), body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, bookingsLocation));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, bookingsLocation));
                 _logger.ErrorException("Unable to send E-Mail to facilities for new booking: " + newBooking.ID, ex);
             }
         }
@@ -670,12 +816,16 @@ namespace VORBS.Services
                 }
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room ooking confirmation", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, user, newBooking, bookingsToCreate));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, user, newBooking, bookingsToCreate));
                 _logger.ErrorException("Unable to send personal email for new booking: " + newBooking.ID, ex);
             }
         }
@@ -704,12 +854,16 @@ namespace VORBS.Services
                 }
 
                 if (!string.IsNullOrEmpty(body) && !string.IsNullOrEmpty(toEmail))
+                {
                     _emailHelper.SendEmail(fromEmail, toEmail, "Meeting room booking confirmation", body);
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, user, newBooking, bookingsToCreate));
+                }
                 else
                     throw new Exception("Body or To-Email is null.");
             }
             catch (Exception ex)
             {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, fromEmail, user, newBooking, bookingsToCreate));
                 _logger.ErrorException("Unable to send personal email for new booking: " + newBooking.ID, ex);
             }
         }

@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.IO;
 using System.Web.Routing;
 using VORBS.Utils.interfaces;
+using NLog;
 
 namespace VORBS.Utils
 {
@@ -16,10 +17,15 @@ namespace VORBS.Utils
     {
         private ISmtpClient mailClient;
         private HttpContextBase _context;
+        private ILogger _logger;
+
         public EmailHelper(ISmtpClient mailClient, HttpContextBase context)
         {
+            _logger = NLog.LogManager.GetCurrentClassLogger();
+
             this.mailClient = mailClient;
             _context = context;
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         /// <summary>
@@ -34,7 +40,6 @@ namespace VORBS.Utils
         {   
             MailMessage message = new MailMessage();
             message.From = new MailAddress(fromAddress);
-
             if (onBehalfOf != null)
             {
                 message.From = new MailAddress(onBehalfOf);
@@ -59,8 +64,19 @@ namespace VORBS.Utils
 
             message.AlternateViews.Add(htmlView);
             message.IsBodyHtml = true;
+            try
+            {
+                mailClient.Send(message);
 
-            mailClient.Send(message);
+                _logger.Debug("MailClient sent message");
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromAddress, onBehalfOf, toAddress, subject, body, bcc));
+            }
+            catch (Exception ex)
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromAddress, onBehalfOf, toAddress, subject, body, bcc));
+                throw ex;
+            }
+            
         }
 
         /// <summary>

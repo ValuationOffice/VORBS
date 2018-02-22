@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.DAL.Repositories
 {
@@ -15,65 +16,124 @@ namespace VORBS.DAL.Repositories
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public Room GetByLocationAndName(Location location, string name)
         {
-            return db.Rooms.Where(r => r.LocationID == location.ID && r.RoomName == name).FirstOrDefault();
+            Room room = db.Rooms.Where(r => r.LocationID == location.ID && r.RoomName == name).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(room, location, name));
+
+            return room;
         }
 
         public List<Room> GetByLocationName(string locationName)
         {
-            return db.Rooms.Where(r => r.Location.Name == locationName).ToList();
+            List<Room> rooms = db.Rooms.Where(r => r.Location.Name == locationName).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, locationName));
+
+            return rooms;
         }
 
         public List<Room> GetByLocationAndSeatCount(Location location, int seatCount)
         {
-            return db.Rooms.Where(x => x.Location.ID == location.ID && x.SeatCount >= seatCount && x.Active == true).ToList();
+            List<Room> rooms = db.Rooms.Where(x => x.Location.ID == location.ID && x.SeatCount >= seatCount && x.Active == true).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, location, seatCount));
+
+            return rooms;
         }
 
         public List<Room> GetByLocationAndSmartRoom(Location location, bool isSmart)
         {
-            return db.Rooms.Where(x => x.Location.ID == location.ID && x.SmartRoom == true && x.Active == true).ToList();
+            List<Room> rooms = db.Rooms.Where(x => x.Location.ID == location.ID && x.SmartRoom == true && x.Active == true).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, location, isSmart));
+
+            return rooms;
         }
 
         public List<Room> GetAllRooms()
         {
-            return db.Rooms.ToList();
+            List<Room> rooms = db.Rooms.ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms));
+
+            return rooms;
         }
 
         public Room GetRoomByName(string name)
         {
-            return db.Rooms.Where(x => x.RoomName == name).FirstOrDefault();
+            Room room = db.Rooms.Where(x => x.RoomName == name).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(room, name));
+
+            return room;
         }
 
         public List<Room> GetByStatus(bool status)
         {
-            return db.Rooms.Where(x => x.Active == status).ToList();
+            List<Room> rooms = db.Rooms.Where(x => x.Active == status).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, status));
+
+            return rooms;
         }
 
         public List<Room> GetByLocationAndStatus(Location location, bool status)
         {
-            return db.Rooms.Where(r => r.Location.Name == location.Name && r.Active == status).ToList();
+            List<Room> rooms = db.Rooms.Where(r => r.Location.Name == location.Name && r.Active == status).ToList();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(rooms, location, status));
+
+            return rooms;
         }
 
         public Room GetRoomById(int id)
         {
-            return db.Rooms.Where(x => x.ID == id).FirstOrDefault();
+            Room room = db.Rooms.Where(x => x.ID == id).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(room, id));
+
+            return room;
         }
 
         public void SaveNewRoom(Room room)
         {
-            db.Rooms.Add(room);
-            db.SaveChanges();
+            try
+            {
+                db.Rooms.Add(room);
+                db.SaveChanges();
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, room));
+            }
+            catch (Exception exn)
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, room));
+                throw exn;
+            }
+
         }
 
         public void EditRoom(Room room)
         {
-            Room originalRoom = GetRoomById(room.ID);
+            try
+            {
+                Room originalRoom = GetRoomById(room.ID);
 
-            db.Entry(originalRoom).CurrentValues.SetValues(room);
-            db.SaveChanges();
+                db.Entry(originalRoom).CurrentValues.SetValues(room);
+                db.SaveChanges();
+
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, room));
+            }
+            catch (Exception exn)
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, room));
+                throw exn;
+            }
+
         }
     }
 }

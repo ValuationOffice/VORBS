@@ -23,6 +23,8 @@ namespace VORBS.API
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         [HttpGet]
@@ -47,6 +49,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get list of users from AD", ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(usersDTO));
             return usersDTO;
         }
 
@@ -59,7 +62,11 @@ namespace VORBS.API
             try
             {
                 if (string.IsNullOrWhiteSpace(name))
+                {
+                    _logger.Debug($"Name is null or empty");
                     return userDTO;
+                }
+                    
                         
                 List<User> userResults = _directoryService.GetBySurname(name);
                 foreach (User user in userResults)
@@ -78,6 +85,7 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to get list of users from AD by name: " + name, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(userDTO, name));
             return userDTO;
         }
 
@@ -88,15 +96,24 @@ namespace VORBS.API
             try
             {
                 if (string.IsNullOrWhiteSpace(pid))
+                {
+                    _logger.Debug($"PID is null or empty");
                     return null;
+                }
+
 
                 if (name)
-                    return _directoryService.GetUser(new User.Pid(pid)).FullName;
+                {
+                    string user = _directoryService.GetUser(new User.Pid(pid)).FullName;
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(user, pid, name));
+                    return user;
+                }
             }
             catch (Exception ex)
             {
                 _logger.ErrorException("Unable to get user by PID: " + pid, ex);
             }
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, pid, name));
             return null;
         }
     }

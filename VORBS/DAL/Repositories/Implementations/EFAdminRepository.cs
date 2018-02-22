@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using VORBS.Models;
+using VORBS.Utils;
 
 namespace VORBS.DAL.Repositories
 {
-    public class EFAdminRepository : IAdminRepository
+    public class EFAdminRepository :  IAdminRepository
     {
         private VORBSContext db;
         private NLog.Logger _logger;
@@ -15,29 +15,55 @@ namespace VORBS.DAL.Repositories
         {
             db = context;
             _logger = NLog.LogManager.GetCurrentClassLogger();
+
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public List<Admin> GetAll()
         {
-            return db.Admins.ToList();
+            List<Admin> admins = db.Admins.ToList();
+            
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(admins));
+
+            return admins;
         }
 
         public Admin GetAdminById(int ID)
         {
-            return db.Admins.Where(a => a.ID == ID).FirstOrDefault();
+            Admin admin = db.Admins.Where(a => a.ID == ID).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(admin, ID));
+            
+            return admin;
         }
 
         public Admin GetAdminByPid(string PID)
         {
-            return db.Admins.Where(x => x.PID == PID).FirstOrDefault();
+            Admin result = db.Admins.Where(x => x.PID == PID).FirstOrDefault();
+
+            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, PID));
+
+            return result;
         }
 
         public void UpdateAdmin(Admin admin)
         {
-            Admin existingAdmin = GetAdminById(admin.ID);
-            db.Entry(existingAdmin).CurrentValues.SetValues(admin);
+            try
+            {
+                Admin existingAdmin = GetAdminById(admin.ID);
+                db.Entry(existingAdmin).CurrentValues.SetValues(admin);
 
-            db.SaveChanges();
+                db.SaveChanges();
+            }
+            catch (Exception exn)
+            {
+                _logger.ErrorException("Unable to update admin: " + admin.PID, exn);
+                throw exn;
+            }
+            finally
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, admin));
+            }
         }
 
         public void SaveNewAdmin(Admin admin)
@@ -52,12 +78,28 @@ namespace VORBS.DAL.Repositories
                 _logger.ErrorException("Unable to save new admin: " + admin.PID, exn);
                 throw exn;
             }
+            finally
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, admin));
+            }
         }
 
         public void DeleteAdmin(Admin admin)
         {
-            db.Admins.Remove(admin);
-            db.SaveChanges();
+            try
+            {
+                db.Admins.Remove(admin);
+                db.SaveChanges();
+            }
+            catch (Exception exn)
+            {
+                _logger.ErrorException("Unable to delete admin: " + admin.PID, exn);
+                throw exn;
+            }
+            finally
+            {
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(null, admin));
+            }
         }
     }
 }
