@@ -25,16 +25,16 @@ namespace VORBS.Services
 
         private NLog.Logger _logger;
 
-        public BookingsService(NLog.Logger logger, IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository, IDirectoryService directoryService, Utils.EmailHelper emailHelper)
+        public BookingsService(IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository, IDirectoryService directoryService, Utils.EmailHelper emailHelper)
         {
-            _logger = logger;
+            _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _bookingsRepository = bookingRepository;
             _roomsRepository = roomRepository;
             _locationsRepository = locationRepository;
 
             _directoryService = directoryService;
-            _availabilityService = new AvailabilityService(_logger, _bookingsRepository, _roomsRepository, _locationsRepository);
+            _availabilityService = new AvailabilityService(_bookingsRepository, _roomsRepository, _locationsRepository);
 
             _emailHelper = emailHelper;
 
@@ -243,8 +243,11 @@ namespace VORBS.Services
 
             if (clashed)
             {
+                ClashedBookingsException exn = new ClashedBookingsException(clashedBookings);
                 _logger.Debug("Booking clashed with an existing booking");
-                throw new ClashedBookingsException(clashedBookings);
+
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, newBooking, clashedBookings, bookingsToCreate));
+                throw exn;
             }
 
             bookingsToCreate.Add(newBooking);
@@ -260,7 +263,9 @@ namespace VORBS.Services
             if (clashedBookings.Count() > 0)
             {
                 _logger.Debug("Booking clashed with an existing booking");
-                throw new ClashedBookingsException(clashedBookings);
+                ClashedBookingsException exn = new ClashedBookingsException(clashedBookings);
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, newBooking, clashedBookings, bookingsToCreate));
+                throw exn;
             }
 
             newBooking.IsSmartMeeting = true;
@@ -358,7 +363,7 @@ namespace VORBS.Services
                     //checking they are still admin
                     if (VorbsAuthorise.IsUserAuthorised(user.PayId, 1))
                     {
-                        _logger.Debug("Overwriting messages");
+                        _logger.Debug("Overwriting bookings");
                         try
                         {
                             List<int> ids = clashedBookings.Select(x => x.ID).ToList();

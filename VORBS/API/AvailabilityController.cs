@@ -29,7 +29,7 @@ namespace VORBS.API
         {
             _logger = NLog.LogManager.GetCurrentClassLogger();
             db = context;
-            _availabilityService = new AvailabilityService(_logger, bookingRepository, roomsRepository, locationRepository);
+            _availabilityService = new AvailabilityService(bookingRepository, roomsRepository, locationRepository);
 
             _bookingRepository = bookingRepository;
             _locationRepository = locationRepository;
@@ -48,7 +48,7 @@ namespace VORBS.API
             {
                 List<RoomDTO> result = new List<RoomDTO>();
                 _logger.Debug("Location is null");
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location, start, smartRoom));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, location, start, smartRoom));
                 return result;
             }
                 
@@ -106,7 +106,7 @@ namespace VORBS.API
             {
                 List<RoomDTO> result = new List<RoomDTO>();
                 _logger.Debug("Location is null");
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location, start, smartRoom, end, numberOfPeople));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(result, location, start, smartRoom, end, numberOfPeople));
                 return result;
             }
                 

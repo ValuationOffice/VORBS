@@ -17,13 +17,13 @@ namespace VORBS.Services
         private ILocationRepository _locationRepository;
         private ILogger _logger;
 
-        public AvailabilityService(ILogger logger, IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository)
+        public AvailabilityService(IBookingRepository bookingRepository, IRoomRepository roomRepository, ILocationRepository locationRepository)
         {
             _bookingRepository = bookingRepository;
             _roomRepository = roomRepository;
             _locationRepository = locationRepository;
 
-            _logger = logger;
+            _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _logger.Trace(LoggerHelper.InitializeClassMessage());
         }

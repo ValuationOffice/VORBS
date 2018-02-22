@@ -71,7 +71,7 @@ namespace VORBS.DAL.Repositories
             {
                 db.Locations.Add(location);
                 db.SaveChanges();
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(typeof(void), location));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, location));
             }
             catch (Exception exn)
             {

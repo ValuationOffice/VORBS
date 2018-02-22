@@ -41,7 +41,7 @@ namespace VORBS.API
             _logger = NLog.LogManager.GetCurrentClassLogger();
 
             _directoryService = directoryService;
-            _bookingService = new BookingsService(_logger, bookingRepository, roomsRepository, locationRepository, directoryService, helper);
+            _bookingService = new BookingsService(bookingRepository, roomsRepository, locationRepository, directoryService, helper);
 
             _bookingsRepository = bookingRepository;
             _locationsRepository = locationRepository;
@@ -115,6 +115,7 @@ namespace VORBS.API
                 var bookings = new List<BookingDTO>();
                 _logger.Debug($"Location or room is null. Location:{location == null}, Room:{room == null}");
                 _logger.Trace(LoggerHelper.ExecutedFunctionMessage(bookings, location, start, end, room));
+                return bookings;
             }
 
             List<BookingDTO> bookingsDTO = new List<BookingDTO>();

@@ -577,7 +577,7 @@ namespace VORBS.DAL.Repositories
 
             smartRoomIds.Add(newBooking.RoomID);
 
-            AvailabilityService aC = new AvailabilityService(_logger, this, _roomRepository, _locationRepository);
+            AvailabilityService aC = new AvailabilityService(this, _roomRepository, _locationRepository);
 
             foreach (var smartLoc in newBooking.SmartLoactions)
             {

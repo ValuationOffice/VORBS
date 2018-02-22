@@ -167,7 +167,7 @@ namespace VORBS.API
                 List<Room> rooms = new List<Room>();
 
                 if (locationName == "location")
-                    _logger.Debug("LocationName is \"Location\"");
+                    _logger.Debug("LocationName is \"location\"");
 
                 if (status < 0)
                     if (locationName == "location")

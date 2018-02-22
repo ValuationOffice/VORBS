@@ -11,6 +11,7 @@ using System.Transactions;
 using VORBS.Services;
 using VORBS.DAL.Repositories;
 using NLog;
+using VORBS.Utils;
 
 namespace VORBS.DAL
 {
@@ -30,7 +31,7 @@ namespace VORBS.DAL
             _locationRepository = new EFLocationRepository(this);
             _roomRepository = new EFRoomRepository(this);
 
-            _logger.Trace($"Initialized {this.GetType().FullName}");
+            _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
         public virtual DbSet<Location> Locations { get; set; }
@@ -48,7 +49,7 @@ namespace VORBS.DAL
             {
                 using (var scope = TransactionUtils.CreateTransactionScope())
                 {
-                    AvailabilityService aC = new AvailabilityService(_logger, _bookingRepository, _roomRepository, _locationRepository);
+                    AvailabilityService aC = new AvailabilityService(_bookingRepository, _roomRepository, _locationRepository);
 
                     bool invalid = aC.DoesMeetingClash(booking, out clashedBookings);
                     //Checks if the booking that clashed is the current booking being saved, this allows us to edit bookings.
@@ -88,7 +89,7 @@ namespace VORBS.DAL
 
             if (!dontCheckClash)
             {
-                AvailabilityService aC = new AvailabilityService(_logger, _bookingRepository, _roomRepository, _locationRepository);
+                AvailabilityService aC = new AvailabilityService(_bookingRepository, _roomRepository, _locationRepository);
                 List<Booking> clashedBookings;
 
                 using (var scope = TransactionUtils.CreateTransactionScope())
