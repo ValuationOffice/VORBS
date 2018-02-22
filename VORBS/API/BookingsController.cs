@@ -50,6 +50,22 @@ namespace VORBS.API
             _logger.Trace(LoggerHelper.InitializeClassMessage());
         }
 
+        [VORBS.Security.VorbsApiAuthoriseAttribute(2)]
+        [Route("")]
+        [HttpGet]
+        public List<string> GetAllBookingOwners()
+        {
+            try
+            {
+                return _bookingsRepository.GetDistinctListOfOwners();
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException("Unable to get list of booking owners", ex);
+                return new List<string>();
+            }
+        }
+
         [Route("{location}/{start:DateTime}/{end:DateTime}/")]
         [HttpGet]
         public List<BookingDTO> GetRoomBookingsForLocation(string location, DateTime start, DateTime end)
@@ -345,6 +361,7 @@ namespace VORBS.API
         }
 
         [HttpPost]
+        [Route("")]
         public HttpResponseMessage SaveNewBooking(Booking newBooking)
         {
             try
