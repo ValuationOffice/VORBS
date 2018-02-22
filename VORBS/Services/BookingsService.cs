@@ -370,7 +370,6 @@ namespace VORBS.Services
                         }
                         catch (Exception exn)
                         {
-                            _logger.Trace(LoggerHelper.ExecutedFunctionMessage(exn, user, newBooking, clashedBookings, bookingsToCreate, deletedBookings));
                             _logger.ErrorException(string.Format("Unable to overwrite bookings as admin. Old Bookings: {0}.", clashedBookings.Select(x => x.ID)), exn);
                         }
                     }
@@ -413,7 +412,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, booking, user, allBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, user, allBookings));
                 _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -436,7 +435,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, booking, user, allBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, user, allBookings));
                 _logger.ErrorException("Unable to send personal email for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -461,7 +460,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, booking, allBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, allBookings));
                 _logger.ErrorException("Unable to send email to facilities for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -486,7 +485,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, booking, allBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, booking, allBookings));
                 _logger.ErrorException("Unable to send email to dss for deleting booking(s): " + String.Join(", ", allBookings.Select(x => x.ID)), ex);
             }
         }
@@ -510,7 +509,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, existingBooking, editBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, existingBooking, editBookings));
                 _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
@@ -536,7 +535,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, existingBooking, editBookings, user));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, existingBooking, editBookings, user));
                 _logger.ErrorException("Unable to send personal email for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
@@ -578,7 +577,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, editBooking, editBookings, originalBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
                 _logger.ErrorException("Unable to retrieve security email markup for editting booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
@@ -615,7 +614,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, editBooking, editBookings, originalBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
                 _logger.ErrorException("Unable to retrieve E-Mail markup for DSS for new booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
@@ -671,7 +670,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, editBooking, editBookings, originalBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, editBooking, editBookings, originalBookings));
                 _logger.ErrorException("Unable to retrieve email markup for facilities for editted booking(s): " + String.Join(", ", editBookings.Select(x => x.ID)), ex);
             }
         }
@@ -696,7 +695,7 @@ namespace VORBS.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, deletedBookings, newBooking, clashedBookings));
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, deletedBookings, newBooking, clashedBookings));
                     _logger.ErrorException("Unable to send personal email for booking deletions by admin. Owner: " + owner, ex);
                 }
 
@@ -720,7 +719,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, newBooking, bookingsLocation));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
                 _logger.ErrorException("Unable to send E-Mail to DSS for new booking: " + newBooking.ID, ex);
             }
         }
@@ -744,7 +743,7 @@ namespace VORBS.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, newBooking, bookingsLocation));
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
                     _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
                 }
             }
@@ -765,7 +764,7 @@ namespace VORBS.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, newBooking, bookingsLocation));
+                    _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, newBooking, bookingsLocation));
                     _logger.ErrorException("Unable to send E-Mail to security for new booking: " + newBooking.ID, ex);
                 }
             }
@@ -788,7 +787,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, bookingsLocation));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, bookingsLocation));
                 _logger.ErrorException("Unable to send E-Mail to facilities for new booking: " + newBooking.ID, ex);
             }
         }
@@ -821,7 +820,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, user, newBooking, bookingsToCreate));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, user, newBooking, bookingsToCreate));
                 _logger.ErrorException("Unable to send personal email for new booking: " + newBooking.ID, ex);
             }
         }
@@ -859,7 +858,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, fromEmail, user, newBooking, bookingsToCreate));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, fromEmail, user, newBooking, bookingsToCreate));
                 _logger.ErrorException("Unable to send personal email for new booking: " + newBooking.ID, ex);
             }
         }

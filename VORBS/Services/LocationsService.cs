@@ -133,7 +133,7 @@ namespace VORBS.Services
             }
             catch (Exception ex)
             {
-                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(ex, fromEmail, ownerBookings));
+                _logger.Trace(LoggerHelper.ExecutedFunctionMessage(LoggerHelper.VOID_TYPE, fromEmail, ownerBookings));
                 _logger.ErrorException("Unable to send admin multiple bookings email.", ex);
             }
         }
