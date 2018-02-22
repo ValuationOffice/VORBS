@@ -75,7 +75,7 @@
             <td>{{ admin.firstName + ' ' + admin.lastName }}</td>
             <td>{{ admin.location.name }}</td>
             <td>{{ admin.email }}</td>
-            <td>{{ admin.permissionLevelText() }}</td>
+            <td>{{ admin.permissionLevel == 1 ? 'Admin' : 'Super Admin' }}</td>
             <td><span data-toggle="modal" data-target="#editAdminModal" ng-click="GetAdmin(admin.id)" class="btn glyphicon glyphicon-edit" title="Edit User"></span></td>
             <td><span data-toggle="modal" data-target="#deleteAdminModal" ng-click="SetAdminId(admin.id)" class="btn glyphicon glyphicon-trash" title="Delete User"></span></td>
         </tr>
@@ -92,13 +92,13 @@
                     <div class="form-inline">
                         <div class="input-group">
                             <label class="control-label">Location</label>
-                            <select class="form-control" ng-options="location.id as location.name for location in Locations" ng-model="editAdminUser.location.id"></select>
+                            <select class="form-control" ng-options="location.id as location.name for location in Locations" ng-model="editAdmin.location.id"></select>
                         </div>
                         <div class="input-group ">
                             <label class="control-label">Permission</label>
-                            <select class="form-control" ng-model="editAdminUser.permissionLevel">
-                                <option value="1">Admin</option>
-                                <option value="2">Super Admin</option>
+                            <select class="form-control" ng-model="editAdmin.permissionLevel">
+                                <option ng-value="1">Admin</option>
+                                <option ng-value="2">Super Admin</option>
                             </select>
                         </div>
                     </div>
