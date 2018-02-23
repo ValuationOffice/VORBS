@@ -3,16 +3,16 @@
     angular.module('vorbs.admin')
         .controller('UsersController', UsersController);
 
-    UsersController.$inject = ['$scope', '$http', '$resource', 'LocationsService', 'UsersService'];
+    UsersController.$inject = ['$scope', 'LocationsService', 'UsersService', 'AdminsService'];
 
-    function UsersController($scope, $http, $resource, LocationsService, UsersService) {
-
-        CreateUserAdminServices($resource);
+    function UsersController($scope, LocationsService, UsersService, AdminsService) {
 
         $scope.Locations = LocationsService.query().$promise.then(function (resp) {
             $scope.Locations = resp;
         });
-        $scope.admins = Admins.getAll({});
+
+        $scope.admins = [];
+
         $scope.adminId = 0;
 
         $scope.SetAdminId = function (id) {
@@ -37,51 +37,37 @@
                 $scope.adminUser.LocationID = $scope.adminUser.LocationID;
             }
 
-            //Dont need to validate as we get detials from Active Directory. AD Data is filtered on server first.
-
-            ////Validate First & Last Name
-            //if ($scope.adminUser.FirstName === "" || $scope.adminUser.LastName === "") {
-            //    SetAdminErrorMessage('Invalid First/Last Name.');
-            //    return;
-            //}
-
-            ////Validate Email
-            //if (!ValidateEmail($scope.adminUser.Email)) {
-            //    SetAdminErrorMessage('Invalid Email Detected.');
-            //    return;
-            //}
-
-            $.ajax({
-                type: "POST",
-                data: JSON.stringify($scope.adminUser),
-                url: "api/admin",
-                contentType: "application/json",
-                success: function () {
+            AdminsService.save({}, $scope.adminUser)
+                .$promise.then(function (resp) {
                     alert('User Added Successfully!');
                     $scope.CreateNewUserObject();
-                    $scope.admins = Admins.getAll({});
-                },
-                error: function (error) {
+                    getAdmins();
+                }, function (error) {
                     if (error.status == 409) {
                         SetAdminErrorMessage('Administrator already exists.');
                     }
                     else {
                         alert('Unable to Add Admin. Please Contact ITSD.');
                     }
-                }
-            });
-
-            SetAdminErrorMessage('');
+                });
         }
 
+
+        var editUserDetails = {
+            locationId: 0,
+            permissionLevel: 0
+        };
         $scope.GetAdmin = function (id) {
             $scope.SetAdminId(id);
 
             var indexAdmin = GetIndexFromAdmins($scope.admins, $scope.adminId);
             if (indexAdmin >= 0) {
-                $scope.editAdmin = $scope.admins[indexAdmin];
-                $scope.editAdminUser.permissionLevel = $scope.editAdmin.permissionLevel
-                $scope.editAdminUser.location.id = $scope.editAdmin.location.id
+                $scope.editAdmin = angular.copy($scope.admins[indexAdmin]);
+
+                editUserDetails = {
+                    locationId: $scope.editAdmin.location.id,
+                    permissionLevel: $scope.editAdmin.permissionLevel
+                };
             }
             else {
                 alert('Unable to retrieve admin data. Admin may have already been deleted.');
@@ -90,63 +76,42 @@
         }
 
         $scope.EditAdmin = function (id) {
-            var dateChanged = false;
+            var dataChanged = false;
             //Change the "edit booking" button to stop multiple edits
             $("#editAdminEditButton").prop('disabled', 'disabled');
             $("#editAdminEditButton").html('Editing Admin. Please wait..');
 
-            if ($scope.editAdminUser.location.id !== $scope.editAdmin.LocationID) {
-                $scope.editAdmin.LocationID = $scope.editAdminUser.location.id
-                dateChanged = true;
+            if ($scope.editAdmin.permissionLevel != editUserDetails.permissionLevel
+                || $scope.editAdmin.location.id != editUserDetails.locationId) {
+                $scope.editAdmin.LocationID = $scope.editAdmin.location.id;
+                dataChanged = true;
             }
 
-            if ($scope.editAdminUser.permissionLevel != $scope.editAdmin.permissionLevel) {
-                $scope.editAdmin.permissionLevel = $scope.editAdminUser.permissionLevel;
-                dateChanged = true;
-            }
-
-            //im sorry, in a rush and we dont need more locations!!
-            delete $scope.editAdmin.location
-
-            if (!dateChanged) {
+            if (!dataChanged) {
                 alert('Admin data has not changed.');
                 EnableEditAdminButton();
                 return;
             }
 
-            try {
-                $.ajax({
-                    type: "POST",
-                    data: JSON.stringify($scope.editAdmin),
-                    url: "api/admin/" + $scope.adminId,
-                    contentType: "application/json",
-                    success: function (data, status) {
-                        alert('Admin Edited Successfully!');
-                        $scope.admins = Admins.getAll({});
-                        $('#editAdminModal').modal('hide');
-                    },
-                    error: function (error) {
-                        alert('Unable to edit the admin. Please try again or contact ITSD.');
-                    }
+            AdminsService.update({ id: $scope.adminId }, $scope.editAdmin)
+                .$promise.then(function () {
+                    alert('Admin Edited Successfully!');
+                    getAdmins();
+                    $('#editAdminModal').modal('hide');
+                }, function () {
+                    alert('Unable to edit the admin. Please try again or contact ITSD.');
+                }).finally(function () {
+                    EnableEditAdminButton();
                 });
-            } catch (e) {
-                EnableEditAdminButton();
-            }
-
-            EnableEditAdminButton();
         }
 
         $scope.DeleteAdmin = function () {
-            Admins.removeAdminById({
-                adminId: $scope.adminId
-            },
-                function (success) {
-                    $scope.admins = Admins.getAll({});
-                    $('#deleteAdminModal').modal('hide');
-                },
-                function (error) {
-                    alert('Unable to delete the admin. Please try again or contact ITSD.'); //TODO:Log Error
-                })
+            AdminsService.delete({ id: $scope.adminId }).$promise.then(function () {
+                getAdmins();
+                $('#deleteAdminModal').modal('hide');
+            }, function () {
+                alert('Unable to delete the admin. Please try again or contact ITSD.');
+            });
         };
 
         $('#activeDirecotryModal').on('show.bs.modal', function () {
@@ -189,34 +154,28 @@
         }
 
         $scope.CreateNewUserObject();
-
-        $scope.editAdminUser = {
-            location: {
-                id: ''
-            },
-            permissionLevel: 1
-        }
-
         $scope.adAdminUser = {
             pID: '',
             firstName: '',
             lastName: '',
             email: ''
         };
-    }
 
-    function CreateUserAdminServices($resource) {
-        Admins = $resource('/api/admin/:adminId', { adminId: 'adminId' },
-            {
-                getAll: { method: 'GET', isArray: true },
-                getAdminById: { method: 'GET' },
-                removeAdminById: { method: 'DELETE' }
+        function getAdmins() {
+
+            var result = [];
+
+            AdminsService.query().$promise.then(function (resp) {
+                result = resp;
+            }).finally(function () {
+                $scope.admins = result;
             });
+        }
 
-        Admins.prototype = {
-            permissionLevelText: function () { return GetPermissionText(this.permissionLevel); }
-        };
+        getAdmins();
     }
+
+
 
     function EnableEditAdminButton() {
         //Change the "new booking" button to stop multiple bookings
@@ -231,7 +190,12 @@
         else {
             $('#adminUserErrorMessage').text(message);
             $('#adminUserErrorMessage').show();
+            $("#adminUserErrorMessage").fadeTo(5000, 500).slideUp(500, function () {
+                $("#adminUserErrorMessage").hide();
+            });
         }
+
+
     }
 
     function GetPermissionText(permission) {

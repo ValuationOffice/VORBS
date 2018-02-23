@@ -3,18 +3,28 @@
     angular.module('vorbs.admin')
         .controller('MyBookingsController', MyBookingsController);
 
-    MyBookingsController.$inject = ['$scope', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService'];
+    MyBookingsController.$inject = ['$scope', 'BookingsService', 'AvailabilityService', 'LocationsService'];
 
-    function MyBookingsController($scope, $resource, BookingsService, AvailabilityService, LocationsService) {
-
-        CreateBookingServices($resource);
+    function MyBookingsController($scope, BookingsService, AvailabilityService, LocationsService) {
 
         $scope.locations = LocationsService.getByStatus({ status: true, extraInfo: false })
             .$promise.then(function (resp) {
                 $scope.locations = resp;
             });
 
-        $scope.owners = Owner.getAll({});
+        $scope.owners = BookingsService.query().$promise.then(function (resp) {
+            $scope.owners = resp;
+        }).finally(function () {
+            $('#fullNameTextBox').typeahead({
+                hint: false,
+                highlight: true,
+                minLength: 3
+            },
+                {
+                    name: 'owners',
+                    source: SubstringMatcher($scope.owners)
+                });
+        });
 
         $scope.bookingId = 0;
 
@@ -46,16 +56,6 @@
         $scope.externalFullNameTextBox = '';
         $scope.externalCompanyNameTextBox = '';
         $scope.externalPassRequired = false;
-
-        $('#fullNameTextBox').typeahead({
-            hint: false,
-            highlight: true,
-            minLength: 3
-        },
-            {
-                name: 'owners',
-                source: SubstringMatcher($scope.owners)
-            });
 
         $scope.FormatPassRequired = function (required) {
             if (required) {
@@ -313,12 +313,6 @@
             fullName: '',
             startDate: new moment().utc().format('DD-MM-YYYY')
         }
-    }
-
-    function CreateBookingServices($resource) {
-        Owner = $resource('/api/admin', {}, {
-            getAll: { method: 'GET', isArray: true }
-        });
     }
 
     function SetAdminBookingErrorMessage(message) {

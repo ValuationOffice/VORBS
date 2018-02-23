@@ -36,14 +36,11 @@ namespace VORBS.API
         }
 
         [HttpGet]
-        [Route("{allAdmins}")]
-        public List<AdminDTO> GetAllAdminUsers(string allAdmins)
+        [Route("")]
+        public List<AdminDTO> GetAllAdminUsers()
         {
             try
             {
-                if (!allAdmins.Equals("adminId"))
-                    return new List<AdminDTO>();
-
                 List<AdminDTO> adminsDTO = new List<AdminDTO>();
 
                 List<Admin> admins = _adminRepository.GetAll();
@@ -105,6 +102,7 @@ namespace VORBS.API
         }
 
         [HttpPost]
+        [Route("")]
         public HttpResponseMessage AddNewAdmin(Admin admin)
         {
             try
@@ -123,7 +121,7 @@ namespace VORBS.API
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("{existingAdminId:int}")]
         public HttpResponseMessage EditAdmin(int existingAdminId, Admin editAdmin)
         {
@@ -160,20 +158,6 @@ namespace VORBS.API
             {
                 _logger.ErrorException("Unable to delete admin: " + adminId, ex);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpGet]
-        public List<string> GetAllBookingOwners()
-        {
-            try
-            {
-                return _bookingRepository.GetDistinctListOfOwners();
-            }
-            catch (Exception ex)
-            {
-                _logger.ErrorException("Unable to get list of booking owners", ex);
-                return new List<string>();
             }
         }
     }
