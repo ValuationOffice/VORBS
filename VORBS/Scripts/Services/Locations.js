@@ -66,9 +66,6 @@
                     },
                     url: '/api/locations/:status/:extraInfo'
                 },
-                create: {
-                    method: 'POST'
-                },
                 update: {
                     method: 'PUT',
                     params: {

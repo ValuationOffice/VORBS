@@ -128,7 +128,7 @@
 
                 if (isValid) {
 
-                    LocationsService.create({}, $scope.newLocation).$promise.then(function (success) {
+                    LocationsService.save({}, $scope.newLocation).$promise.then(function (success) {
                         $('#newLocationModal').modal('hide');
                         var $roomScope = angular.element($("#roomControllerDiv")).scope();
 
