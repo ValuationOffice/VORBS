@@ -88,7 +88,7 @@
 
         function CreateNewRoom(newRoom) {
 
-            RoomsService.create({}, newRoom).$promise.then(function () {
+            RoomsService.save({}, newRoom).$promise.then(function () {
                 alert('New room has been created.');
                 ReloadRooms(null);
             }, function () {

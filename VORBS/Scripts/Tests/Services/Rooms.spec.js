@@ -127,28 +127,6 @@
     });
 
 
-    describe('create method', function () {
-
-        it('should exist', function () {
-            expect(RoomsService.create).not.toEqual(null);
-            expect(RoomsService.create).toBeDefined();
-        });
-
-        it('should create a room object', function () {
-
-            var room = roomMockData.getSingleMockRoom;
-
-            $httpBackend.expectPOST('/api/room', room)
-                .respond(200);
-
-            RoomsService.create({}, room);
-
-            expect($httpBackend.flush).not.toThrow();
-
-        });
-    });
-
-
     describe('update method', function () {
 
         it('should exist', function () {
