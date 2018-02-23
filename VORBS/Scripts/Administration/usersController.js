@@ -49,8 +49,6 @@
                     else {
                         alert('Unable to Add Admin. Please Contact ITSD.');
                     }
-                }).finally(function () {
-                    SetAdminErrorMessage('');
                 });
         }
 
@@ -192,7 +190,12 @@
         else {
             $('#adminUserErrorMessage').text(message);
             $('#adminUserErrorMessage').show();
+            $("#adminUserErrorMessage").fadeTo(5000, 500).slideUp(500, function () {
+                $("#adminUserErrorMessage").hide();
+            });
         }
+
+
     }
 
     function GetPermissionText(permission) {
