@@ -100,27 +100,6 @@
         });
     });
 
-    describe('create method', function () {
-
-        it('should exist', function () {
-            expect(BookingsService.create).not.toEqual(null);
-            expect(BookingsService.create).toBeDefined();
-        });
-
-        it('should create a booking object', function () {
-
-            var booking = bookingMockData.getSingleMockBooking;
-
-            $httpBackend.expectPOST('/api/bookings', booking)
-                .respond(200);
-
-            BookingsService.create({}, booking);
-
-            expect($httpBackend.flush).not.toThrow();
-
-        });
-    });
-
     describe('update method', function () {
 
         it('should exist', function () {
@@ -133,7 +112,7 @@
             var booking = bookingMockData.getSingleMockBooking;
             var recurrence = false;
 
-            $httpBackend.expectPOST('/api/bookings/' + booking.id + '/' + recurrence, booking)
+            $httpBackend.expectPUT('/api/bookings/' + booking.id + '/' + recurrence, booking)
                 .respond(200);
 
             BookingsService.update({

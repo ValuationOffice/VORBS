@@ -3,9 +3,9 @@
     angular.module('vorbs.admin')
         .controller('RoomsController', RoomsController);
 
-    RoomsController.$inject = ['$scope', '$http', '$resource', 'LocationsService', 'RoomsService'];
+    RoomsController.$inject = ['$scope', 'LocationsService', 'RoomsService'];
 
-    function RoomsController($scope, $http, $resource, LocationsService, RoomsService) {
+    function RoomsController($scope, LocationsService, RoomsService) {
 
         $scope.Locations = LocationsService.query().$promise.then(
             function (resp) {

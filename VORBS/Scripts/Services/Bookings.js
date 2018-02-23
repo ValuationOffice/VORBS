@@ -88,11 +88,8 @@
                 },
                 url: '/api/bookings/:startDate/:period'
             },
-            create: {
-                method: 'POST'
-            },
             update: {
-                method: 'POST',
+                method: 'PUT',
                 params: {
                     existingId: '@existingId',
                     recurrence: '@recurrence'

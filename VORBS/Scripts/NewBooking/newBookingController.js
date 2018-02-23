@@ -2,9 +2,9 @@
     angular.module('vorbs.newBooking')
         .controller('NewBookingController', NewBookingController);
 
-    NewBookingController.$inject = ['$scope', '$http', '$resource', 'BookingsService', 'AvailabilityService', 'LocationsService', 'RoomsService', 'UsersService'];
+    NewBookingController.$inject = ['$scope', 'BookingsService', 'AvailabilityService', 'LocationsService', 'RoomsService', 'UsersService'];
 
-    function NewBookingController($scope, $http, $resource, BookingsService, AvailabilityService, LocationsService, RoomsService, UsersService) {
+    function NewBookingController($scope, BookingsService, AvailabilityService, LocationsService, RoomsService, UsersService) {
 
         $scope.locations = [];
         $scope.clashedBookings = [];
@@ -464,7 +464,7 @@
                     $scope.newBooking.ExternalAttendees = $scope.booking.ExternalAttendees;//.join(';');
                 }
 
-                BookingsService.create({}, $scope.newBooking).$promise.then(function () {
+                BookingsService.save({}, $scope.newBooking).$promise.then(function () {
                     alert('Booking Confirmed.');
                     window.location.href = "/MyBookings"; //Redirect to my bookings
                 }, function (error) {
