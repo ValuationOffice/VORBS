@@ -400,7 +400,7 @@ namespace VORBS.API
             }
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("{existingBookingId:int}/{recurrence:bool?}")]
         public HttpResponseMessage EditExistingBooking(int existingBookingId, Booking editBooking, bool? recurrence = false)
         {

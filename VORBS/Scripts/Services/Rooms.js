@@ -35,9 +35,6 @@
                 }, 
                 url: '/api/room/:locationId/:roomName'
             },
-            create: {
-                method: 'POST'
-            },
             update: {
                 method: 'PUT',
                 params: {

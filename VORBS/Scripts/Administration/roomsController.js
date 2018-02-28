@@ -3,9 +3,9 @@
     angular.module('vorbs.admin')
         .controller('RoomsController', RoomsController);
 
-    RoomsController.$inject = ['$scope', '$http', '$resource', 'LocationsService', 'RoomsService'];
+    RoomsController.$inject = ['$scope', 'LocationsService', 'RoomsService'];
 
-    function RoomsController($scope, $http, $resource, LocationsService, RoomsService) {
+    function RoomsController($scope, LocationsService, RoomsService) {
 
         $scope.Locations = LocationsService.query().$promise.then(
             function (resp) {
@@ -88,7 +88,7 @@
 
         function CreateNewRoom(newRoom) {
 
-            RoomsService.create({}, newRoom).$promise.then(function () {
+            RoomsService.save({}, newRoom).$promise.then(function () {
                 alert('New room has been created.');
                 ReloadRooms(null);
             }, function () {

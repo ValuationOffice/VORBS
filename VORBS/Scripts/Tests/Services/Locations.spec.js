@@ -95,27 +95,6 @@
         });
     });
 
-    describe('create method', function () {
-
-        it('should exist', function () {
-            expect(LocationsService.create).not.toEqual(null);
-            expect(LocationsService.create).toBeDefined();
-        });
-
-        it('should create a location object', function () {
-
-            var location = locationMockData.getSingleMockLocation;
-
-            $httpBackend.expectPOST('/api/locations', location)
-                .respond(200);
-
-            LocationsService.create({}, location);
-
-            expect($httpBackend.flush).not.toThrow();
-
-        });
-    });
-
     describe('update method', function () {
 
         it('should exist', function () {
