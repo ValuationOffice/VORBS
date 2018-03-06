@@ -66,8 +66,8 @@ namespace VORBS.Services
 
             var totalBookingsClashed = _bookingRepository.GetByDateOnlyAndRoom(date, room)
                     //Only bookings on the days that intersect our given time period
-                    .Where(z => startTime <= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second)
-                 || startTime >= EntityFunctions.CreateTime(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < EntityFunctions.CreateTime(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))
+                    .Where(z => startTime <= new TimeSpan(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && endTime > new TimeSpan(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second)
+                 || startTime >= new TimeSpan(z.StartDate.Hour, z.StartDate.Minute, z.StartDate.Second) && startTime < new TimeSpan(z.EndDate.Hour, z.EndDate.Minute, z.EndDate.Second))
                 .ToList();
 
             clashedBookings = totalBookingsClashed;
@@ -109,7 +109,7 @@ namespace VORBS.Services
         {
             Location location = _locationRepository.GetLocationById(locationId);
             var availableRooms = _roomRepository.GetByLocationAndSeatCount(location, numberOfAttendees)
-                               .Where(x => x.Bookings.Where(b => startTime < EntityFunctions.CreateTime(b.EndDate.Hour, b.EndDate.Minute, b.EndDate.Second) && endTime > EntityFunctions.CreateTime(b.StartDate.Hour, b.StartDate.Minute, b.StartDate.Second)).Count() == 0);
+                               .Where(x => x.Bookings.Where(b => startTime < new TimeSpan(b.EndDate.Hour, b.EndDate.Minute, b.EndDate.Second) && endTime > new TimeSpan(b.StartDate.Hour, b.StartDate.Minute, b.StartDate.Second)).Count() == 0);
 
 
             availableRooms = (orderAsc) ? availableRooms.OrderBy(r => r.SeatCount) : availableRooms.OrderByDescending(r => r.SeatCount);
