@@ -235,6 +235,7 @@
     <Compile Include="Utils\interfaces\ISmtpClient.cs" />
     <Compile Include="Utils\EmailClient.cs" />
     <Compile Include="Utils\LoggerHelper.cs" />
+    <Compile Include="Utils\StubbedEmailClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />

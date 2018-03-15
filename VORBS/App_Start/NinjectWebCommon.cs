@@ -79,10 +79,19 @@ namespace VORBS.App_Start
             kernel.Bind<IRoomRepository>().To<EFRoomRepository>();
 
             //Services
+
+#if DEBUG
+            kernel.Bind<IDirectoryService>().To<StubbedDirectoryService>();
+            kernel.Bind<EmailHelper>().To<EmailHelper>()
+                .WithConstructorArgument("mailClient", new StubbedEmailClient());
+#else
             kernel.Bind<IDirectoryService>().To<ActiveDirectoryService>();
             kernel.Bind<EmailHelper>().To<EmailHelper>()
                 .WithConstructorArgument("mailClient", new EmailClient());
-                
-        }        
+#endif
+
+
+
+        }
     }
 }
