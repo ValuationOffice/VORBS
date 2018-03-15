@@ -48,7 +48,8 @@ namespace VORBS.Utils
 
         public LinkedResource GetLinkedResource(string path, string id)
         {
-            LinkedResource  resource = new LinkedResource(path, id);
+            LinkedResource  resource = new LinkedResource(path);
+            resource.ContentId = id;
             _logger.Trace(LoggerHelper.ExecutedFunctionMessage(resource, path, id));
             return resource;
         }
