@@ -58,6 +58,7 @@
     <Compile Include="Services\LocationsServiceTests.cs" />
     <Compile Include="Services\AdminServiceTests.cs" />
     <Compile Include="Services\RoomServiceTests.cs" />
+    <Compile Include="Utils\EmailClientTests.cs" />
     <Compile Include="Utils\EmailHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -70,6 +71,14 @@
       <Project>{39c06688-9d12-4c37-9bed-abf73dfc3f79}</Project>
       <Name>VORBS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Utils\Images\govuklogo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Utils\Images\voalogo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
