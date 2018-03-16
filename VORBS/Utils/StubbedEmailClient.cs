@@ -34,7 +34,7 @@ namespace VORBS.Utils
             if (!Directory.Exists(rootDirectory))
                 Directory.CreateDirectory(rootDirectory);
 
-            string fileName = $"Subject--{message.Subject}";
+            string fileName = $"{message.Subject}_{DateTime.Now.ToString("hh-mm-ss")}";
             using (FileStream fs = File.Create($"{rootDirectory}/{fileName}.html"))
             {
                 StringBuilder builder = new StringBuilder();
