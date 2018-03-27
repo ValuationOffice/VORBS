@@ -59,7 +59,7 @@ namespace VORBS.Utils
 
             AlternateView htmlView = AlternateView.CreateAlternateViewFromString(body, null, "text/html");
 
-            htmlView.LinkedResources.Add(mailClient.GetLinkedResource(_context.Server.MapPath("~/Content/images/EmailTemplates/govuklogo.png"), "govgovuklogo"));
+            htmlView.LinkedResources.Add(mailClient.GetLinkedResource(_context.Server.MapPath("~/Content/images/EmailTemplates/govuklogo.png"), "govuklogo"));
             htmlView.LinkedResources.Add(mailClient.GetLinkedResource(_context.Server.MapPath("~/Content/images/EmailTemplates/voalogo.png"), "voalogo"));
 
             message.AlternateViews.Add(htmlView);
