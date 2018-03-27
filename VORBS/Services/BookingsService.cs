@@ -177,8 +177,13 @@ namespace VORBS.Services
             Room bookingRoom = _roomsRepository.GetRoomById(newBooking.RoomID);
             newBooking.RoomID = newBooking.Room.ID;
 
-            newBooking.Owner = user.FullName;
-            newBooking.PID = user.PayId.Identity;
+            /*Apply the current users details as the owner, in the case of no owner set. 
+            By default, a filled in owner field means it was booked on behalf of. */
+            if (string.IsNullOrEmpty(newBooking.Owner))
+            {
+                newBooking.Owner = user.FullName;
+                newBooking.PID = user.PayId.Identity;
+            }
 
             if (newBooking.Recurrence.IsRecurring)
             {
