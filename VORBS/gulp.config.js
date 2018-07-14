@@ -1,6 +1,6 @@
 ﻿module.exports = function () {
 
-    var client = './Scripts';
+    var client = './ClientApp';
 
     var config = {
         /**
@@ -10,20 +10,20 @@
         * of any redundant files.
         */
         alljs: [
-            './Scripts/Administration/*.js',
-            './Scripts/Help Page/*.js',
-            './Scripts/MyBookings/*.js',
-            './Scripts/NewBooking/*.js',
-            './Scripts/Services/*.js',
-            './Scripts/Shared Functions/*.js'
+            './ClientApp/Administration/*.js',
+            './ClientApp/Help Page/*.js',
+            './ClientApp/MyBookings/*.js',
+            './ClientApp/NewBooking/*.js',
+            './ClientApp/Services/*.js',
+            './ClientApp/Shared Functions/*.js'
         ],
         clientModules: [
-            './Scripts/app.module.js',
-            './Scripts/Administration/*.module.js',
-            './Scripts/Help Page/*.module.js',
-            './Scripts/MyBookings/*.module.js',
-            './Scripts/NewBooking/*.module.js',
-            './Scripts/Services/*.module.js',
+            './ClientApp/app.module.js',
+            './ClientApp/Administration/*.module.js',
+            './ClientApp/Help Page/*.module.js',
+            './ClientApp/MyBookings/*.module.js',
+            './ClientApp/NewBooking/*.module.js',
+            './ClientApp/Services/*.module.js',
         ],
         npm: {
             json: require('./package.json'),
