@@ -16,11 +16,11 @@ To download the dependencies you will need [NodeJS]("https://nodejs.org/en/") in
 
 Navigate inside the VORBS project directory and run the command: `npm install`.
 
-To list all the available gulp tasks, navigate inside the VORBS project directory and run the command: `gulp`
+To list all the available gulp tasks, navigate inside the VORBS project directory and run the command: `npm run list`
 
 ### Testing ###
 
-To run the tests for the front-end project, navigate inside the VORBS project directory and run the command: `gulp test`
+To run the tests for the front-end project, navigate inside the VORBS project directory and run the command: `npm test`
 
 ### Seeding data ###
 There is the choice to seed the database with data when it is created. You can specify the values in the DAL/VORBSInitializer.cs file.

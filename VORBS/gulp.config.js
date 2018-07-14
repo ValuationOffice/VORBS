@@ -25,9 +25,9 @@
             './Scripts/NewBooking/*.module.js',
             './Scripts/Services/*.module.js',
         ],
-        bower: {
-            json: require('./bower.json'),
-            directory: client + '/lib/'
+        npm: {
+            json: require('./package.json'),
+            directory: 'node_modules/'
         },
         client: client,
 
@@ -49,12 +49,11 @@
     function getKarmaOptions() {
         var options = {
             files: [].concat(
-                config.bower.directory + 'angular/angular.js',
-                config.bower.directory + 'jquery/dist/jquery.js',
-                config.bower.directory + 'angular-mocks/angular-mocks.js',
-                config.bower.directory + 'angular-resource/angular-resource.js',
-                config.bower.directory + 'moment/moment.js',
-                config.bower.directory + 'angular-moment/angular-moment.js',
+                config.npm.directory + 'angular/angular.js',
+                config.npm.directory + 'jquery/dist/jquery.js',
+                config.npm.directory + 'angular-mocks/angular-mocks.js',
+                config.npm.directory + 'angular-resource/angular-resource.js',
+                config.npm.directory + 'moment/moment.js',
                 config.specHelpers,
                 config.clientModules,
                 config.alljs,

@@ -3,10 +3,13 @@
   "name": "vorbs",
   "private": true,
   "scripts": {
-    "postinstall": "bower install"
+    "list": "gulp",
+    "test": "gulp test",
+    "test:watch": "gulp autotest",
+    "vet": "gulp vet"
   },
   "devDependencies": {
-    "bower": "^1.8.0",
+    "angular-mocks": "^1.7.2",
     "eslint": "^4.2.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^4.0.0",
@@ -22,5 +25,13 @@
     "karma-spec-reporter": "0.0.31",
     "phantomjs": "^2.1.7",
     "yargs": "^8.0.2"
+  },
+  "dependencies": {
+    "angular": "^1.7.2",
+    "angular-resource": "^1.7.2",
+    "modernizr": "^3.6.0",
+    "moment": "^2.22.2",
+    "respond": "^0.9.0",
+    "typeahead.js": "^0.11.1"
   }
 }
