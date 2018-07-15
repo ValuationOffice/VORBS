@@ -8,32 +8,30 @@ namespace VORBS
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            bundles.Add(new ScriptBundle("~/bundles/vendor").Include(
+                        "~/build/vendor.js"));
+
             bundles.Add(new ScriptBundle("~/bundles/angular").Include(
                         "~/node_modules/angular/angular.js",
                         "~/node_modules/angular-resource/angular-resource.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
-                        "~/Scripts/jquery-{version}.js"));
+                        "~/node_modules/jquery/dist/jquery.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/Scripts/jquery.validate*"));
-
-            // Use the development version of Modernizr to develop with and learn from. Then, when you're
-            // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
-            bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
-                        "~/node_modules/modernizr/modernizr.js"));
+                        "~/node_modules/jquery-validation/dist/jquery.validate.js",
+                        "~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/moment").Include(
                         "~/node_modules/moment/moment.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
+                        "~/node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/typeahead").Include(
                         "~/node_modules/typeahead.js/dist/bloodhound.js",
                         "~/node_modules/typeahead.js/dist/typeahead.bundle.js",
                         "~/node_modules/typeahead.js/dist/typeahead.query.js"));
-
-            bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
-                      "~/node_modules/respond/dest/respond.src.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css"

@@ -238,42 +238,7 @@
     <Compile Include="Utils\StubbedEmailClient.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ClientApp\Administration\admin.module.js" />
-    <Content Include="ClientApp\Administration\bookingsController.js" />
-    <Content Include="ClientApp\Administration\locationsController.js" />
-    <Content Include="ClientApp\Administration\roomsController.js" />
-    <Content Include="ClientApp\Administration\usersController.js" />
-    <Content Include="ClientApp\app.module.js" />
-    <Content Include="ClientApp\Help Page\help.module.js" />
-    <Content Include="ClientApp\Help Page\helpController.js" />
-    <Content Include="ClientApp\MyBookings\myBookings.module.js" />
-    <Content Include="ClientApp\MyBookings\myBookingsController.js" />
-    <Content Include="ClientApp\NewBooking\newBooking.module.js" />
-    <Content Include="ClientApp\NewBooking\newBookingController.js" />
-    <Content Include="ClientApp\Services\Admins.js" />
-    <Content Include="ClientApp\Services\Availability.js" />
-    <Content Include="ClientApp\Services\Bookings.js" />
-    <Content Include="ClientApp\Services\Locations.js" />
-    <Content Include="ClientApp\Services\Rooms.js" />
-    <Content Include="ClientApp\Services\services.module.js" />
-    <Content Include="ClientApp\Services\Users.js" />
-    <Content Include="ClientApp\Shared Functions\bookingFunctions.js" />
-    <Content Include="ClientApp\Tests\Data\adminMockData.js" />
-    <Content Include="ClientApp\Tests\Data\availabilityMockData.js" />
-    <Content Include="ClientApp\Tests\Data\bookingMockData.js" />
-    <Content Include="ClientApp\Tests\Data\locationsMockData.js" />
-    <Content Include="ClientApp\Tests\Data\roomMockData.js" />
-    <Content Include="ClientApp\Tests\Data\usersMockData.js" />
-    <Content Include="ClientApp\Tests\Services\Admins.spec.js" />
-    <Content Include="ClientApp\Tests\Services\Availability.spec.js" />
-    <Content Include="ClientApp\Tests\Services\Bookings.spec.js" />
-    <Content Include="ClientApp\Tests\Services\Locations.spec.js" />
-    <Content Include="ClientApp\Tests\Services\Rooms.spec.js" />
-    <Content Include="ClientApp\Tests\Services\Users.spec.js" />
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="ClientApp\vendor.js" />
     <Content Include="Content\BootStrapDatePicker\datepicker.css" />
     <Content Include="Content\BootStrapDatePicker\datepicker3.css" />
     <Content Include="Content\BootStrapTimePicker\bootstrap-responsive.css" />
@@ -299,15 +264,28 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
     <Content Include="gulp.config.js" />
     <Content Include="gulpfile.js" />
     <Content Include="Icon.png" />
     <Content Include="karma.conf.js" />
+    <Content Include="ClientApp\Administration\locationsController.js" />
+    <Content Include="ClientApp\Administration\admin.module.js" />
+    <Content Include="ClientApp\Administration\bookingsController.js" />
+    <Content Include="ClientApp\Administration\roomsController.js" />
+    <Content Include="ClientApp\Administration\usersController.js" />
+    <Content Include="ClientApp\app.module.js" />
+    <Content Include="ClientApp\Help Page\helpController.js" />
+    <Content Include="ClientApp\Help Page\help.module.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.js" />
     <Content Include="Scripts\jquery-uiBootstrap\jquery.bootstrap-touchspin.min.js" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="ClientApp\Services\Admins.js" />
+    <Content Include="ClientApp\Services\Availability.js" />
+    <Content Include="ClientApp\Services\Bookings.js" />
+    <Content Include="ClientApp\Services\Locations.js" />
+    <Content Include="ClientApp\Services\Rooms.js" />
+    <Content Include="ClientApp\Services\services.module.js" />
+    <Content Include="ClientApp\Services\Users.js" />
+    <Content Include="ClientApp\Shared Functions\bookingFunctions.js" />
     <Content Include="Scripts\BootStrapDatePicker\bootstrap-datepicker.js" />
     <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.js" />
     <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.min.js" />
@@ -315,9 +293,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\config.json" />
     <Content Include="Scripts\BootStrapTimePicker\bootstrap-timepicker.min.js.map">
       <DependentUpon>bootstrap-timepicker.min.js</DependentUpon>
     </Content>
@@ -325,15 +300,24 @@
     <Content Include="package-lock.json" />
     <Content Include=".eslintrc" />
     <Content Include="Scripts\FullCalandar\fullcalendar.min.js" />
-    <None Include="Scripts\jquery-2.1.4.intellisense.js" />
-    <Content Include="Scripts\jquery-2.1.4.js" />
-    <Content Include="Scripts\jquery-2.1.4.min.js" />
-    <Content Include="Scripts\jquery-2.1.4.min.map" />
-    <None Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="webpack.config.js" />
+    <Content Include=".babelrc" />
+    <Content Include="ClientApp\styles\vendor.scss" />
+    <Content Include="ClientApp\MyBookings\myBookings.module.js" />
+    <Content Include="ClientApp\MyBookings\myBookingsController.js" />
+    <Content Include="ClientApp\NewBooking\newBooking.module.js" />
+    <Content Include="ClientApp\NewBooking\newBookingController.js" />
+    <Content Include="ClientApp\Tests\Data\adminMockData.js" />
+    <Content Include="ClientApp\Tests\Data\availabilityMockData.js" />
+    <Content Include="ClientApp\Tests\Data\bookingMockData.js" />
+    <Content Include="ClientApp\Tests\Data\locationsMockData.js" />
+    <Content Include="ClientApp\Tests\Data\roomMockData.js" />
+    <Content Include="ClientApp\Tests\Data\usersMockData.js" />
+    <Content Include="ClientApp\Tests\Services\Admins.spec.js" />
+    <Content Include="ClientApp\Tests\Services\Availability.spec.js" />
+    <Content Include="ClientApp\Tests\Services\Bookings.spec.js" />
+    <Content Include="ClientApp\Tests\Services\Locations.spec.js" />
+    <Content Include="ClientApp\Tests\Services\Users.spec.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -389,6 +373,7 @@
     <Content Include="Views\EmailTemplates\DSSDeletedBooking.cshtml" />
     <Content Include="Views\Shared\_EmailLayout.cshtml" />
     <Content Include="Views\EmailTemplates\SecurityNewBookingBookersCopy.cshtml" />
+    <Content Include="ClientApp\Tests\Services\Rooms.spec.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

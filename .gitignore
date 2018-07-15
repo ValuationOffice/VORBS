@@ -287,3 +287,4 @@ __pycache__/
 *.xsd.cs
 
 VORBS/logs/*
+VORBS/build/*

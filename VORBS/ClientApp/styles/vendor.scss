@@ -1,0 +1,11 @@
+﻿// Bootstrap Variable Overrides
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+$border-radius-small: 0px;
+$border-radius-large: 0px;
+$btn-default-bg: #C9C9C9;
+$btn-primary-bg: #21846E;
+$grid-columns: 18;
+$grid-gutter-width: 20px;
+$input-border-radius: 0px;
+
+@import "~bootstrap-sass/assets/stylesheets/_bootstrap";
